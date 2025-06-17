@@ -1,9 +1,13 @@
 from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient
 from .config import settings
+import os
 
 MONGO_URI=f"mongodb+srv://{settings.mongodb_username}:{settings.mongodb_password}@cluster0.yu7sul0.mongodb.net/"
 client = AsyncIOMotorClient(MONGO_URI)
+
+# 🧪 allow test override
+DB_NAME = os.getenv("DB_NAME", "social_webapp")
 db = client["social_webapp"]
 account_collection = db["accounts"]
 
