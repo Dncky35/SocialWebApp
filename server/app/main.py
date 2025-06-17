@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+from .routers import auth
 import os
 
 # FASTAPI api
@@ -26,6 +27,8 @@ app.add_middleware(
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],  # Only allow necessary methods
     allow_headers=["Authorization", "Content-Type", "Set-Cookie", "Cookie"],
 )
+
+app.include_router(auth.router)
 
 @app.get("/")
 async def root():

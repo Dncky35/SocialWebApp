@@ -14,5 +14,5 @@ class Account(BaseModel):
     created_at: datetime = datetime.utcnow()
 
     @classmethod
-    def as_form(cls, email:str = From(...), password:str = Form(...), username:str=Form(...)):
+    def as_form(cls, email:str = Form(...), password:str = Form(...), username:str=Form(...)):
         return cls(email=email, password=password, username=username)

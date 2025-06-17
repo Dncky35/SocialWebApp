@@ -1,6 +1,8 @@
-from fastapi import APIRouter, Form, HTTPException, status, Response, Depends
+from fastapi import APIRouter, Form, HTTPException, status, Response, Depends, Cookie
+from fastapi.security import OAuth2PasswordRequestForm
 from ..core import database, utils
 from .. import models
+from ..core import oauth2
 
 router = APIRouter(
     prefix="/auth",
@@ -54,7 +56,7 @@ async def login_account(response:Response, credentials: OAuth2PasswordRequestFor
     if not credentials.username or not credentials.password:
         raise HTTPException(status_code=422, detail="Email and password are required.")
 
-    account = database.account_collection.find_one({"email":credentials.email.lower()})
+    account = await database.account_collection.find_one({"email":credentials.email.lower()})
 
     if not account or not utils.verify_password(credentials.password, account.password):
         raise HTTPException(status_code=401, detail="Invalid credentials.")

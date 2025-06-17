@@ -4,7 +4,7 @@ from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta
 from .config import settings
 from bson import ObjectId
-from ..schemas import Token as tokenSchema
+from ..schemas import token as token_schema
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 15
 REFRESH_TOKEN_EXPIRE_DAYS = 7
@@ -25,7 +25,7 @@ def create_token(data: dict, is_access_token: bool = False):
     secret_key = settings.secret_key if is_access_token else settings.refresh_secret_key
     return jwt.encode(to_encode, secret_key, algorithm=settings.algorithm)
 
-def verify_token(token: str, is_access_token: bool = False) -> tokenSchema.TokenData:
+def verify_token(token: str, is_access_token: bool = False) -> token_schema.TokenData:
     secret_key = settings.secret_key_refresh if token_type == "refresh" else settings.secret_key
     try:
         payload = jwt.decode(token, secret_key, algorithms=[settings.algorithm])
@@ -35,7 +35,7 @@ def verify_token(token: str, is_access_token: bool = False) -> tokenSchema.Token
         if id is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload")
         
-        return tokenSchema.TokenData(account_id=account_id, role=role)
+        return token_schema.TokenData(account_id=account_id, role=role)
 
     except ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token has expired")
@@ -53,7 +53,7 @@ async def get_current_user(token = Cookie(None, alias="accessToken")):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     return account
 
-def get_logged_in_user(token = Cookie(None, alias="refreshToken")):
+async def get_logged_in_user(token = Cookie(None, alias="refreshToken")):
 
     if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token missing")
