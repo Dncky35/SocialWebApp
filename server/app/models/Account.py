@@ -8,10 +8,11 @@ class Account(BaseModel):
     id: Optional[str] = None
     email: str
     password: str
+    username: str
     role: str = "user"
     is_verified: bool = False
     created_at: datetime = datetime.utcnow()
 
     @classmethod
-    def as_form(cls, email:str = From(...), password:str = Form(...)):
-        return cls(email=email, password=password)
+    def as_form(cls, email:str = From(...), password:str = Form(...), username:str=Form(...)):
+        return cls(email=email, password=password, username=username)

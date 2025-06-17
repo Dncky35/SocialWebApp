@@ -4,6 +4,7 @@ from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timedelta
 from .config import settings
 from bson import ObjectId
+from ..schemas import Token as tokenSchema
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 15
 REFRESH_TOKEN_EXPIRE_DAYS = 7
@@ -15,7 +16,12 @@ def create_token(data: dict, is_access_token: bool = False):
     expire = datetime.utcnow() + (
         timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES) if is_access_token else timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
     )
-    to_encode.update({"exp": expire, "sub": str(data.get("account_id"))})
+    to_encode.update({
+        "exp": expire, 
+        "sub": str(data.get("account_id")),
+        "role": data.get("role", "user")
+        })
+
     secret_key = settings.secret_key if is_access_token else settings.refresh_secret_key
     return jwt.encode(to_encode, secret_key, algorithm=settings.algorithm)
 
@@ -24,11 +30,12 @@ def verify_token(token: str, is_access_token: bool = False) -> tokenSchema.Token
     try:
         payload = jwt.decode(token, secret_key, algorithms=[settings.algorithm])
         id: str = payload.get("sub")
+        role = payload.get("role", "user")
 
         if id is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload")
         
-        return tokenSchema.TokenData(account_id=id)
+        return tokenSchema.TokenData(account_id=account_id, role=role)
 
     except ExpiredSignatureError:
         raise HTTPException(status_code=401, detail="Token has expired")
