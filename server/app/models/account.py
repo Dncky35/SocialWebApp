@@ -15,8 +15,8 @@ class Account(BaseModel):
     is_verified: bool = False  # email verified or not
     followers: Optional[List[str]] = []  # list of user IDs
     following: Optional[List[str]] = []  # list of user IDs
-    created_at: datetime = Field(default_factory=datetime.now(timezone.utc))
-    updated_at: datetime = Field(default_factory=datetime.now(timezone.utc))
+    created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     @classmethod
     def as_form(

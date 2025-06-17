@@ -21,7 +21,7 @@ async def create_account(response:Response, form_data: models.Account = Depends(
         raise HTTPException(status_code=400, detail="Username already taken.")
 
     hashed_pw = utils.hash_password(form_data.password)
-    account_dict = form_data.dict()
+    account_dict = form_data.model_dump()
     account_dict.pop("id")
     account_dict["password"] = hashed_pw
 
