@@ -2,7 +2,7 @@ from fastapi import APIRouter, Form, HTTPException, status, Response, Depends, C
 from fastapi.security import OAuth2PasswordRequestForm
 from ..core import database, utils
 from .. import models
-from ..core import oauth2
+from ..core import oauth2, config
 
 router = APIRouter(
     prefix="/auth",
@@ -23,11 +23,6 @@ async def create_account(response:Response, form_data: models.Account = Depends(
     result = await database.account_collection.insert_one(account_dict)
     account_dict["id"] = str(result.inserted_id)
 
-    refresh_token = oauth2.create_token(
-        data={"account_id": account_dict["id"], "role": "user"},
-        expires_delta=timedelta(days=7)
-    )
-
     refreshToken = oauth2.create_token(data={"account_id":account_dict["id"]})
     response.set_cookie(
         key="refreshToken",
@@ -43,8 +38,8 @@ async def create_account(response:Response, form_data: models.Account = Depends(
 @router.post("/login", status_code=status.HTTP_202_ACCEPTED)
 async def login_account(response:Response, credentials: OAuth2PasswordRequestForm = Depends()):
 
-    user = await database.account_collection.find_one({"email": credentials.username})
-    if not user or not utils.verify_password(credentials.password, user["password"]):
+    account = await database.account_collection.find_one({"email": credentials.username})
+    if not account or not utils.verify_password(credentials.password, account["password"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
     refreshToken = oauth2.create_token(data={"account_id": str(account["_id"]), "role" : account["role"]})    
@@ -77,7 +72,7 @@ async def rotate_refresh_token(response: Response, current_account=Depends(oauth
     new_refresh_token = oauth2.create_token(data={"account_id": current_account.id, "role":current_account.role})
     response.set_cookie(
         key="refreshToken",
-        value=refreshToken,
+        value=new_refresh_token,
         max_age= 60 * 60 * 24 * 7,
         **config.settings.cookie_config,
     )
@@ -88,10 +83,10 @@ async def verify_access_token(current_account=Depends(oauth2.get_current_user)):
 
 @router.post("/access_token")
 async def refresh_access_token(response: Response, current_account=Depends(oauth2.get_logged_in_user)):
-    access_token = oauth2.create_token(data={"account_id": current_account.id, "role":current_account.role}, is_access_token=True)
+    new_access_token = oauth2.create_token(data={"account_id": current_account.id, "role":current_account.role}, is_access_token=True)
     response.set_cookie(
         key="accessToken",
-        value=access_token,
+        value=new_access_token,
         max_age=60 * 15,
         **config.settings.cookie_config,
     )
