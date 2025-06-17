@@ -18,6 +18,7 @@ async def create_account(response:Response, form_data: models.Account = Depends(
 
     hashed_pw = utils.hash_password(form_data.password)
     account_dict = form_data.dict()
+    account_dict.pop("id")
     account_dict["password"] = hashed_pw
 
     result = await database.account_collection.insert_one(account_dict)
@@ -69,7 +70,8 @@ async def verify_refresh_token(refresh_token: str = Cookie(None, alias="refreshT
 
 @router.post("/rotate_refresh_token")
 async def rotate_refresh_token(response: Response, current_account=Depends(oauth2.get_logged_in_user)):
-    new_refresh_token = oauth2.create_token(data={"account_id": current_account.id, "role":current_account.role})
+    print(f"\nCurrent Account: {current_account}\n")
+    new_refresh_token = oauth2.create_token(data={"account_id": current_account.account_id, "role":current_account.role})
     response.set_cookie(
         key="refreshToken",
         value=new_refresh_token,
@@ -77,17 +79,19 @@ async def rotate_refresh_token(response: Response, current_account=Depends(oauth
         **config.settings.cookie_config,
     )
 
+    return {"result": "Refresh token rotated."}
+
 @router.get("/verify_access_token")
 async def verify_access_token(current_account=Depends(oauth2.get_current_user)):
     return {"result": "Access token is valid."}
 
-@router.post("/access_token")
+@router.post("/create_access_token")
 async def refresh_access_token(response: Response, current_account=Depends(oauth2.get_logged_in_user)):
-    new_access_token = oauth2.create_token(data={"account_id": current_account.id, "role":current_account.role}, is_access_token=True)
+    new_access_token = oauth2.create_token(data={"account_id": current_account.account_id, "role":current_account.role}, is_access_token=True)
     response.set_cookie(
         key="accessToken",
         value=new_access_token,
         max_age=60 * 15,
         **config.settings.cookie_config,
     )
-    return {"result": "Access token refreshed."}
+    return {"result": "Access token refreshed/Created."}

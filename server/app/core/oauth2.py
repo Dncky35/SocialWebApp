@@ -49,17 +49,17 @@ async def get_current_user(token = Cookie(None, alias="accessToken")):
     if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Access token missing")
     token_data = verify_token(token=token, is_access_token=True)
-    account = await database.accounts_collection.find_one({"_id":ObjectId(token_data.account_id)})
+    account = await database.account_collection.find_one({"_id":ObjectId(token_data.account_id)})
     if account is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
-    return account
+    return token_data
 
 async def get_logged_in_user(token = Cookie(None, alias="refreshToken")):
 
     if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token missing")
     token_data = verify_token(token=token)
-    account = await database.accounts_collection.find_one({"_id":ObjectId(token_data.account_id)})
+    account = await database.account_collection.find_one({"_id":ObjectId(token_data.account_id)})
     if account is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
-    return account
+    return token_data
