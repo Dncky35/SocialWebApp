@@ -1,8 +1,15 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
+from fastapi.responses import JSONResponse
+from pymongo.errors import PyMongoError
 from .routers import auth
+import logging
 import os
+
+# Configure logging
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 # FASTAPI api
 app = FastAPI()
@@ -22,7 +29,7 @@ if os.getenv("ENV") == "production":
 # Enable CORS securely
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Restrict origins for security
+    allow_origins=origins,  # Restrict origins for security
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],  # Only allow necessary methods
     allow_headers=["Authorization", "Content-Type", "Set-Cookie", "Cookie"],
@@ -36,9 +43,20 @@ async def root():
 
 @app.middleware("http")
 async def log_request(request:Request, call_next):
-    print(f"Request Report:")
-    print(f"\nRequest:\n{request.method}, url: {request.url}")
-    print(f"\nRequest Headers: {request.headers}")
+    # print(f"Request Report:")
+    # print(f"\nRequest:\n{request.method}, url: {request.url}")
+    # print(f"\nRequest Headers: {request.headers}")
+    # response = await call_next(request)
+    # print(f"\nResponse headers:\n{response.headers}")
+
+    logger.info(f"Request: {request.method} {request.url}")
     response = await call_next(request)
-    print(f"\nResponse headers:\n{response.headers}")
+    logger.info(f"Response status: {response.status_code}")
     return response
+
+@app.exception_handler(PyMongoError)
+async def pymongo_exception_handler(request: Request, exc: PyMongoError):
+    return JSONResponse(
+        status_code=500,
+        content={"message": "Database error occurred", "details": str(exc)},
+    )
