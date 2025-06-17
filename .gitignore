@@ -37,6 +37,7 @@ build/
 # Environment variables
 .env
 *.env
+.env.test
 
 # Database files
 *.sqlite3
