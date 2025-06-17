@@ -1,7 +1,7 @@
 from fastapi import Cookie, status, HTTPException
 from jose import jwt, JWTError, ExpiredSignatureError
 from fastapi.security import OAuth2PasswordBearer
-from datetime import datetime, timedelta
+from datetime import datetime, timezone, timedelta
 from .config import settings
 from ..core import database
 from bson import ObjectId
@@ -14,7 +14,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 def create_token(data: dict, is_access_token: bool = False):
     to_encode = data.copy()
-    expire = datetime.utcnow() + (
+    expire = datetime.now(timezone.utc) + (
         timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES) if is_access_token else timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
     )
     to_encode.update({

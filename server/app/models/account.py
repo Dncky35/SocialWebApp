@@ -1,6 +1,6 @@
 from fastapi import Form
 from pydantic import BaseModel, EmailStr, Field
-from datetime import datetime
+from datetime import datetime, timezone
 from typing import Optional, List
 
 class Account(BaseModel):
@@ -15,8 +15,8 @@ class Account(BaseModel):
     is_verified: bool = False  # email verified or not
     followers: Optional[List[str]] = []  # list of user IDs
     following: Optional[List[str]] = []  # list of user IDs
-    created_at: datetime = Field(default_factory=datetime.utcnow)
-    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=datetime.now(timezone.utc))
+    updated_at: datetime = Field(default_factory=datetime.now(timezone.utc))
 
     @classmethod
     def as_form(
