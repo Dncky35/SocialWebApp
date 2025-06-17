@@ -1,6 +1,6 @@
+from pydantic import ConfigDict
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
-import os
 
 load_dotenv()  # Load environment variables from .env
 
@@ -12,8 +12,7 @@ class Settings(BaseSettings):
     secret_key_refresh:str
     cookie_domain:str
 
-    class Config:
-        env_file=".env"
+    model_config = ConfigDict(env_file=".env")
 
     @property
     def cookie_config(self):
