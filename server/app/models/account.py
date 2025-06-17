@@ -1,3 +1,4 @@
+from fastapi import Form
 from pydantic import BaseModel, EmailStr, Field
 from datetime import datetime
 from typing import Optional, List
@@ -5,7 +6,7 @@ from typing import Optional, List
 class Account(BaseModel):
     id: Optional[str] = None  # MongoDB ObjectId as string
     email: EmailStr  # validates email format automatically
-    username: str = Field(..., min_length=3, max_length=30, regex="^[a-zA-Z0-9_]+$")
+    username: str = Field(..., min_length=3, max_length=30, pattern="^[a-zA-Z0-9_]+$")
     password: str  # hashed password
     full_name: Optional[str] = None
     bio: Optional[str] = None
