@@ -1,4 +1,3 @@
-from pydantic import BaseModel
 from motor.motor_asyncio import AsyncIOMotorClient
 from .config import settings
 import os
@@ -8,7 +7,7 @@ client = AsyncIOMotorClient(MONGO_URI)
 
 # 🧪 allow test override
 DB_NAME = os.getenv("DB_NAME", "social_webapp")
-db = client["social_webapp"]
+db = client[DB_NAME]
 account_collection = db["accounts"]
 
 # Helper Function to Convert MongoDB Data

@@ -6,13 +6,27 @@ from pymongo.errors import PyMongoError
 from .routers import auth
 import logging
 import os
+import app.core.database as database
+from contextlib import asynccontextmanager
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Startup code (if any) can go here
+    yield
+    # Shutdown code
+    await database.client.close()
+
 # FASTAPI api
-app = FastAPI()
+app = FastAPI(
+    lifespan=lifespan,
+    title="Social Web App API",
+    description="API for the Social Web App",
+    version="1.0.0",
+)
 
 origins = [  # Ensure both Gitpod URLs are included
         "https://cloudrocean.xyz",
