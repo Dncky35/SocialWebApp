@@ -1,16 +1,18 @@
 # Social Web App
 
-A full-stack social web application built with **FastAPI**, **Next.js**, and **MongoDB**.
+A full-stack social web application backend built with **FastAPI**, **MongoDB**, and ready for full-stack development with Next.js frontend.
 
 ---
 
 ## 🚀 Tech Stack
 
 - **Backend:** FastAPI (Python)
-- **Database:** MongoDB
-- **Frontend:** Next.js (TypeScript)
-- **ORM/ODM:** Motor (async MongoDB client), (optional: Beanie)
-- **Deployment:** Docker (future)
+- **Database:** MongoDB (Atlas)
+- **Frontend (Planned):** Next.js (TypeScript)
+- **ORM/ODM:** Motor (async MongoDB client)
+- **Authentication:** JWT (access & refresh tokens), OAuth2PasswordFlow, Secure HTTP-only Cookies
+- **Password Hashing:** Passlib (pbkdf2_sha256)
+- **Environment Management:** Pydantic Settings & dotenv
 
 ---
 
@@ -18,14 +20,19 @@ A full-stack social web application built with **FastAPI**, **Next.js**, and **M
 
 ```
 backend/
-│
-├── app/
-│   ├── main.py             # FastAPI app entry point
-│   ├── models/             # MongoDB collections
-│   ├── routes/             # API routes
-│   ├── db/                 # Database connection
-│   └── schemas/            # Pydantic schemas for validation
-└── requirements.txt        # Python dependencies
+└── app/
+    ├── main.py           # FastAPI app entry point
+    ├── core/
+    │   ├── config.py     # Environment config
+    │   ├── database.py   # MongoDB connection
+    │   ├── oauth2.py     # JWT token utilities
+    │   └── utils.py      # Password hashing utilities
+    ├── models/
+    │   └── account.py    # Account model schema
+    ├── schemas/
+    │   └── token.py      # Token schema (Pydantic)
+    └── routers/
+        └── auth.py       # Authentication routes (signup, login, logout, token rotation)
 ```
 
 ---
@@ -53,36 +60,59 @@ venv\Scripts\activate     # (Windows)
 pip install -r requirements.txt
 ```
 
-### 4️⃣ Run MongoDB locally
+### 4️⃣ Create a `.env` file
 
-Make sure MongoDB is running on `mongodb://localhost:27017` (default).
+Create a `.env` file in the `backend/app/` directory and add:
 
-### 5️⃣ Start FastAPI server
+```
+mongodb_username=your_mongodb_username
+mongodb_password=your_mongodb_password
+secret_key=your_secret_key_for_access_token
+secret_key_refresh=your_secret_key_for_refresh_token
+algorithm=HS256
+cookie_domain=localhost
+```
+
+> ⚠️ Make sure to configure your MongoDB Atlas cluster credentials.
+
+### 5️⃣ Run MongoDB locally or Atlas
+
+Your MongoDB URI will be constructed automatically from credentials.
+
+### 6️⃣ Start FastAPI server
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-Visit `http://127.0.0.1:8000` to check your API.
+Visit `http://127.0.0.1:8000` for the API root.  
+Swagger UI available at: `http://127.0.0.1:8000/docs`
 
 ---
 
-## ✅ Current Features
+## ✅ Implemented Features
 
-- [x] Basic FastAPI backend setup
-- [x] MongoDB connection
-- [x] Basic user registration
+- User Signup (hashed password stored)
+- User Login (JWT based)
+- OAuth2 flow using FastAPI’s secure system
+- Refresh token (long-lived, stored as HTTP-only cookie)
+- Access token (short-lived, stored as HTTP-only cookie)
+- Token refresh and rotation
+- Logout system
+- Secure cookie handling (CORS-ready, production & dev modes)
+- Request logging middleware
 
 ---
 
-## 🔜 Upcoming Features
+## 🔜 Next Steps
 
-- [ ] User authentication (JWT)
-- [ ] Post creation (text/image)
-- [ ] Follow/unfollow system
-- [ ] Frontend with Next.js
-- [ ] Dockerization
-- [ ] Deployment (Render, Vercel, Railway...)
+- User profiles (view, edit)
+- Follow/Unfollow functionality
+- Post creation (text/image upload)
+- Timeline/feed system
+- Notification system
+- Full frontend integration with Next.js
+- Deployment (Docker + cloud)
 
 ---
 
