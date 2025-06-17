@@ -12,31 +12,21 @@ router = APIRouter(
 @router.post("/signup")
 async def create_account(response:Response, form_data: models.Account = Depends(models.Account.as_form)):
 
-    if not all([form_data.email, form_data.password, form_data.username]):
-        raise HTTPException(status_code=422, detail="All fields are required.")
+    existing = await database.account_collection.find_one({"email": form_data.email})
+    if existing:
+        raise HTTPException(status_code=400, detail="Email already registered.")
 
-    if len(form_data.username) < 5:
-        raise HTTPException(status_code=422, detail="Username must be at least 5 characters.")
-
-    if len(form_data.password) < 8:
-        raise HTTPException(status_code=422, detail="Password must be at least 8 characters.")
-
-    # Check if account is already exists
-    account = await database.account_collection.find_one({"email":form_data.email.lower()})
-
-    if account:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Account is already exists!")
-    
-    hashed_password = utils.hash_password(form_data.password)
-
-    account_dict = {
-        "email": form_data.email.lower(),
-        "password": hashed_password,
-        "username": form_data.username,
-    }
+    hashed_pw = utils.hash_password(form_data.password)
+    account_dict = form_data.dict()
+    account_dict["password"] = hashed_pw
 
     result = await database.account_collection.insert_one(account_dict)
     account_dict["id"] = str(result.inserted_id)
+
+    refresh_token = oauth2.create_token(
+        data={"account_id": account_dict["id"], "role": "user"},
+        expires_delta=timedelta(days=7)
+    )
 
     refreshToken = oauth2.create_token(data={"account_id":account_dict["id"]})
     response.set_cookie(
@@ -52,14 +42,10 @@ async def create_account(response:Response, form_data: models.Account = Depends(
 
 @router.post("/login", status_code=status.HTTP_202_ACCEPTED)
 async def login_account(response:Response, credentials: OAuth2PasswordRequestForm = Depends()):
-    
-    if not credentials.username or not credentials.password:
-        raise HTTPException(status_code=422, detail="Email and password are required.")
 
-    account = await database.account_collection.find_one({"email":credentials.email.lower()})
-
-    if not account or not utils.verify_password(credentials.password, account.password):
-        raise HTTPException(status_code=401, detail="Invalid credentials.")
+    user = await database.account_collection.find_one({"email": credentials.username})
+    if not user or not utils.verify_password(credentials.password, user["password"]):
+        raise HTTPException(status_code=401, detail="Invalid credentials")
 
     refreshToken = oauth2.create_token(data={"account_id": str(account["_id"]), "role" : account["role"]})    
     response.set_cookie(
