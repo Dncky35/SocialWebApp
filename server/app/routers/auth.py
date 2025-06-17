@@ -15,6 +15,10 @@ async def create_account(response:Response, form_data: models.Account = Depends(
     existing = await database.account_collection.find_one({"email": form_data.email})
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered.")
+    
+    existing_username = await database.account_collection.find_one({"username": form_data.username})
+    if existing_username:
+        raise HTTPException(status_code=400, detail="Username already taken.")
 
     hashed_pw = utils.hash_password(form_data.password)
     account_dict = form_data.dict()
