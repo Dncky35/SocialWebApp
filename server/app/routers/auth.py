@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Form, HTTPException, status, Response, Depends, Cookie
 from fastapi.security import OAuth2PasswordRequestForm
-from ..core import database, utils
+from ..core import database, utils, oauth2, config
 from .. import models
-from ..core import oauth2, config
 
 router = APIRouter(
     prefix="/auth",
@@ -10,40 +9,50 @@ router = APIRouter(
 )
 
 @router.post("/signup")
-async def create_account(response:Response, form_data: models.Account = Depends(models.Account.as_form)):
-
-    existing = await database.account_collection.find_one({"email": form_data.email})
+async def create_account(
+    response: Response,
+    form_data: models.Account = Depends(models.Account.as_form),
+):
+    # Check if email already exists
+    existing = await models.Account.find_one(models.Account.email == form_data.email)
     if existing:
         raise HTTPException(status_code=400, detail="Email already registered.")
     
-    existing_username = await database.account_collection.find_one({"username": form_data.username})
+    # Check if username already taken
+    existing_username = await models.Account.find_one(models.Account.username == form_data.username)
     if existing_username:
         raise HTTPException(status_code=400, detail="Username already taken.")
-
+    
+    # Hash password
     hashed_pw = utils.hash_password(form_data.password)
-    account_dict = form_data.model_dump()
-    account_dict.pop("id")
-    account_dict["password"] = hashed_pw
-
-    result = await database.account_collection.insert_one(account_dict)
-    account_dict["id"] = str(result.inserted_id)
-
-    refreshToken = oauth2.create_token(data={"account_id":account_dict["id"]})
+    
+    # Create Account document instance with hashed password
+    account = models.Account(
+        email=form_data.email,
+        username=form_data.username,
+        password=hashed_pw,
+        full_name=form_data.full_name,
+        # other fields will have default values
+    )
+    
+    # Save to DB (insert)
+    await account.insert()
+    
+    # Create token using inserted account id
+    refreshToken = oauth2.create_token(data={"account_id": str(account.id)})
     response.set_cookie(
         key="refreshToken",
         value=refreshToken,
-        max_age= 60 * 60 * 24 * 7,
+        max_age=60 * 60 * 24 * 7,  # 7 days
         **config.settings.cookie_config,
     )
-
-    return{
-        "Message" : "Account Creation Done"
-    }
+    
+    return {"Message": "Account Creation Done"}
 
 @router.post("/login", status_code=status.HTTP_202_ACCEPTED)
 async def login_account(response:Response, credentials: OAuth2PasswordRequestForm = Depends()):
 
-    account = await database.account_collection.find_one({"email": credentials.username})
+    account = await models.Account.find_one({"email": credentials.username})
     if not account or not utils.verify_password(credentials.password, account["password"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 

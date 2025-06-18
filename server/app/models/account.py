@@ -1,22 +1,26 @@
-from fastapi import Form
-from pydantic import BaseModel, EmailStr, Field
+from beanie import Document, PydanticObjectId
+from pydantic import EmailStr, Field
 from datetime import datetime, timezone
 from typing import Optional, List
+from fastapi import Form
 
-class Account(BaseModel):
-    id: Optional[str] = None  # MongoDB ObjectId as string
-    email: EmailStr  # validates email format automatically
-    username: str = Field(..., min_length=3, max_length=30, pattern="^[a-zA-Z0-9_]+$")
-    password: str  # hashed password
+class Account(Document):
+    id: Optional[PydanticObjectId] = Field(default=None, alias="_id")
+    email: EmailStr
+    username: str = Field(..., min_length=3, max_length=30, pattern=r"^[a-zA-Z0-9_]+$")
+    password: str  # Store hashed password here
     full_name: Optional[str] = None
     bio: Optional[str] = None
-    avatar_url: Optional[str] = None  # profile picture
-    role: str = "user"  # roles: user, admin, moderator, etc.
-    is_verified: bool = False  # email verified or not
-    followers: Optional[List[str]] = []  # list of user IDs
-    following: Optional[List[str]] = []  # list of user IDs
+    avatar_url: Optional[str] = None
+    role: str = Field(default="user")
+    is_verified: bool = Field(default=False)
+    followers: List[PydanticObjectId] = Field(default_factory=list)
+    following: List[PydanticObjectId] = Field(default_factory=list)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
+
+    class Settings:
+        name = "accounts"  # MongoDB collection name
 
     @classmethod
     def as_form(
