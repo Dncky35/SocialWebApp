@@ -12,7 +12,7 @@ class Settings(BaseSettings):
     secret_key_refresh:str
     cookie_domain:str
 
-    model_config = ConfigDict(env_file=".env")
+    model_config = ConfigDict(env_file=".env.dev")
 
     @property
     def cookie_config(self):
