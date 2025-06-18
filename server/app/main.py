@@ -16,9 +16,9 @@ logger = logging.getLogger(__name__)
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     await init_db()  # call your existing init_db function
-    app.state.mongo_client = client  # store client if you want to access later
+    # app.state.mongo_client = client  # store client if you want to access later
     yield
-    client.close()
+    # client.close()
 
 # FASTAPI api
 app = FastAPI(
@@ -32,8 +32,8 @@ origins = [  # Ensure both Gitpod URLs are included
         "https://cloudrocean.xyz",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
-        "https://3000-dncky35-reacttraining-k8wikratnfd.ws-us119.gitpod.io",
-        "https://8000-dncky35-reacttraining-k8wikratnfd.ws-us119.gitpod.io",
+        "https://8000-dncky35-socialwebapp-09hw3b6xdaz.ws-us120.gitpod.io/",
+        "https://3000-dncky35-socialwebapp-09hw3b6xdaz.ws-us120.gitpod.io/",
     ]
 
 # Enforce HTTPS only in production
@@ -57,11 +57,6 @@ async def root():
 
 @app.middleware("http")
 async def log_request(request:Request, call_next):
-    # print(f"Request Report:")
-    # print(f"\nRequest:\n{request.method}, url: {request.url}")
-    # print(f"\nRequest Headers: {request.headers}")
-    # response = await call_next(request)
-    # print(f"\nResponse headers:\n{response.headers}")
 
     logger.info(f"Request: {request.method} {request.url}")
     response = await call_next(request)
