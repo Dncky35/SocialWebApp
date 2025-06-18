@@ -1,6 +1,7 @@
 from pydantic import ConfigDict
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
+from typing import Optional
 import os
 
 # Get which env file to load
@@ -13,7 +14,7 @@ class Settings(BaseSettings):
     secret_key: str
     algorithm: str
     secret_key_refresh: str
-    cookie_domain: str
+    cookie_domain: Optional[str] = None
 
     model_config = ConfigDict(env_file=env_file)
 
