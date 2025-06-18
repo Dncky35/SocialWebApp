@@ -6,14 +6,23 @@ from pymongo.errors import PyMongoError
 from .routers import auth
 import logging
 import os
-import app.core.database as database
+from contextlib import asynccontextmanager
+from app.core.database import init_db
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    await init_db()  # call your existing init_db function
+    app.state.mongo_client = client  # store client if you want to access later
+    yield
+    client.close()
+
 # FASTAPI api
 app = FastAPI(
+    lifespan=lifespan,
     title="Social Web App API",
     description="API for the Social Web App",
     version="1.0.0",
