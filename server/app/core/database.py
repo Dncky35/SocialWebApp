@@ -10,7 +10,13 @@ MONGO_URI = f"mongodb+srv://{settings.mongodb_username}:{settings.mongodb_passwo
 client = AsyncIOMotorClient(MONGO_URI)
 
 # Select DB based on env file
-DB_NAME = "social_webapp_test" if "test" in env_file else "social_webapp"
+if "test" in env_file:
+    DB_NAME = "social_webapp_test"
+elif "dev" in env_file:
+    DB_NAME = "social_webapp_dev"
+else:
+    DB_NAME = "social_webapp"
+    
 db = client[DB_NAME]
 
 # Initialization function for Beanie
