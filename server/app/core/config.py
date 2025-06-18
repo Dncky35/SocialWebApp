@@ -11,6 +11,7 @@ class Settings(BaseSettings):
     algorithm:str
     secret_key_refresh:str
     cookie_domain:str
+    db_name:str
 
     model_config = ConfigDict(env_file=".env.dev")
 
