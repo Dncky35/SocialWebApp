@@ -7,7 +7,7 @@ from fastapi import Form
 class Account(Document):
     id: Optional[PydanticObjectId] = Field(default=None, alias="_id")
     email: EmailStr
-    username: str = Field(..., min_length=3, max_length=30, regex=r"^[a-zA-Z0-9_]+$")
+    username: str = Field(..., min_length=3, max_length=30, pattern=r"^[a-zA-Z0-9_]+$")
     password: str  # Store hashed password here
     full_name: Optional[str] = None
     bio: Optional[str] = None
