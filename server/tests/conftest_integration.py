@@ -17,7 +17,7 @@ def event_loop():
 @pytest.fixture(scope="session", autouse=True)
 async def real_beanie():
     # Build MongoDB URI with credentials from config
-    mongodb_url = f"mongodb://{settings.mongodb_username}:{settings.mongodb_password}@localhost:27017"
+    mongodb_url = f"mongodb+srv://{settings.mongodb_username}:{settings.mongodb_password}@cluster0.yu7sul0.mongodb.net/"
 
     test_client = motor.motor_asyncio.AsyncIOMotorClient(mongodb_url)
     test_db = test_client[settings.db_name]
