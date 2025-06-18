@@ -1,5 +1,6 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from .config import settings, env_file
+from beanie import init_beanie
 
 MONGO_URI = f"mongodb+srv://{settings.mongodb_username}:{settings.mongodb_password}@cluster0.yu7sul0.mongodb.net/"
 client = AsyncIOMotorClient(MONGO_URI)
@@ -15,3 +16,8 @@ account_collection = db["accounts"]
 # Helper Function to Convert MongoDB Data
 def serialize_document(doc) -> dict:
     return {**doc, "id": str(doc["_id"])} if doc else None
+
+# Async init function to call on app startup
+async def init_db():
+    # Initialize Beanie with Motor client, database and document models
+    await init_beanie(database=db, document_models=[AccountModel])
