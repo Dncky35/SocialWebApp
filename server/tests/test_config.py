@@ -5,7 +5,7 @@ from app.core.config import Settings
 @pytest.fixture(autouse=True)
 def clear_env_vars():
     # Backup and clear relevant env vars before each test
-    keys = ["mongodb_username", "mongodb_password", "secret_key", "algorithm", "secret_key_refresh", "cookie_domain"]
+    keys = ["mongodb_username", "mongodb_password", "secret_key", "algorithm", "secret_key_refresh", "cookie_domain", "db_name"]
     backup = {k: os.environ.get(k) for k in keys}
     for k in keys:
         if k in os.environ:
@@ -23,6 +23,7 @@ def test_settings_load_env_vars(monkeypatch):
     monkeypatch.setenv("algorithm", "HS256")
     monkeypatch.setenv("secret_key_refresh", "refreshsecret")
     monkeypatch.setenv("cookie_domain", "localhost")
+    monkeypatch.setenv("db_name", "testdb")
 
     settings = Settings()
 
@@ -32,6 +33,7 @@ def test_settings_load_env_vars(monkeypatch):
     assert settings.algorithm == "HS256"
     assert settings.secret_key_refresh == "refreshsecret"
     assert settings.cookie_domain == "localhost"
+    assert settings.db_name == "testdb"
 
 def test_cookie_config_localhost():
     s = Settings(cookie_domain="localhost")
