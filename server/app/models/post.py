@@ -2,6 +2,7 @@ from beanie import Document, PydanticObjectId
 from pydantic import Field
 from datetime import datetime, timezone
 from fastapi import Form
+from pydantic import BaseModel
 
 class Post(Document):
     id: Optional[PydanticObjectId] = Field(default=None, alias="_id")
@@ -14,3 +15,7 @@ class Post(Document):
 
     class settings:
         name = "posts" # MongoDB collection name
+
+class PostUpdate(BaseModel):
+    content: Optional[str] = None
+    image_url: Optional[str] = None
