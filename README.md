@@ -1,125 +1,113 @@
 # Social Web App
 
-A full-stack social web application backend built with **FastAPI**, **MongoDB**, and ready for full-stack development with Next.js frontend.
+A modern social media backend API built using FastAPI, MongoDB, and Beanie. This project is designed to showcase account management, secure authentication with JWT and cookies, post creation, and like/unlike features in a scalable, clean codebase suitable for production and learning.
 
----
+## 🛠 Tech Stack
 
-## 🚀 Tech Stack
+- **Backend**: FastAPI
+- **Database**: MongoDB with Beanie ODM
+- **Authentication**: JWT (Access & Refresh tokens), HTTPOnly cookies
+- **ORM/ODM**: Beanie
+- **Testing**: Pytest, HTTPX, ASGITransport
 
-- **Backend:** FastAPI (Python)
-- **Database:** MongoDB (Atlas)
-- **Frontend (Planned):** Next.js (TypeScript)
-- **ORM/ODM:** Motor (async MongoDB client)
-- **Authentication:** JWT (access & refresh tokens), OAuth2PasswordFlow, Secure HTTP-only Cookies
-- **Password Hashing:** Passlib (pbkdf2_sha256)
-- **Environment Management:** Pydantic Settings & dotenv
-
----
-
-## 📂 Project Structure (Backend)
+## 📂 Project Structure
 
 ```
-backend/
-└── app/
-    ├── main.py           # FastAPI app entry point
-    ├── core/
-    │   ├── config.py     # Environment config
-    │   ├── database.py   # MongoDB connection
-    │   ├── oauth2.py     # JWT token utilities
-    │   └── utils.py      # Password hashing utilities
-    ├── models/
-    │   └── account.py    # Account model schema
-    ├── schemas/
-    │   └── token.py      # Token schema (Pydantic)
-    └── routers/
-        └── auth.py       # Authentication routes (signup, login, logout, token rotation)
+app/
+├── core/             # Configuration, DB, utils, auth (JWT)
+├── models/           # Pydantic and Beanie models (Account, Post)
+├── routers/          # FastAPI route handlers (auth, posts)
+├── schemas/          # Shared schemas (e.g., token)
+├── main.py           # App entrypoint
+tests/
+├── unit/             # Unit tests
+├── integration/      # Integration tests (auth, posts)
+├── conftest.py       # Fixtures & setup
+.env                  # Environment variables
 ```
 
----
+## ✅ Features
 
-## 🛠 Setup Instructions
+### ✅ Authentication
 
-### 1️⃣ Clone the repository
+- Signup with validation
+- Secure login using OAuth2PasswordRequestForm
+- Access/Refresh token management (with cookie storage)
+- Logout, token verification, and rotation
+
+### ✅ Posts
+
+- Create a post (text, optional image)
+- Retrieve all posts with pagination (`?offset=0&limit=20`)
+- Retrieve single post by ID
+- Update and delete post (only by author)
+- Like/Unlike post
+
+## 🚀 Getting Started
+
+### 1. Clone & Setup
 
 ```bash
-git clone https://github.com/your-username/social-web-app.git
-cd social-web-app/backend
-```
-
-### 2️⃣ Create a virtual environment
-
-```bash
-python -m venv venv
-source venv/bin/activate  # (Linux/Mac)
-venv\Scripts\activate     # (Windows)
-```
-
-### 3️⃣ Install dependencies
-
-```bash
+git clone https://github.com/yourusername/SocialWebApp.git
+cd SocialWebApp/server
+python -m venv .venv
+source .venv/bin/activate  # or .venv\Scripts\activate on Windows
 pip install -r requirements.txt
 ```
 
-### 4️⃣ Create a `.env` file
+### 2. Configure Environment
 
-Create a `.env` file in the `backend/app/` directory and add:
+Create a `.env.dev` file (or `.env.test`, `.env.prod`) with:
 
 ```
-mongodb_username=your_mongodb_username
-mongodb_password=your_mongodb_password
-secret_key=your_secret_key_for_access_token
-secret_key_refresh=your_secret_key_for_refresh_token
-algorithm=HS256
-cookie_domain=localhost
+MONGODB_USERNAME=youruser
+MONGODB_PASSWORD=yourpass
+SECRET_KEY=youraccesstokensecret
+SECRET_KEY_REFRESH=yourrefreshtokensecret
+ALGORITHM=HS256
+COOKIE_DOMAIN=localhost
+DB_NAME=social_webapp
 ```
 
-> ⚠️ Make sure to configure your MongoDB Atlas cluster credentials.
-
-### 5️⃣ Run MongoDB locally or Atlas
-
-Your MongoDB URI will be constructed automatically from credentials.
-
-### 6️⃣ Start FastAPI server
+### 3. Run the Server
 
 ```bash
 uvicorn app.main:app --reload
 ```
 
-Visit `http://127.0.0.1:8000` for the API root.  
-Swagger UI available at: `http://127.0.0.1:8000/docs`
+## 🧪 Testing
+
+```bash
+# Unit tests
+pytest tests/unit --disable-warnings
+
+# Integration tests
+ENV_FILE=.env.test pytest tests/integration --import-mode=importlib --disable-warnings
+```
+
+> ✅ Authentication tests implemented.  
+> ⚠️ Post and like system tests are **pending**.
+
+## 🌐 API Endpoints
+
+Some key routes include:
+
+- `/auth/signup` – Register user
+- `/auth/login` – Login and receive cookies
+- `/auth/logout` – Clear tokens
+- `/auth/create_access_token` – Rotate access token
+- `/posts/` – Create new post
+- `/posts/{id}` – Get single post
+- `/posts/{id}/like` – Like a post
+- `/posts/{id}/unlike` – Unlike a post
+
+## 📌 Future Plans
+
+- Implement post & like integration tests
+- Add user follow/unfollow system
+- Add comments
+- Frontend with Next.js
 
 ---
 
-## ✅ Implemented Features
-
-- User Signup (hashed password stored)
-- User Login (JWT based)
-- OAuth2 flow using FastAPI’s secure system
-- Refresh token (long-lived, stored as HTTP-only cookie)
-- Access token (short-lived, stored as HTTP-only cookie)
-- Token refresh and rotation
-- Logout system
-- Secure cookie handling (CORS-ready, production & dev modes)
-- Request logging middleware
-
----
-
-## 🔜 Next Steps
-
-- User profiles (view, edit)
-- Follow/Unfollow functionality
-- Post creation (text/image upload)
-- Timeline/feed system
-- Notification system
-- Full frontend integration with Next.js
-- Deployment (Docker + cloud)
-
----
-
-## 👨‍💻 Author
-
-**Ercan Dinçkaya**
-
----
-
-Feel free to contribute, open issues, or suggest features!
+Built with ❤️ by Ercan Dinçkaya | [CloudROcean](https://play.google.com/store/search?q=cloudRocean&c=apps)
