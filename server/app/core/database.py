@@ -1,8 +1,7 @@
 from motor.motor_asyncio import AsyncIOMotorClient
 from beanie import init_beanie
 from .config import settings, env_file
-from app.models import Account  # Your Beanie model
-
+from app.models import Account, post
 # Build Mongo URI
 MONGO_URI = f"mongodb+srv://{settings.mongodb_username}:{settings.mongodb_password}@cluster0.yu7sul0.mongodb.net/"
 
@@ -23,5 +22,5 @@ db = client[DB_NAME]
 async def init_db():
     await init_beanie(
         database=db,
-        document_models=[Account]
+        document_models=[Account, post.Post]  # Add all your Beanie models here
     )

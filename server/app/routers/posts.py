@@ -1,9 +1,9 @@
 from datetime import datetime, timezone
 from beanie import PydanticObjectId
+from bson import ObjectId
 from fastapi import APIRouter, Depends, Query, HTTPException
-from app.models.post import Post, PostUpdate
-from app.core import database, oauth2
-from beanie.operators import In
+from app.models.post import Post, PostUpdate, PostCreate
+from app.core import oauth2
 from typing import List
 
 router = APIRouter(
@@ -12,7 +12,7 @@ router = APIRouter(
 )
 
 @router.post("/", status_code=201)
-async def create_post(post_data: Post, current_user=Depends(oauth2.get_current_user)):
+async def create_post(post_data: PostCreate, current_user=Depends(oauth2.get_current_user)):
     
     post = Post(
         **post_data.dict(exclude_unset=True),
@@ -74,11 +74,13 @@ async def delete_post(id:str, current_user=Depends(oauth2.get_current_user)):
 
 @router.post("/{id}/like", status_code=200)
 async def toogle_like_post(id:str, current_user=Depends(oauth2.get_current_user)):
-    post = await Post.find_one({"_id":id})
+    post = await Post.get(PydanticObjectId(id))
     if not post:
         raise HTTPException(status_code=404, detail="Post not found")
 
-    account_id = current_user.account_id
+    account_id = ObjectId(current_user.account_id)
+
+    print(f"post likes: {post.likes}")
 
     if account_id in post.likes:
         post.likes.remove(account_id)

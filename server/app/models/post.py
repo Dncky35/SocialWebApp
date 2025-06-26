@@ -2,7 +2,6 @@ from typing import List, Optional
 from beanie import Document, PydanticObjectId
 from pydantic import Field
 from datetime import datetime, timezone
-from fastapi import Form
 from pydantic import BaseModel
 
 class Post(Document):
@@ -16,6 +15,10 @@ class Post(Document):
 
     class settings:
         name = "posts" # MongoDB collection name
+
+class PostCreate(BaseModel):
+    content: str
+    image_url: Optional[str] = None
 
 class PostUpdate(BaseModel):
     content: Optional[str] = None
