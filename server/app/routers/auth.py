@@ -53,10 +53,12 @@ async def create_account(
 async def login_account(response:Response, credentials: OAuth2PasswordRequestForm = Depends()):
 
     account = await models.Account.find_one({"email": credentials.username})
-    if not account or not utils.verify_password(credentials.password, account["password"]):
+    if not account or not utils.verify_password(credentials.password, account.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
+    
+    print(f"\nAccount: {account}\n")
 
-    refreshToken = oauth2.create_token(data={"account_id": str(account["_id"]), "role" : account["role"]})    
+    refreshToken = oauth2.create_token(data={"account_id": str(account.id), "role" : account.role})    
     response.set_cookie(
         key="refreshToken",
         value=refreshToken,

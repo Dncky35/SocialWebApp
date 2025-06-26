@@ -7,7 +7,7 @@ from .routers import auth
 import logging
 import os
 from contextlib import asynccontextmanager
-from app.core.database import init_db
+from app.core.database import init_db, client
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -15,10 +15,15 @@ logger = logging.getLogger(__name__)
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
-    await init_db()  # call your existing init_db function
-    # app.state.mongo_client = client  # store client if you want to access later
+    try:
+        await init_db()
+        print("✅ MongoDB initialized successfully")
+    except Exception as e:
+        print(f"❌ Error initializing MongoDB: {e}")
+        raise
     yield
-    # client.close()
+    client.close()
+    print("🛑 MongoDB connection closed.")
 
 # FASTAPI api
 app = FastAPI(
