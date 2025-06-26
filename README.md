@@ -1,113 +1,141 @@
-# Social Web App
+# Social Web App - Backend API
 
-A modern social media backend API built using FastAPI, MongoDB, and Beanie. This project is designed to showcase account management, secure authentication with JWT and cookies, post creation, and like/unlike features in a scalable, clean codebase suitable for production and learning.
+This is the backend server for a modern social web application. It's built with Python using the FastAPI framework and MongoDB as the database. The API provides functionalities for user authentication, post management, and social interactions like following users and liking posts.
 
-## 🛠 Tech Stack
+## Features
 
-- **Backend**: FastAPI
-- **Database**: MongoDB with Beanie ODM
-- **Authentication**: JWT (Access & Refresh tokens), HTTPOnly cookies
-- **ORM/ODM**: Beanie
-- **Testing**: Pytest, HTTPX, ASGITransport
+- **User Authentication**: Secure signup and login using JWT (Access & Refresh Tokens stored in HTTPOnly cookies).
+- **Password Management**: Passwords are securely hashed before being stored.
+- **Post Management**: Full CRUD (Create, Read, Update, Delete) functionality for user posts.
+- **Social Graph**: Users can follow and unfollow each other.
+- **Engagement**: Users can like and unlike posts.
+- **Pagination**: Implemented for feed and list endpoints (followers, following) to handle large datasets efficiently.
+- **Data Validation**: Pydantic models are used for robust request data validation.
+- **Interactive API Docs**: Automatic, interactive API documentation powered by Swagger UI and ReDoc.
 
-## 📂 Project Structure
+## Technology Stack
 
-```
-app/
-├── core/             # Configuration, DB, utils, auth (JWT)
-├── models/           # Pydantic and Beanie models (Account, Post)
-├── routers/          # FastAPI route handlers (auth, posts)
-├── schemas/          # Shared schemas (e.g., token)
-├── main.py           # App entrypoint
-tests/
-├── unit/             # Unit tests
-├── integration/      # Integration tests (auth, posts)
-├── conftest.py       # Fixtures & setup
-.env                  # Environment variables
-```
-
-## ✅ Features
-
-### ✅ Authentication
-
-- Signup with validation
-- Secure login using OAuth2PasswordRequestForm
-- Access/Refresh token management (with cookie storage)
-- Logout, token verification, and rotation
-
-### ✅ Posts
-
-- Create a post (text, optional image)
-- Retrieve all posts with pagination (`?offset=0&limit=20`)
-- Retrieve single post by ID
-- Update and delete post (only by author)
-- Like/Unlike post
-
-## 🚀 Getting Started
-
-### 1. Clone & Setup
-
-```bash
-git clone https://github.com/yourusername/SocialWebApp.git
-cd SocialWebApp/server
-python -m venv .venv
-source .venv/bin/activate  # or .venv\Scripts\activate on Windows
-pip install -r requirements.txt
-```
-
-### 2. Configure Environment
-
-Create a `.env.dev` file (or `.env.test`, `.env.prod`) with:
-
-```
-MONGODB_USERNAME=youruser
-MONGODB_PASSWORD=yourpass
-SECRET_KEY=youraccesstokensecret
-SECRET_KEY_REFRESH=yourrefreshtokensecret
-ALGORITHM=HS256
-COOKIE_DOMAIN=localhost
-DB_NAME=social_webapp
-```
-
-### 3. Run the Server
-
-```bash
-uvicorn app.main:app --reload
-```
-
-## 🧪 Testing
-
-```bash
-# Unit tests
-pytest tests/unit --disable-warnings
-
-# Integration tests
-ENV_FILE=.env.test pytest tests/integration --import-mode=importlib --disable-warnings
-```
-
-> ✅ Authentication tests implemented.  
-> ⚠️ Post and like system tests are **pending**.
-
-## 🌐 API Endpoints
-
-Some key routes include:
-
-- `/auth/signup` – Register user
-- `/auth/login` – Login and receive cookies
-- `/auth/logout` – Clear tokens
-- `/auth/create_access_token` – Rotate access token
-- `/posts/` – Create new post
-- `/posts/{id}` – Get single post
-- `/posts/{id}/like` – Like a post
-- `/posts/{id}/unlike` – Unlike a post
-
-## 📌 Future Plans
-
-- Implement post & like integration tests
-- Add user follow/unfollow system
-- Add comments
-- Frontend with Next.js
+- **Framework**: [FastAPI](https://fastapi.tiangolo.com/)
+- **Database**: [MongoDB](https://www.mongodb.com/)
+- **ODM (Object-Document Mapper)**: [Beanie](https://beanie-odm.dev/)
+- **Authentication**: JWT with `python-jose`
+- **Password Hashing**: `passlib` with `bcrypt`
+- **Async Server**: Uvicorn
 
 ---
 
-Built with ❤️ by Ercan Dinçkaya | [CloudROcean](https://play.google.com/store/search?q=cloudRocean&c=apps)
+## Project Setup
+
+Follow these steps to get the project running on your local machine.
+
+### 1. Prerequisites
+
+- Python 3.8+
+- A running MongoDB instance (local or on a service like MongoDB Atlas).
+
+### 2. Clone the Repository
+
+```bash
+git clone <your-repository-url>
+cd SocailWebApp/server
+```
+
+### 3. Set Up a Virtual Environment
+
+It's highly recommended to use a virtual environment to manage project dependencies.
+
+```bash
+# For Windows
+python -m venv venv
+.\venv\Scripts\activate
+
+# For macOS/Linux
+python3 -m venv venv
+source venv/bin/activate
+```
+
+### 4. Install Dependencies
+
+Create a `requirements.txt` file with the necessary packages and install them.
+
+**`requirements.txt`:**
+```
+fastapi
+uvicorn[standard]
+beanie
+pydantic
+python-jose[cryptography]
+passlib[bcrypt]
+python-multipart
+pydantic-settings
+```
+
+**Install command:**
+```bash
+pip install -r requirements.txt
+```
+
+### 5. Configure Environment Variables
+
+Create a `.env` file in the `server/` directory. This file will hold your secret keys and database configuration. You can copy the example below.
+
+**`.env.example`:**
+```ini
+# --- Database Configuration ---
+# Replace with your MongoDB connection string
+DATABASE_URL=mongodb://localhost:27017/social_app
+
+# --- JWT Authentication ---
+SECRET_KEY=a_very_secret_key_that_should_be_long_and_random
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=15
+REFRESH_TOKEN_EXPIRE_DAYS=7
+
+# --- Cookie Settings ---
+# For local development, 'localhost' is fine. For production, use your domain.
+COOKIE_DOMAIN=localhost
+COOKIE_SECURE=False
+COOKIE_SAMESITE=lax
+```
+
+### 6. Run the Application
+
+Once the setup is complete, you can start the development server.
+
+```bash
+# The --reload flag automatically restarts the server on code changes
+uvicorn app.main:app --reload
+```
+
+The API will be available at `http://127.0.0.1:8000`.
+
+---
+
+## API Documentation
+
+FastAPI automatically generates interactive API documentation. Once the server is running, you can access it at:
+
+- **Swagger UI**: http://127.0.0.1:8000/docs
+- **ReDoc**: http://127.0.0.1:8000/redoc
+
+## API Endpoints Summary
+
+| Method | Path                         | Description                               |
+|--------|------------------------------|-------------------------------------------|
+| **Auth** |                              |                                           |
+| `POST` | `/auth/signup`               | Create a new user account.                |
+| `POST` | `/auth/login`                | Log in to get access/refresh tokens.      |
+| `POST` | `/auth/logout`               | Log out and clear session cookies.        |
+| `POST` | `/auth/create_access_token`  | Create a new access token.                |
+| **Posts** |                              |                                           |
+| `POST` | `/posts/`                    | Create a new post.                        |
+| `GET`  | `/posts/`                    | Get a paginated list of all posts.        |
+| `GET`  | `/posts/{id}`                | Get a single post by its ID.              |
+| `PATCH`| `/posts/{id}`                | Update a post you authored.               |
+| `DELETE`| `/posts/{id}`               | Delete a post you authored.               |
+| `POST` | `/posts/{id}/like`           | Toggle like/unlike on a post.             |
+| **Accounts** |                           |                                           |
+| `POST` | `/accounts/follow/{id}`      | Follow another user.                      |
+| `POST` | `/accounts/unfollow/{id}`    | Unfollow another user.                    |
+| `GET`  | `/accounts/followers`        | Get a list of your followers.             |
+| `GET`  | `/accounts/following`        | Get a list of users you are following.    |
