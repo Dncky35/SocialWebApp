@@ -5,6 +5,7 @@ from beanie import PydanticObjectId
 from bson import ObjectId
 from bson.errors import InvalidId
 from beanie.operators import AddToSet, Pull
+from app.schemas.account import PublicAccount
 
 router = APIRouter(
     prefix="/accounts",
@@ -57,23 +58,41 @@ async def unfollow_user(account_id: str, current_account=Depends(oauth2.get_curr
     return {"message": f"Successfully unfollowed {account_to_unfollow.username}."}
 
 
-@router.get("/followers")
+@router.get("/followers", response_model=List[PublicAccount])
 async def get_my_followers(
     offset: int = Query(0, ge=0),
     limit: int = Query(20, le=100),
     current_user=Depends(oauth2.get_current_user)
 ):
-    user = await Account.get(current_user.account_id)
-    followers = user.followers[offset:offset + limit] if user and user.followers else []
-    return {"followers": followers, "count": len(user.followers) if user and user.followers else 0}
+    account = await Account.get(current_user.account_id)
+    if not account or not user.followers:
+        return []
 
+    follower_ids = account.followers[offset:offset + limit]
+    follower_accounts = await Account.find({"_id": {"$in": follower_ids}}).to_list()
+    return [PublicAccount(
+        id=str(f.id),
+        username=f.username,
+        full_name=f.full_name,
+        avatar_url=f.avatar_url
+    ) for f in followers]
 
-@router.get("/following")
+@router.get("/following", response_model=List[PublicAccount])
 async def get_my_following(
     offset: int = Query(0, ge=0),
     limit: int = Query(20, le=100),
     current_user=Depends(oauth2.get_current_user)
 ):
     user = await Account.get(current_user.account_id)
-    following = user.following[offset:offset + limit] if user and user.following else []
-    return {"following": following, "count": len(user.following) if user and user.following else 0}
+    if not user or not user.following:
+        return []
+
+    following_ids = user.following[offset:offset + limit]
+
+    following = await Account.find(Account.id.in_(following_ids)).to_list()
+    return [PublicAccount(
+        id=str(f.id),
+        username=f.username,
+        full_name=f.full_name,
+        avatar_url=f.avatar_url
+    ) for f in following]
