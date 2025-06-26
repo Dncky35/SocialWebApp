@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, Query, HTTPException
 from app.models.post import Post, PostUpdate
 from app.core import database, oauth2
+from beanie.operators import In
 from typing import List
 
 router = APIRouter(
@@ -68,3 +69,27 @@ async def delete_post(id:str, current_user=Depends(oauth2.get_current_user)):
 
     await post.delete()
     return {"message": "Post deleted successfully"}
+
+@router.post("/{id}/like", status_code=200)
+async def toogle_like_post(id:str, current_user=Depends(oauth2.get_current_user)):
+    post = await Post.find_one({"_id":id})
+    if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+
+    account_id = current_user.account_id
+
+    if account_id in post.likes:
+        post.likes.remove(account_id)
+        action = "unliked"
+    else:
+        post.likes.append(account_id)
+        action = "liked"
+
+    post.updated_at = datatime.now(timezone.utc)
+    await post.save()
+
+    return {
+        "message" : f"post {action} successfully",
+        "likes_count": len(post.likes),
+        "liked": account_id in post.likes, 
+    }
