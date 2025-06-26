@@ -1,3 +1,4 @@
+from typing import List
 from fastapi import APIRouter, HTTPException, status, Depends, Query
 from app.core import oauth2
 from app.models.account import Account
@@ -65,7 +66,7 @@ async def get_my_followers(
     current_user=Depends(oauth2.get_current_user)
 ):
     account = await Account.get(current_user.account_id)
-    if not account or not user.followers:
+    if not account or not current_user.followers:
         return []
 
     follower_ids = account.followers[offset:offset + limit]
@@ -75,7 +76,7 @@ async def get_my_followers(
         username=f.username,
         full_name=f.full_name,
         avatar_url=f.avatar_url
-    ) for f in followers]
+    ) for f in follower_accounts]
 
 @router.get("/following", response_model=List[PublicAccount])
 async def get_my_following(

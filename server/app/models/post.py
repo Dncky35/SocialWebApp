@@ -1,3 +1,4 @@
+from typing import List, Optional
 from beanie import Document, PydanticObjectId
 from pydantic import Field
 from datetime import datetime, timezone

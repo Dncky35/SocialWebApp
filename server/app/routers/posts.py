@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+from beanie import PydanticObjectId
 from fastapi import APIRouter, Depends, Query, HTTPException
 from app.models.post import Post, PostUpdate
 from app.core import database, oauth2
@@ -42,7 +44,7 @@ async def get_single_post(id:str, current_account=Depends(oauth2.get_current_use
 
     return post
 
-@router.pathc("/{id}", response_model=Post)
+@router.patch("/{id}", response_model=Post)
 async def update_post(id:str, post_data:PostUpdate, current_user=Depends(oauth2.get_current_user)):
     post = await Post.get(PydanticObjectId(id))
     if not post:
@@ -85,7 +87,7 @@ async def toogle_like_post(id:str, current_user=Depends(oauth2.get_current_user)
         post.likes.append(account_id)
         action = "liked"
 
-    post.updated_at = datatime.now(timezone.utc)
+    post.updated_at = datetime.now(timezone.utc)
     await post.save()
 
     return {
