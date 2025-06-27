@@ -1,7 +1,7 @@
 from beanie import Document, PydanticObjectId
 from pydantic import Field
 from datetime import datetime, timezone
-from typing import Optional
+from typing import Optional, List
 
 class Comment(Document):
     post_id: PydanticObjectId
