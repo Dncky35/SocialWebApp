@@ -1,17 +1,84 @@
 from typing import List
 from fastapi import APIRouter, HTTPException, status, Depends, Query
+from beanie.operators import Regex
 from app.core import oauth2
 from app.models.account import Account
 from beanie import PydanticObjectId
 from bson import ObjectId
 from bson.errors import InvalidId
 from beanie.operators import AddToSet, Pull
-from app.schemas.account import PublicAccount
+from app.schemas.account import PublicAccount, UpdateProfile
 
 router = APIRouter(
     prefix="/accounts",
     tags=["accounts"]
 )
+
+@router.get("/me/profile", response_model=PublicAccount)
+async def get_my_profile(current_user=Depends(oauth2.get_current_user)):
+    try:
+        account = await Account.get(PydanticObjectId(current_user.account_id))
+    except (InvalidId, Exception):
+        raise HTTPException(status_code=400, detail="Invalid account ID.")
+
+    if not account:
+        raise HTTPException(status_code=404, detail="Account not found")
+
+    return PublicAccount(
+        id=account.id,
+        username=account.username,
+        full_name=account.full_name,
+        bio=account.bio,
+        profile_image_url=account.profile_image_url,
+        followers_count=len(account.followers),
+        following_count=len(account.following),
+    )
+
+@router.get("/{account_id}/profile", response_model=PublicAccount)
+async def get_profile(account_id: str, current_user=Depends(oauth2.get_current_user)):
+    try:
+        account = await Account.get(account_id)
+    except (InvalidId, Exception):
+        raise HTTPException(status_code=400, detail="Invalid account ID.")
+
+    if not account:
+        raise HTTPException(status_code=404, detail="Account not found")
+
+    is_following = ObjectId(current_user.account_id) in account.followers if current_user else None
+
+    return PublicAccount(
+        id=account.id,
+        username=account.username,
+        full_name=account.full_name,
+        bio=account.bio,
+        profile_image_url=account.profile_image_url,
+        followers_count=len(account.followers),
+        following_count=len(account.following),
+        is_following=is_following,
+    )
+    
+@router.patch("/me/profile", status_code=status.HTTP_200_OK)
+async def update_my_profile(profile_data: UpdateProfile, current_user=Depends(oauth2.get_current_user)):
+    try:
+        account = await Account.get(PydanticObjectId(current_user.account_id))
+    except (InvalidId, Exception):
+        raise HTTPException(status_code=400, detail="Invalid account ID.")
+
+    if not account:
+        raise HTTPException(status_code=404, detail="Account not found")
+
+    # account.full_name = profile_data.full_name or account.full_name
+    # account.bio = profile_data.bio or account.bio
+    # account.profile_image_url = profile_data.profile_image_url or account.profile_image_url
+
+    update_fields = profile_data.dict(exclude_unset=True)
+    for key, value in update_fields.items():
+        setattr(account, key, value)
+
+    await account.save()
+
+    return { "message": "Profile updated successfully" }
+
 
 @router.post("/follow/{account_id}", status_code=status.HTTP_200_OK)
 async def follow_account(account_id: str, current_account=Depends(oauth2.get_current_user)):
@@ -97,3 +164,27 @@ async def get_my_following(
         full_name=f.full_name,
         avatar_url=f.avatar_url
     ) for f in following]
+
+@router.get("/search", response_model=List[PublicAccount])
+async def search_accounts(username: str, offset: int = Query(0, ge=0), limit: int = Query(20, ge=1, le=100, current_account=Depends(oauth2.get_current_user))):
+    if not username:
+        return []
+
+    # Case-insensitive partial match on username
+    query = Regex(Account.username, f".*{username}.*", options="i")
+    accounts = await Account.find(query).skip(offset).limit(limit).to_list()
+
+    returns = [
+        PublicAccount(
+            id=acc.id,
+            username=acc.username,
+            full_name=acc.full_name,
+            bio=acc.bio,
+            profile_image_url=acc.profile_image_url,
+            followers_count=len(acc.followers),
+            following_count=len(acc.following),
+        )
+        for acc in accounts
+    ]
+
+    return returns
