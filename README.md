@@ -7,8 +7,9 @@ This is the backend server for a modern social web application. It's built with 
 - **User Authentication**: Secure signup and login using JWT (Access & Refresh Tokens stored in HTTPOnly cookies).
 - **Password Management**: Passwords are securely hashed before being stored.
 - **Post Management**: Full CRUD (Create, Read, Update, Delete) functionality for user posts.
+- **Comment Management**: Full CRUD for comments on posts, including replies (nested comments).
 - **Social Graph**: Users can follow and unfollow each other.
-- **Engagement**: Users can like and unlike posts.
+- **Engagement**: Users can like and unlike posts and comments.
 - **Pagination**: Implemented for feed and list endpoints (followers, following) to handle large datasets efficiently.
 - **Data Validation**: Pydantic models are used for robust request data validation.
 - **Interactive API Docs**: Automatic, interactive API documentation powered by Swagger UI and ReDoc.
@@ -134,6 +135,13 @@ FastAPI automatically generates interactive API documentation. Once the server i
 | `PATCH`| `/posts/{id}`                | Update a post you authored.               |
 | `DELETE`| `/posts/{id}`               | Delete a post you authored.               |
 | `POST` | `/posts/{id}/like`           | Toggle like/unlike on a post.             |
+| `POST` | `/posts/{id}/comment`        | Create a new comment on a post.           |
+| **Comments** |                           |                                           |
+| `GET`  | `/comments/{id}`             | Get a single comment by its ID.           |
+| `PATCH`| `/comments/{id}`             | Update a comment you authored.            |
+| `DELETE`| `/comments/{id}`            | Delete a comment you authored.            |
+| `POST` | `/comments/{id}/like`        | Toggle like/unlike on a comment.          |
+| `POST` | `/comments/{id}/comment`     | Reply to another comment.                 |
 | **Accounts** |                           |                                           |
 | `POST` | `/accounts/follow/{id}`      | Follow another user.                      |
 | `POST` | `/accounts/unfollow/{id}`    | Unfollow another user.                    |
