@@ -28,10 +28,6 @@ async def create_post(post_data: PostCreate, current_user=Depends(oauth2.get_cur
 @router.get("/", response_model=List[Post])
 async def get_all_post(offset:int = Query(0, ge=0), limit:int = Query(20, ge=1, le=100), current_user=Depends(oauth2.get_current_user)):
     posts = await Post.find_all().sort(-Post.created_at).skip(offset).limit(limit).to_list()
-
-    if not posts:
-        raise HTTPException(status_code=404, detail="Post not found")
-
     return posts
 
 @router.get("/{id}", response_model=Post)
@@ -112,7 +108,11 @@ async def create_comment(post_id:str, comment_data:CommentRequest, current_accou
 @router.get("/{post_id}/comment", response_model=List[Comment])
 async def get_comments(post_id:str, offset:int = Query(0, ge=0), limit:int = Query(20, ge=1, le=100), 
 current_account=Depends(oauth2.get_current_user)):
-    comments = await Comment.find(Comment.post_id == post_id).sort("-created_at").to_list()
+    comments = await Comment.find(Comment.post_id == post_id)\
+                        .sort("-created_at")\
+                        .skip(offset)\
+                        .limit(limit)\
+                        .to_list()
     return comments
 
 

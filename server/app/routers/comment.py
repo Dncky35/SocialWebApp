@@ -1,4 +1,4 @@
-from fastapi import APIRouter, status, Depends,HTTPException
+from fastapi import APIRouter, status, Depends, HTTPException, Query
 from app.models.comment import Comment
 from beanie import PydanticObjectId
 from app.core import oauth2
@@ -55,9 +55,6 @@ async def create_sub_comment(comment_id:str, current_account=Depends(oauth2.get_
     if not comment:
         raise HTTPException(status_code=404, detail="Comment not found")
 
-    if current_account.account_id != comment.author_id:
-        raise HTTPException(status_code=403, detail="Not authorized")
-
     sub_commnet = Comment(
         **sub_comment_data.dict(exclude_unset=True),
         author_id=current_account.account_id,
@@ -90,6 +87,21 @@ async def toogle_like_comment(comment_id:str, current_account=Depends(oauth2.get
         "likes_count": len(comment.likes),
         "liked": account_id in comment.likes, 
     }
+
+@router.get("/{comment_id}/replies", response_model=list[Comment])
+async def get_replies(comment_id:str, offset:int = Query(0, ge=0), limit:int = Query(20, ge=1, le=100), current_account=Depends(oauth2.get_current_user)):
+    comment = await Comment.get(PydanticObjectId(comment_id))
+    if not comment:
+        raise HTTPException(status_code=404, detail="Comment not found")
+
+    replies = await Comment.find(Comment.parent_comment_id == comment.id)\
+                        .sort("-created_at")\
+                        .skip(offset)\
+                        .limit(limit)\
+                        .to_list()
+                        
+    return replies
+
 
     
 
