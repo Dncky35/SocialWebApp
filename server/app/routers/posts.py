@@ -82,8 +82,6 @@ async def toogle_like_post(id:str, current_user=Depends(oauth2.get_current_user)
 
     account_id = ObjectId(current_user.account_id)
 
-    print(f"post likes: {post.likes}")
-
     if account_id in post.likes:
         post.likes.remove(account_id)
         action = "unliked"
