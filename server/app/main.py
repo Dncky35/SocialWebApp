@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.responses import JSONResponse
 from pymongo.errors import PyMongoError
-from .routers import auth, posts, account
+from .routers import auth, posts, account, comment
 import logging
 import os
 from contextlib import asynccontextmanager
@@ -57,10 +57,11 @@ app.add_middleware(
 app.include_router(auth.router)
 app.include_router(posts.router)
 app.include_router(account.router)
+app.include_router(comment.router)
 
 @app.get("/")
 async def root():
-    return { "Message" : "Welcome Home Social Web App"}
+    return {"message": "Welcome to the Social Web App API"}
 
 @app.middleware("http")
 async def log_request(request:Request, call_next):
