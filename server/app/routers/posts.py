@@ -109,7 +109,7 @@ async def create_comment(post_id:str, comment_data:CommentRequest, current_accou
     await comment.insert()
     return comment
 
-@router("/{post_id}/comment", response_model=List[Comment])
+@router.get("/{post_id}/comment", response_model=List[Comment])
 async def get_comments(post_id:str, offset:int = Query(0, ge=0), limit:int = Query(20, ge=1, le=100), 
 current_account=Depends(oauth2.get_current_user)):
     comments = await Comment.find(Comment.post_id == post_id).sort("-created_at").to_list()
