@@ -1,8 +1,10 @@
 from datetime import datetime, timezone
 from beanie import PydanticObjectId
 from bson import ObjectId
-from fastapi import APIRouter, Depends, Query, HTTPException
+from fastapi import APIRouter, Depends, Query, HTTPException, status
 from app.models.post import Post, PostUpdate, PostCreate
+from app.models.comment import Comment
+from app.schemas.comment import CommentRequest
 from app.core import oauth2
 from typing import List
 
@@ -97,3 +99,14 @@ async def toogle_like_post(id:str, current_user=Depends(oauth2.get_current_user)
         "likes_count": len(post.likes),
         "liked": account_id in post.likes, 
     }
+
+@router.post("/{post_id}/comment", status_code=status.HTTP_201_CREATED)
+async def create_comment(post_id:str, comment_data:CommentRequest, current_account=Depends(oauth2.get_current_user)):
+    comment = Comment(
+        **comment_data.dict(exclude_unset=True),
+        author_id=current_account.account_id,
+        post_id=post_id,
+    )
+
+    await comment.insert()
+    return comment
