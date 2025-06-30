@@ -46,7 +46,11 @@ async def delete_comment(comment_id: str, current_account=Depends(oauth2.get_cur
     if comment.author_id != current_account.account_id:
         raise HTTPException(status_code=403, detail="Not authorized")
 
-    await comment.delete()
+    # await comment.delete()
+    comment.is_deleted = True
+    await comment.save()
+
+
     return {"Result": "Comment deleted successfully"}
 
 @router.post("/{comment_id}/comment", status_code=status.HTTP_200_OK)

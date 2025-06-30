@@ -67,7 +67,12 @@ async def delete_post(id:str, current_user=Depends(oauth2.get_current_user)):
     if post.author_id != current_user.account_id:
         raise HTTPException(status_code=403, detail="Not authorized")
 
-    await post.delete()
+    # await post.delete()
+    # soft deleting
+    post.is_deleted = True
+    post.updated_at = datetime.now(timezone.utc)
+    await post.save()
+
     return {"message": "Post deleted successfully"}
 
 @router.post("/{id}/like", status_code=200)

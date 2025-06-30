@@ -14,6 +14,7 @@ class Account(Document):
     avatar_url: Optional[str] = None
     role: str = Field(default="user")
     is_verified: bool = Field(default=False)
+    is_deleted: bool = Field(default=False)
     followers: List[PydanticObjectId] = Field(default_factory=list)
     following: List[PydanticObjectId] = Field(default_factory=list)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
