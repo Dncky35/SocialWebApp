@@ -1,8 +1,9 @@
 from typing import List
 from fastapi import APIRouter, HTTPException, status, Depends, Query
-from beanie.operators import Regex
+from beanie.operators import RegEx
 from app.core import oauth2
 from app.models.account import Account
+from app.models.post import Post
 from beanie import PydanticObjectId
 from bson import ObjectId
 from bson.errors import InvalidId
@@ -171,7 +172,7 @@ async def search_accounts(username: str, offset: int = Query(0, ge=0), limit: in
         return []
 
     # Case-insensitive partial match on username
-    query = Regex(Account.username, f".*{username}.*", options="i")
+    query = RegEx(Account.username, f".*{username}.*", options="i")
     accounts = await Account.find(query).skip(offset).limit(limit).to_list()
 
     returns = [

@@ -1,6 +1,6 @@
 from pydantic import BaseModel, EmailStr, Field
 from beanie import PydanticObjectId
-from typing import Optional
+from typing import Literal, Optional
 
 class PublicAccount(BaseModel):
     id: PydanticObjectId
