@@ -18,4 +18,15 @@ class PublicAccount(BaseModel):
 class UpdateProfile(BaseModel):
     full_name: Optional[str] = Field(None, min_length=1, max_length=50)
     bio: Optional[str] = Field(None, max_length=160)
-    profile_image_url: Optional[str] = Field(None, max_length=255)
+    avatar_url: Optional[str] = Field(None, max_length=255)
+
+class AccountAdminRequest(BaseModel):
+    email: Optional[str] = Field(None, max_length=255)
+    username: Optional[str] = Field(None, max_length=50)
+    password: Optional[str] = Field(None, max_length=255)
+    full_name: Optional[str] = Field(None, max_length=50)
+    bio: Optional[str] = Field(None, max_length=160)
+    avatar_url: Optional[str] = Field(None, max_length=255)
+    role: Optional[Literal["user", "admin", "moderator"]] = Field(None)
+    is_verified: bool = Field(default=False)
+    is_deleted: bool = Field(default=False)

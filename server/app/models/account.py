@@ -8,10 +8,10 @@ class Account(Document):
     id: Optional[PydanticObjectId] = Field(default=None, alias="_id")
     email: EmailStr
     username: str = Field(..., min_length=3, max_length=30, pattern=r"^[a-zA-Z0-9_]+$")
-    password: str  # Store hashed password here
-    full_name: Optional[str] = None
-    bio: Optional[str] = None
-    avatar_url: Optional[str] = None
+    password: str = Field(..., min_length=8, max_length=255)
+    full_name: Optional[str] = Field(..., min_length=4, max_length=50)
+    bio: Optional[str] = Field(None, max_length=160)
+    avatar_url: Optional[str] = Field(None, max_length=255)
     role: str = Field(default="user")
     is_verified: bool = Field(default=False)
     is_deleted: bool = Field(default=False)
