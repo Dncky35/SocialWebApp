@@ -2,6 +2,7 @@ from fastapi import Cookie, status, HTTPException
 from jose import jwt, JWTError, ExpiredSignatureError
 from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timezone, timedelta
+from beanie import PydanticObjectId
 from .config import settings
 from ..core import database
 from bson import ObjectId
@@ -64,3 +65,22 @@ async def get_logged_in_user(token = Cookie(None, alias="refreshToken")):
     if account is None:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     return token_data
+
+async def get_current_admin_user(token = Cookie(None, alias="accessToken")) -> models.Account:
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Access token missing")
+    
+    token_data = verify_token(token=token, is_access_token=True)
+    
+    try: 
+        account = await models.Account.get(PydanticObjectId(token_data.account_id))
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid account ID")
+    
+    if not account:
+        raise HTTPException(status_code=404, detail="Account not found")
+
+    if not account.is_admin:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
+    
+    return account
