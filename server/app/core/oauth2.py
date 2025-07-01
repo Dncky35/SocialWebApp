@@ -84,3 +84,15 @@ async def get_current_admin_user(token = Cookie(None, alias="accessToken")) -> m
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
     
     return account
+
+ROLE_HIERARCHY = ["user", "moderator", "admin", "superadmin"]
+
+def get_next_role(current_role:str, promote=True) -> str:
+    try:
+        idx = ROLE_HIERARCHY.index(current_role)
+        if promote:
+            return ROLE_HIERARCHY[idx + 1] if idx + 1 < len(ROLE_HIERARCHY) else current_role
+        else:
+            return ROLE_HIERARCHY[idx - 1] if idx > 0 else current_role
+    except ValueError:
+        return current_role
