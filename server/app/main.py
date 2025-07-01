@@ -3,7 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.responses import JSONResponse
 from pymongo.errors import PyMongoError
-from .routers import auth, posts, account, comment
+from app.routers import auth, posts, account, comment, admin
 import logging
 import os
 from contextlib import asynccontextmanager
@@ -58,6 +58,7 @@ app.include_router(auth.router)
 app.include_router(posts.router)
 app.include_router(account.router)
 app.include_router(comment.router)
+app.include_router(admin.router)
 
 @app.get("/")
 async def root():
