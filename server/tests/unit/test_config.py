@@ -5,62 +5,98 @@ from app.core.config import Settings
 @pytest.fixture(autouse=True)
 def clear_env_vars():
     # Backup and clear relevant env vars before each test
-    keys = ["mongodb_username", "mongodb_password", "secret_key", "algorithm", "secret_key_refresh", "cookie_domain", "db_name"]
+    keys = [
+        "mongodb_username", "mongodb_password", "secret_key", "algorithm",
+        "secret_key_refresh", "domain", "environment", "ENV_FILE"
+    ]
     backup = {k: os.environ.get(k) for k in keys}
     for k in keys:
-        if k in os.environ:
-            del os.environ[k]
+        os.environ.pop(k, None)
     yield
     # Restore after test
     for k, v in backup.items():
         if v is not None:
             os.environ[k] = v
 
-def test_settings_load_env_vars(monkeypatch):
-    monkeypatch.setenv("mongodb_username", "testuser")
-    monkeypatch.setenv("mongodb_password", "testpass")
-    monkeypatch.setenv("secret_key", "secret123")
-    monkeypatch.setenv("algorithm", "HS256")
-    monkeypatch.setenv("secret_key_refresh", "refreshsecret")
-    monkeypatch.setenv("cookie_domain", "localhost")
-    monkeypatch.setenv("db_name", "testdb")
+def test_cookie_config_localhost_in_dev_env():
+    os.environ["domain"] = "localhost"
+    os.environ["environment"] = "dev"
+    os.environ["mongodb_username"] = "test"
+    os.environ["mongodb_password"] = "test"
+    os.environ["secret_key"] = "test"
+    os.environ["secret_key_refresh"] = "test"
+    os.environ["algorithm"] = "HS256"
 
-    settings = Settings()
-
-    assert settings.mongodb_username == "testuser"
-    assert settings.mongodb_password == "testpass"
-    assert settings.secret_key == "secret123"
-    assert settings.algorithm == "HS256"
-    assert settings.secret_key_refresh == "refreshsecret"
-    assert settings.cookie_domain == "localhost"
-    assert settings.db_name == "testdb"
-
-def test_cookie_config_localhost():
-    s = Settings(cookie_domain="localhost")
+    s = Settings()
     config = s.cookie_config
+
     assert config["httponly"] is True
-    assert config["secure"] is False
+    assert config["secure"] is False  # Because dev env
     assert config["samesite"] == "lax"
     assert config["path"] == "/"
     assert "domain" not in config
 
-def test_cookie_config_empty_domain():
-    s = Settings(cookie_domain="")
+def test_cookie_config_custom_domain_in_prod_env():
+    os.environ["domain"] = "example.com"
+    os.environ["environment"] = "prod"
+    os.environ["mongodb_username"] = "test"
+    os.environ["mongodb_password"] = "test"
+    os.environ["secret_key"] = "test"
+    os.environ["secret_key_refresh"] = "test"
+    os.environ["algorithm"] = "HS256"
+
+    s = Settings()
     config = s.cookie_config
+
+    assert config["secure"] is True  # Because prod env
+    assert config["samesite"] == "none"
+    assert config["domain"] == "example.com"
+
+def test_cookie_config_localhost_in_test_env():
+    os.environ["domain"] = "localhost"
+    os.environ["environment"] = "test"
+    os.environ["mongodb_username"] = "test"
+    os.environ["mongodb_password"] = "test"
+    os.environ["secret_key"] = "test"
+    os.environ["secret_key_refresh"] = "test"
+    os.environ["algorithm"] = "HS256"
+
+    s = Settings()
+    config = s.cookie_config
+
     assert config["secure"] is False
     assert config["samesite"] == "lax"
     assert "domain" not in config
 
-def test_cookie_config_none_domain():
-    s = Settings(cookie_domain=None)
-    config = s.cookie_config
-    assert config["secure"] is False
-    assert config["samesite"] == "lax"
-    assert "domain" not in config
+def test_cookie_config_custom_domain_in_dev_env():
+    os.environ["domain"] = "dev.example.com"
+    os.environ["environment"] = "dev"
+    os.environ["mongodb_username"] = "test"
+    os.environ["mongodb_password"] = "test"
+    os.environ["secret_key"] = "test"
+    os.environ["secret_key_refresh"] = "test"
+    os.environ["algorithm"] = "HS256"
 
-def test_cookie_config_custom_domain():
-    s = Settings(cookie_domain="example.com")
+    s = Settings()
     config = s.cookie_config
+
+    assert config["secure"] is False  # dev env
+    assert config["samesite"] == "none"
+    assert config["domain"] == "dev.example.com"
+
+def test_cookie_config_custom_domain_in_unknown_env():
+    os.environ["domain"] = "example.com"
+    os.environ["environment"] = "stage"
+    os.environ["mongodb_username"] = "test"
+    os.environ["mongodb_password"] = "test"
+    os.environ["secret_key"] = "test"
+    os.environ["secret_key_refresh"] = "test"
+    os.environ["algorithm"] = "HS256"
+
+    s = Settings()
+    config = s.cookie_config
+
+    # secure is True because "stage" is not in ["dev", "development", "test"]
     assert config["secure"] is True
     assert config["samesite"] == "none"
     assert config["domain"] == "example.com"

@@ -11,14 +11,14 @@ from app.models.account import Account
 from app.core.config import settings
 
 # Load test environment
-env_file = os.getenv("ENV_FILE", ".env.test")
+env_file = os.getenv("ENV_FILE", ".env")
 load_dotenv(env_file)
 
 @pytest.fixture(scope="function")
 async def real_beanie():
     mongodb_url = f"mongodb+srv://{settings.mongodb_username}:{settings.mongodb_password}@cluster0.yu7sul0.mongodb.net/"
     test_client = AsyncIOMotorClient(mongodb_url)
-    test_db = test_client["social_webapp_test"]
+    test_db = test_client[f"social_webapp_{settings.environment}"]
 
     # Initialize Beanie
     await init_beanie(database=test_db, document_models=[Account])
