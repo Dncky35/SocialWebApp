@@ -5,7 +5,7 @@ from typing import Optional
 import os
 
 # Get which env file to load
-env_file = os.getenv("ENV_FILE", ".env.dev")
+env_file = os.getenv("ENV_FILE", ".env")
 load_dotenv(env_file)
 
 class Settings(BaseSettings):
@@ -14,20 +14,22 @@ class Settings(BaseSettings):
     secret_key: str
     algorithm: str
     secret_key_refresh: str
-    cookie_domain: Optional[str] = None
-    db_name: str
+    domain: Optional[str] = None
+    environment: str
 
     model_config = ConfigDict(env_file=env_file)
 
     @property
     def cookie_config(self):
-        is_local = self.cookie_domain in [None, "", "localhost"]
+        is_local = self.domain in [None, "", "localhost"]
+        is_development = self.environment in ["dev", "development", "test"]
+
         return {
             "httponly": True,
-            "secure": not is_local,
+            "secure": not is_development,
             "samesite": "lax" if is_local else "none",
             "path": "/",
-            **({"domain": self.cookie_domain} if self.cookie_domain and not is_local else {}),
+            **({"domain": self.domain} if self.domain and not is_local else {}),
         }
 
 settings = Settings()

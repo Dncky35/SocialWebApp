@@ -5,6 +5,7 @@ from fastapi.responses import JSONResponse
 from pymongo.errors import PyMongoError
 from app.routers import auth, posts, account, comment
 from app.routers.admin import admin_accounts, admin_toggle
+from app.core.config import settings
 import logging
 import os
 from contextlib import asynccontextmanager
@@ -43,7 +44,7 @@ origins = [  # Ensure both Gitpod URLs are included
     ]
 
 # Enforce HTTPS only in production
-if os.getenv("ENV") == "production":
+if settings.environment == "production":
     app.add_middleware(HTTPSRedirectMiddleware)
 
 # Enable CORS securely
