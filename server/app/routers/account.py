@@ -188,3 +188,22 @@ async def search_accounts(username: str, offset: int = Query(0, ge=0), limit: in
     ]
 
     return returns
+
+@router.get("/feed/following")
+async def get_feed(offset:int = Query(0, ge=0), limit:int = Query(20, ge=1, le=100), current_account = Depends(oauth2.get_current_user)):
+    # GET LIST OF CURRENT USER'S FOLLOW USERS
+    try:
+        account = await Account.get(PydanticObjectId(current_account.account_id))
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid Account ID")
+
+    if not account:
+        raise HTTPException(status_code=404, detail="Account not found")
+
+    following_ids = account.following
+
+    # GET POST THAT POSTED BY following_ids
+    posts = await Post.find(Post.author_id.in_(following_ids)).sort(-Post.created_at).skip(offset).limit(limit).to_list()
+    return posts
+
+
