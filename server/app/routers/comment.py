@@ -20,16 +20,27 @@ async def get_single_comment(comment_id: str, current_account=Depends(oauth2.get
 
     if not comment:
         return {"error": "Comment not found"}
+    
+    if comment.is_deleted:
+        return {"error": "Comment not found"}
 
     return comment
 
 @router.patch("/{comment_id}", status_code=status.HTTP_200_OK)
 async def update_comment(comment_id: str, comment_data: CommentRequest, current_account=Depends(oauth2.get_current_user)):
-    comment = await Comment.get(PydanticObjectId(comment_id))
+    
+    try:
+        comment = await Comment.get(PydanticObjectId(comment_id))
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid comment ID")
+
     if not comment:
         raise HTTPException(status_code=404, detail="Comment not found")
-
-    if comment.author_id != current_account.account_id:
+    
+    if comment.is_deleted:
+        raise HTTPException(status_code=404, detail="Comment already deleted")
+    
+    if PydanticObjectId(comment.author_id) != PydanticObjectId(current_account.account_id):
         raise HTTPException(status_code=403, detail="Not authorized")
 
     comment.content = comment_data.content or comment.content
@@ -43,8 +54,11 @@ async def delete_comment(comment_id: str, current_account=Depends(oauth2.get_cur
     if not comment:
         raise HTTPException(status_code=404, detail="Comment not found")
 
-    if comment.author_id != current_account.account_id:
+    if PydanticObjectId(comment.author_id) != PydanticObjectId(current_account.account_id):
         raise HTTPException(status_code=403, detail="Not authorized")
+    
+    if comment.is_deleted:
+        raise HTTPException(status_code=404, detail="Comment already deleted")
 
     # await comment.delete()
     comment.is_deleted = True
@@ -54,9 +68,10 @@ async def delete_comment(comment_id: str, current_account=Depends(oauth2.get_cur
     return {"Result": "Comment deleted successfully"}
 
 @router.post("/{comment_id}/comment", status_code=status.HTTP_200_OK)
-async def create_sub_comment(comment_id:str, current_account=Depends(oauth2.get_current_user), sub_comment_data: CommentRequest = Depends(CommentRequest)):
-    comment = await Comment.get(PydanticObjectId(comment_id))
-    if not comment:
+async def create_sub_comment(comment_id:str, sub_comment_data:CommentRequest, 
+                             current_account=Depends(oauth2.get_current_user) ):
+    comment = await Comment.get(PydanticObjectId(comment_id) if PydanticObjectId.is_valid(comment_id) else None)
+    if not comment or comment.is_deleted:
         raise HTTPException(status_code=404, detail="Comment not found")
 
     sub_commnet = Comment(
@@ -71,11 +86,12 @@ async def create_sub_comment(comment_id:str, current_account=Depends(oauth2.get_
 
 @router.post("/{comment_id}/like", status_code=status.HTTP_200_OK)
 async def toogle_like_comment(comment_id:str, current_account=Depends(oauth2.get_current_user)):
-    comment = await Comment.get(PydanticObjectId(comment_id))
-    if not comment:
+    comment = await Comment.get(PydanticObjectId(comment_id) if PydanticObjectId.is_valid(comment_id) else None)
+
+    if not comment or comment.is_deleted:
         raise HTTPException(status_code=404, detail="Comment not found")
     
-    account_id = ObjectId(current_account.account_id)
+    account_id = PydanticObjectId(current_account.account_id)
 
     if account_id in comment.likes:
         comment.likes.remove(account_id)
@@ -94,8 +110,8 @@ async def toogle_like_comment(comment_id:str, current_account=Depends(oauth2.get
 
 @router.get("/{comment_id}/replies", response_model=list[Comment])
 async def get_replies(comment_id:str, offset:int = Query(0, ge=0), limit:int = Query(20, ge=1, le=100), current_account=Depends(oauth2.get_current_user)):
-    comment = await Comment.get(PydanticObjectId(comment_id))
-    if not comment:
+    comment = await Comment.get(PydanticObjectId(comment_id) if PydanticObjectId.is_valid(comment_id) else None)
+    if not comment or comment.is_deleted:
         raise HTTPException(status_code=404, detail="Comment not found")
 
     replies = await Comment.find(Comment.parent_comment_id == comment.id)\

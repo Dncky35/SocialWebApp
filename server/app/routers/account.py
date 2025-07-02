@@ -17,12 +17,8 @@ router = APIRouter(
 
 @router.get("/me/profile", response_model=PublicAccount)
 async def get_my_profile(current_user=Depends(oauth2.get_current_user)):
-    try:
-        account = await Account.get(PydanticObjectId(current_user.account_id))
-    except (InvalidId, Exception):
-        raise HTTPException(status_code=400, detail="Invalid account ID.")
-
-    if not account:
+    account = await Account.get(PydanticObjectId(current_user.account_id) if PydanticObjectId.is_valid(current_user.account_id) else None)
+    if not account or account.is_deleted:
         raise HTTPException(status_code=404, detail="Account not found")
 
     return PublicAccount(
@@ -30,7 +26,7 @@ async def get_my_profile(current_user=Depends(oauth2.get_current_user)):
         username=account.username,
         full_name=account.full_name,
         bio=account.bio,
-        profile_image_url=account.profile_image_url,
+        profile_image_url=account.avatar_url,
         followers_count=len(account.followers),
         following_count=len(account.following),
     )
@@ -42,10 +38,10 @@ async def get_profile(account_id: str, current_user=Depends(oauth2.get_current_u
     except (InvalidId, Exception):
         raise HTTPException(status_code=400, detail="Invalid account ID.")
 
-    if not account:
+    if not account or account.is_deleted:
         raise HTTPException(status_code=404, detail="Account not found")
 
-    is_following = ObjectId(current_user.account_id) in account.followers if current_user else None
+    is_following = PydanticObjectId(current_user.account_id) in account.followers if current_user else None
 
     return PublicAccount(
         id=account.id,
@@ -65,7 +61,7 @@ async def update_my_profile(profile_data: UpdateProfile, current_user=Depends(oa
     except (InvalidId, Exception):
         raise HTTPException(status_code=400, detail="Invalid account ID.")
 
-    if not account:
+    if not account or account.is_deleted:
         raise HTTPException(status_code=404, detail="Account not found")
 
     # account.full_name = profile_data.full_name or account.full_name

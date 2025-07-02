@@ -40,7 +40,9 @@ async def get_all_post(offset:int = Query(0, ge=0), limit:int = Query(20, ge=1, 
     # Fetch posts from the database
     # Note: Beanie's find_all() method does not support filtering by is_deleted directly    
     # so we use find() with a filter
-    posts = await Post.find_all(Post.is_deleted == False).sort(-Post.created_at).skip(offset).limit(limit).to_list()
+    posts = await Post.find_all().sort(-Post.created_at).skip(offset).limit(limit).to_list()
+    posts = [post for post in posts if not post.is_deleted]
+
     return posts
 
 @router.get("/{id}", response_model=Post)
@@ -51,6 +53,9 @@ async def get_single_post(id:str, current_account=Depends(oauth2.get_current_use
         raise HTTPException(status_code=400, detail="Invalid Post ID")
 
     if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    if post.is_deleted:
         raise HTTPException(status_code=404, detail="Post not found")
 
     return post
@@ -63,6 +68,9 @@ async def update_post(id:str, post_data:PostUpdate, current_user=Depends(oauth2.
     
     if post.author_id != current_user.account_id:
         raise HTTPException(status_code=403, detail="Not authorized")
+    
+    if post.is_deleted:
+        raise HTTPException(status_code=404, detail="Post not found")
 
     post.content = post_data.content or post.content
     post.image_url = post_data.image_url or post.image_url
@@ -73,8 +81,11 @@ async def update_post(id:str, post_data:PostUpdate, current_user=Depends(oauth2.
 
 @router.delete("/{id}")
 async def delete_post(id:str, current_user=Depends(oauth2.get_current_user)):
-    post = await Post.get(PydanticObjectId(id))
+    post = await Post.get(PydanticObjectId(id) if PydanticObjectId.is_valid(id) else None)
     if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    if post.is_deleted:
         raise HTTPException(status_code=404, detail="Post not found")
 
     if post.author_id != current_user.account_id:
@@ -92,6 +103,9 @@ async def delete_post(id:str, current_user=Depends(oauth2.get_current_user)):
 async def toogle_like_post(id:str, current_user=Depends(oauth2.get_current_user)):
     post = await Post.get(PydanticObjectId(id))
     if not post:
+        raise HTTPException(status_code=404, detail="Post not found")
+    
+    if post.is_deleted:
         raise HTTPException(status_code=404, detail="Post not found")
 
     account_id = ObjectId(current_user.account_id)
@@ -126,11 +140,30 @@ async def create_comment(post_id:str, comment_data:CommentRequest, current_accou
 @router.get("/{post_id}/comment", response_model=List[Comment])
 async def get_comments(post_id:str, offset:int = Query(0, ge=0), limit:int = Query(20, ge=1, le=100), 
 current_account=Depends(oauth2.get_current_user)):
-    comments = await Comment.find(Comment.post_id == post_id)\
+    # Validate offset and limit
+    if offset < 0 or limit < 1 or limit > 100:
+        raise HTTPException(status_code=400, detail="Invalid offset or limit")
+    
+    # Adjust offset for pagination
+    if offset > 0:
+        offset = (offset - 1) * limit
+    else:
+        offset = 0
+    # Fetch comments for the specified post with pagination
+    try:
+        comments = await Comment.find_all(Comment.post_id == PydanticObjectId(post_id))\
                         .sort("-created_at")\
                         .skip(offset)\
                         .limit(limit)\
                         .to_list()
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Invalid Post ID, {str(e)}")
+    
+    # Filter out deleted comments
+    comments = [comment for comment in comments if not comment.is_deleted]
+    # Ensure we only return comments for the specified post
+    comments = [comment for comment in comments if comment.parent_comment_id is None]
+
     return comments
 
 
