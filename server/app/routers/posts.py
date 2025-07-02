@@ -27,7 +27,20 @@ async def create_post(post_data: PostCreate, current_user=Depends(oauth2.get_cur
 
 @router.get("/", response_model=List[Post])
 async def get_all_post(offset:int = Query(0, ge=0), limit:int = Query(20, ge=1, le=100), current_user=Depends(oauth2.get_current_user)):
-    posts = await Post.find_all().sort(-Post.created_at).skip(offset).limit(limit).to_list()
+    # Fetch all posts with pagination and no get deleted posts
+    if offset < 0 or limit < 1 or limit > 100:
+        raise HTTPException(status_code=400, detail="Invalid offset or limit")
+    # Ensure we only fetch posts that are not deleted
+    # and sort them by created_at in descending order
+    if offset > 0:
+        offset = (offset - 1) * limit
+    else:
+        offset = 0 
+    
+    # Fetch posts from the database
+    # Note: Beanie's find_all() method does not support filtering by is_deleted directly    
+    # so we use find() with a filter
+    posts = await Post.find_all(Post.is_deleted == False).sort(-Post.created_at).skip(offset).limit(limit).to_list()
     return posts
 
 @router.get("/{id}", response_model=Post)
