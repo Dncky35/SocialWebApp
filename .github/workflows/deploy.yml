@@ -38,5 +38,5 @@ jobs:
           docker pull dncky35/socialwebapp:latest
           docker stop socialwebapp || true
           docker rm socialwebapp || true
-          docker run -d --env-file /home/ercan/.env -p 8010:8000 --name socialwebapp yourdockerhubusername/socialwebapp:latest
+          docker run -d --env-file /home/ercan/.env -p 8010:8000 --name socialwebapp dncky35/socialwebapp:latest
 
