@@ -43,9 +43,9 @@ origins = [  # Ensure both Gitpod URLs are included
         "https://3000-dncky35-socialwebapp-09hw3b6xdaz.ws-us120.gitpod.io/",
     ]
 
-# Enforce HTTPS only in production
-if settings.environment == "production":
-    app.add_middleware(HTTPSRedirectMiddleware)
+# # Enforce HTTPS only in production
+# if settings.environment == "production":
+#     app.add_middleware(HTTPSRedirectMiddleware)
 
 # Enable CORS securely
 app.add_middleware(
