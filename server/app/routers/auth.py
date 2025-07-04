@@ -47,7 +47,7 @@ async def create_account(
         **config.settings.cookie_config,
     )
     
-    return {"Message": "Account Creation Done"}
+    return account
 
 @router.post("/login", status_code=status.HTTP_202_ACCEPTED)
 async def login_account(response:Response, credentials: OAuth2PasswordRequestForm = Depends()):
@@ -66,9 +66,7 @@ async def login_account(response:Response, credentials: OAuth2PasswordRequestFor
         **config.settings.cookie_config,
     )
 
-    return{
-        "Message" : "Login is Done"
-    }
+    return account
 
 @router.post("/logout")
 async def logout(response: Response):
