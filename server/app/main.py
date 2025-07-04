@@ -39,8 +39,7 @@ origins = [  # Ensure both Gitpod URLs are included
         "https://cloudrocean.xyz",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
-        "https://8000-dncky35-socialwebapp-09hw3b6xdaz.ws-us120.gitpod.io/",
-        "https://3000-dncky35-socialwebapp-09hw3b6xdaz.ws-us120.gitpod.io/",
+        "https://cdpn.io",
     ]
 
 # # Enforce HTTPS only in production
