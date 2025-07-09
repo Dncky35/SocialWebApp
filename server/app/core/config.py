@@ -29,7 +29,7 @@ class Settings(BaseSettings):
             "secure": not is_development,
             "samesite": "lax" if is_local else "none",
             "path": "/",
-            **({"domain": self.domain} if self.domain and not is_local else {}),
+            # **({"domain": self.domain} if self.domain and not is_local else {}),
         }
 
 settings = Settings()
