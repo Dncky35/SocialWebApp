@@ -39,7 +39,7 @@ async def create_account(
     await account.insert()
     
     # Create token using inserted account id
-    refreshToken = oauth2.create_token(data={"account_id": str(account.id), "role" : account.role})
+    refreshToken = oauth2.create_token(data={"account_id": str(account.id)})
     response.set_cookie(
         key="refreshToken",
         value=refreshToken,
