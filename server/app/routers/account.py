@@ -8,14 +8,14 @@ from beanie import PydanticObjectId
 from bson import ObjectId
 from bson.errors import InvalidId
 from beanie.operators import AddToSet, Pull
-from app.schemas.account import PublicAccount, UpdateProfile
+from app.schemas.account import PublicAccount, PrivateAccount, UpdateProfile
 
 router = APIRouter(
     prefix="/accounts",
     tags=["accounts"]
 )
 
-@router.get("/me/profile", response_model=PublicAccount)
+@router.get("/me/profile", response_model=PrivateAccount)
 async def get_my_profile(current_user=Depends(oauth2.get_current_user)):
     account = await Account.get(PydanticObjectId(current_user.account_id) if PydanticObjectId.is_valid(current_user.account_id) else None)
     if not account or account.is_deleted:
@@ -23,8 +23,10 @@ async def get_my_profile(current_user=Depends(oauth2.get_current_user)):
 
     return PublicAccount(
         id=account.id,
-        username=account.username,
+        email=account.email,
         full_name=account.full_name,
+        is_verified=account.is_verified,
+        username=account.username,
         bio=account.bio,
         profile_image_url=account.avatar_url,
         followers_count=len(account.followers),
@@ -44,14 +46,12 @@ async def get_profile(account_id: str, current_user=Depends(oauth2.get_current_u
     is_following = PydanticObjectId(current_user.account_id) in account.followers if current_user else None
 
     return PublicAccount(
-        id=account.id,
         username=account.username,
-        full_name=account.full_name,
         bio=account.bio,
-        profile_image_url=account.profile_image_url,
+        profile_image_url=account.avatar_url,
         followers_count=len(account.followers),
         following_count=len(account.following),
-        is_following=is_following,
+        is_following= is_following
     )
     
 @router.patch("/me/profile", status_code=status.HTTP_200_OK)
@@ -175,9 +175,8 @@ async def search_accounts(username: str, offset: int = Query(0, ge=0), limit: in
         PublicAccount(
             id=acc.id,
             username=acc.username,
-            full_name=acc.full_name,
             bio=acc.bio,
-            profile_image_url=acc.profile_image_url,
+            profile_image_url=acc.avatar_url,
             followers_count=len(acc.followers),
             following_count=len(acc.following),
         )

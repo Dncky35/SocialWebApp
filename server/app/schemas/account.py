@@ -5,7 +5,6 @@ from typing import Literal, Optional
 class PublicAccount(BaseModel):
     id: PydanticObjectId
     username: str
-    full_name: Optional[str]
     bio: Optional[str]
     profile_image_url: Optional[str]
     followers_count: int
@@ -15,8 +14,12 @@ class PublicAccount(BaseModel):
     class Config:
         orm_mode = True
 
+class PrivateAccount(PublicAccount):
+    email:str
+    full_name: Optional[str]
+    is_verified: bool = Field(default=False)
+
 class UpdateProfile(BaseModel):
-    full_name: Optional[str] = Field(None, min_length=1, max_length=50)
     bio: Optional[str] = Field(None, max_length=160)
     avatar_url: Optional[str] = Field(None, max_length=255)
 
