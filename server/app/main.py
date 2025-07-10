@@ -2,6 +2,9 @@ from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.responses import JSONResponse
+from app.core.limiter import limiter
+from slowapi import _rate_limit_exceeded_handler
+from slowapi.errors import RateLimitExceeded
 from pymongo.errors import PyMongoError
 from app.routers import auth, posts, account, comment
 from app.routers.admin import admin_accounts, admin_toggle
@@ -34,6 +37,9 @@ app = FastAPI(
     description="API for the Social Web App",
     version="1.0.0",
 )
+
+app.state.limiter = limiter
+app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 origins = [  # Ensure both Gitpod URLs are included
         "https://cloudrocean.xyz",
@@ -80,3 +86,6 @@ async def pymongo_exception_handler(request: Request, exc: PyMongoError):
         status_code=500,
         content={"message": "Database error occurred", "details": str(exc)},
     )
+
+
+
