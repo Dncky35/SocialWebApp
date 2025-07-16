@@ -17,10 +17,3 @@ class Post(Document):
     class settings:
         name = "posts" # MongoDB collection name
 
-class PostCreate(BaseModel):
-    content: str
-    image_url: Optional[str] = None
-
-class PostUpdate(BaseModel):
-    content: Optional[str] = None
-    image_url: Optional[str] = None

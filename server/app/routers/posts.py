@@ -2,7 +2,8 @@ from datetime import datetime, timezone
 from beanie import PydanticObjectId
 from bson import ObjectId
 from fastapi import APIRouter, Depends, Query, HTTPException, status
-from app.models.post import Post, PostUpdate, PostCreate
+from app.models.post import Post
+from app.schemas.post import PostUpdate, PostCreate
 from app.models.comment import Comment
 from app.schemas.comment import CommentRequest
 from app.core import oauth2
