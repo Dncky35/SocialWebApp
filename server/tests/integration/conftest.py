@@ -1,44 +1,31 @@
 import os
-import asyncio
 import pytest
-from dotenv import load_dotenv
-from motor.motor_asyncio import AsyncIOMotorClient
 from beanie import init_beanie
+from dotenv import load_dotenv
 from httpx import AsyncClient, ASGITransport
+from motor.motor_asyncio import AsyncIOMotorClient
+
+from app.core.config import settings
 from app.main import app
 from app.models.account import Account
-from app.core.config import settings
+from app.models.post import Post
+from app.models.comment import Comment
 
-# Load test environment variables.
-# It's good practice to use a dedicated .env file for testing (e.g., .env.test)
-# to avoid conflicts with development or production configurations.
-env_file = os.getenv("ENV_FILE", ".env.test")
-load_dotenv(env_file)
-
-# Use a dedicated test database name to isolate tests
-TEST_DB_NAME = f"test_social_webapp_{settings.environment}"
-
-
-@pytest.fixture(scope="function")
-def event_loop():
-    """
-    Creates an instance of the default event loop for the whole session.
-    This is necessary for async fixtures with a scope higher than 'function'.
-    """
-    policy = asyncio.get_event_loop_policy()
-    loop = policy.new_event_loop()
-    yield loop
-    loop.close()
+# The `event_loop` fixture is no longer needed with modern pytest-asyncio.
+# pytest-asyncio manages the event loop automatically.
 
 
 @pytest.fixture(scope="session")
-async def db_client(event_loop):
+async def db_client():
     """
     Creates a MongoDB client for the test session.
     This client is created only once per test run, improving efficiency.
+    It uses the DATABASE_URL from the test environment configuration.
     """
-    mongodb_url = f"mongodb+srv://{settings.mongodb_username}:{settings.mongodb_password}@cluster0.yu7sul0.mongodb.net/"
-    client = AsyncIOMotorClient(mongodb_url)
+    # This URI is also defined in app/core/database.py. Consider centralizing it
+    # in a `database_url` property in the Settings class for consistency.
+    MONGO_URI = f"mongodb+srv://{settings.mongodb_username}:{settings.mongodb_password}@cluster0.yu7sul0.mongodb.net/"
+    client = AsyncIOMotorClient(MONGO_URI)
     yield client
     client.close()
 
@@ -47,16 +34,32 @@ async def db_client(event_loop):
 async def db(db_client: AsyncIOMotorClient):
     """
     Provides a test database that is clean for each test function.
-    Initializes Beanie with the test database.
+    Initializes Beanie with the test database and all application models.
     The entire database is dropped after each test to ensure isolation.
     """
-    test_db = db_client[TEST_DB_NAME]
-    await init_beanie(database=test_db, document_models=[Account])
+    # Explicitly get the test database by name. The name is constructed based
+    # on the environment, which should be 'test' for integration tests.
+    db_name = f"social_webapp_test"
+    test_db = db_client.get_database(name=db_name)
+
+    print(f"✅ Using DB: {db.name}")
+    # Add all your Beanie Document models here to ensure they are initialized
+    # for every test. This prevents errors when tests interact with different
+    # parts of your application.
+    document_models = [
+        Account,
+        Post,
+        Comment,
+    ]
+    await init_beanie(database=test_db, document_models=document_models)
 
     yield test_db
 
-    # Clean up the database after the test
-    await db_client.drop_database(TEST_DB_NAME)
+    # Clean up by deleting all documents from each collection instead of
+    # dropping the database. This avoids permission issues on cloud-hosted
+    # MongoDB instances (like the 'dropDatabase' action).
+    for model in document_models:
+        await model.get_motor_collection().delete_many({})
 
 
 @pytest.fixture(scope="function")
