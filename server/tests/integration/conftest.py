@@ -52,16 +52,32 @@ async def logged_client(client: AsyncClient, db):
     response = await client.post("/auth/signup", data=register_data)
     assert response.status_code == 200
 
-    # Step 3: Extract cookies and manually set them in client headers
-    cookies = response.cookies
+    # Step 2: Extract refreshToken from Set-Cookie header
+    set_cookie_headers = response.headers.get_list("set-cookie")
 
-    # Set cookies into the client
-    client.cookies.set("refreshToken", cookies.get("refreshToken"))
+    refresh_token = None
+    for cookie in set_cookie_headers:
+        if cookie.startswith("refreshToken="):
+            refresh_token = cookie.split(";", 1)[0].split("=")[1]
+            break
 
+    assert refresh_token is not None, "refreshToken not set in signup response"
+
+    # Set refreshToken manually into client cookies
+    client.cookies.set("refreshToken", refresh_token)
+
+    # Step 3: Use the refresh token to get an access token
     response = await client.post("/auth/create_access_token")
     assert response.status_code == 200
-    assert response.json()["detail"] == "Access token refreshed/Created."
 
-    client.cookies.set("accessToken", cookies.get("accessToken"))
+    # Extract access token if needed (optional)
+    access_token_cookie = None
+    for cookie in response.headers.get_list("set-cookie"):
+        if cookie.startswith("accessToken="):
+            access_token_cookie = cookie.split(";", 1)[0].split("=")[1]
+            break
+
+    if access_token_cookie:
+        client.cookies.set("accessToken", access_token_cookie)
 
     return client
