@@ -10,9 +10,10 @@ on:
     paths:
       - 'server/**'
 
-build-and-push-image:
+jobs:
+
+  build-and-push-image:
     runs-on: ubuntu-latest
-    needs: test-backend
 
     steps:
       - name: Check out repository
@@ -31,9 +32,9 @@ build-and-push-image:
         run: |
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=yes ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'EOF'
             set -e
-            cd /home/ercan/socialwebapp/server
+            cd /home/ercan/cloudrocean/server
             source .venv/bin/activate
             pip install -r requirements.txt
             deactivate
-           
+            sudo systemctl restart fastapi.service
           EOF
