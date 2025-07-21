@@ -1,7 +1,9 @@
 from fastapi import APIRouter, Form, HTTPException, status, Response, Depends, Cookie
 from fastapi.security import OAuth2PasswordRequestForm
-from ..core import database, utils, oauth2, config
-from .. import models
+from app.core import oauth2, database, utils, config
+from app import models
+from app.schemas.account import PublicAccount, PrivateAccount
+from datetime import datetime, timedelta
 
 router = APIRouter(
     prefix="/auth",
@@ -12,6 +14,7 @@ router = APIRouter(
 async def create_account(
     response: Response,
     form_data: models.Account = Depends(models.Account.as_form),
+    response_model= PrivateAccount
 ):
     # Check if email already exists
     existing = await models.Account.find_one(models.Account.email == form_data.email)
@@ -46,17 +49,29 @@ async def create_account(
         max_age=60 * 60 * 24 * 7,  # 7 days
         **config.settings.cookie_config,
     )
+
+    private_account = PrivateAccount(
+        id=account.id,
+        email=account.email,
+        username=account.username,
+        full_name=account.full_name,
+        is_verified=account.is_verified,
+        bio=account.bio,
+        avatar_url=account.avatar_url,
+        followers_count=len(account.followers),
+        following_count=len(account.following),
+        created_at=account.created_at,
+        updated_at=account.updated_at,
+    )
     
-    return account
+    return private_account
 
 @router.post("/login", status_code=status.HTTP_202_ACCEPTED)
-async def login_account(response:Response, credentials: OAuth2PasswordRequestForm = Depends()):
+async def login_account(response:Response, credentials: OAuth2PasswordRequestForm = Depends(), response_model=PrivateAccount):
 
     account = await models.Account.find_one({"email": credentials.username})
     if not account or not utils.verify_password(credentials.password, account.password):
         raise HTTPException(status_code=401, detail="Invalid credentials")
-    
-    print(f"\nAccount: {account}\n")
 
     refreshToken = oauth2.create_token(data={"account_id": str(account.id), "role" : account.role})    
     response.set_cookie(
@@ -66,12 +81,35 @@ async def login_account(response:Response, credentials: OAuth2PasswordRequestFor
         **config.settings.cookie_config,
     )
 
-    return account
+    private_account = PrivateAccount(
+        id=account.id,
+        email=account.email,
+        username=account.username,
+        full_name=account.full_name,
+        is_verified=account.is_verified,
+        bio=account.bio,
+        avatar_url=account.avatar_url,
+        followers_count=len(account.followers),
+        following_count=len(account.following),
+        created_at=account.created_at,
+        updated_at=account.updated_at,
+    )
+
+    return private_account
 
 @router.post("/logout")
 async def logout(response: Response):
-    response.delete_cookie("accessToken")
-    response.delete_cookie("refreshToken")
+
+    response.delete_cookie(
+        key="accessToken",
+        max_age=0,
+        path="/"
+    )
+    response.delete_cookie(
+        key="refreshToken",
+        max_age=0,
+        path="/"
+    )
     return {"message": "Logged out successfully"}
 
 @router.get("/verify_refresh_token")

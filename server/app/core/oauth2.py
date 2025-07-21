@@ -3,10 +3,10 @@ from jose import jwt, JWTError, ExpiredSignatureError
 from fastapi.security import OAuth2PasswordBearer
 from datetime import datetime, timezone, timedelta
 from beanie import PydanticObjectId
-from .config import settings
+from app.core.config import settings
 from bson import ObjectId
-from ..schemas import token as token_schema
-from .. import models
+from app.schemas import token as token_schema
+from app import models
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 15
 REFRESH_TOKEN_EXPIRE_DAYS = 7

@@ -1,15 +1,18 @@
 from pydantic import BaseModel, EmailStr, Field
 from beanie import PydanticObjectId
 from typing import Literal, Optional
+from datetime import datetime
+
 
 class PublicAccount(BaseModel):
     id: PydanticObjectId
     username: str
     bio: Optional[str]
-    profile_image_url: Optional[str]
+    avatar_url: Optional[str]
     followers_count: int
     following_count: int
     is_following: Optional[bool] = None  # Only set when viewing others
+    created_at: datetime
 
     class Config:
         orm_mode = True
@@ -18,6 +21,7 @@ class PrivateAccount(PublicAccount):
     email:str
     full_name: Optional[str]
     is_verified: bool = Field(default=False)
+    updated_at: datetime
 
 class UpdateProfile(BaseModel):
     bio: Optional[str] = Field(None, max_length=160)
