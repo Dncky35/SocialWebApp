@@ -32,9 +32,22 @@ jobs:
         run: |
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=yes ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'EOF'
             set -e
+
+            # Source environment (important for NVM or custom paths)
+            export NVM_DIR="\$HOME/.nvm"
+            [ -s "\$NVM_DIR/nvm.sh" ] && \. "\$NVM_DIR/nvm.sh"
+            [ -s "\$NVM_DIR/bash_completion" ] && \. "\$NVM_DIR/bash_completion"
+
+            # Debug (optional, remove once confirmed working)
+            echo "Using node: \$(which node)"
+            echo "Using npm: \$(which npm)"
+            node -v
+            npm -v
+
             cd /home/ercan/socialwebapp/client
             git pull origin prod
             npm install
             npm run build
             sudo systemctl restart socialwebapp_client.service
           EOF
+
