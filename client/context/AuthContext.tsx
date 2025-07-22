@@ -1,13 +1,16 @@
 "use client";
-import React, { useState, createContext, useContext } from "react";
+import React, { useState, createContext, useContext, useCallback, useEffect } from "react";
 import { PrivateAccount } from "@/schemas/account";
 import usePost from "@/hooks/usePost";
 import useGet from "@/hooks/useGet";
+import { ApiError } from "@/hooks/useFetch";
 
 interface AuthState{
     account: PrivateAccount | null;
     isLoading: boolean;
     setAccount: React.Dispatch<React.SetStateAction<null>>
+    signUp: (email: string, username: string, password: string) => Promise<void>
+    error: ApiError | null | undefined;
 }
 
 const AuthContext = createContext<AuthState | undefined>(undefined);
@@ -15,11 +18,35 @@ const AuthContext = createContext<AuthState | undefined>(undefined);
 export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) => {
     const { isLoading:isLoadingPost, error:errorPost, postData } = usePost("URLSearchParams");
     const { isLoading:isLoadingGet, error:errorGet, getData } = useGet();
-
     const [account, setAccount] = useState(null);
 
+    useEffect(() => {
+        // Getting account from local storage
+        const account = localStorage.getItem("account");
+        if(account){
+            setAccount(JSON.parse(account));
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, []);
+
+    const signUp = useCallback(async (email:string, username:string, password:string) => {
+        const result = await postData(`/api/auth/signup`, {email, username, password}, {
+            credentials:"include",
+        });
+
+        if(result){
+            setAccount(result);
+            // store account on local store
+            localStorage.setItem("account", JSON.stringify(result));
+
+            // root to home page
+            window.location.href = "/";
+        }
+
+    }, [postData]);
+
     return (
-        <AuthContext.Provider value={{account, isLoading: isLoadingPost || isLoadingGet, setAccount}}>
+        <AuthContext.Provider value={{account, error: errorPost || errorGet, isLoading: isLoadingPost || isLoadingGet, setAccount, signUp}}>
             {children}
         </AuthContext.Provider>
     );

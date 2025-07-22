@@ -1,8 +1,10 @@
 "use client"
+import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 
 const Signup:React.FC = () => {
+	const { signUp, isLoading, error } = useAuth();
 
 	const [formData, setFormData] = useState([
 		{name: "email", type: "email", error:"", value:""},
@@ -34,6 +36,8 @@ const Signup:React.FC = () => {
 			password: formData[2].value,
 		};
 
+		await signUp(payload.email, payload.username, payload.password);
+
 		// const result = await postData(`${BASE_URL}auth/signup`, payload);
 
 		// if(result)
@@ -43,6 +47,13 @@ const Signup:React.FC = () => {
 	return (
 		<div className="flex items-center justify-center p-4 rounded shadow-xl">
 			<div className="w-full max-w-md">
+				{isLoading && (
+					<div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
+						<div className="bg-white rounded-lg shadow-lg p-6 max-w-xl text-center text-lg font-semibold text-cyan-900">
+							Creating account...
+						</div>
+					</div>
+				)}
 				<form
 					className="bg-cyan-900 py-6 px-8 rounded shadow-md"
 					onSubmit={(e) => handleSubmit(e)}
@@ -73,13 +84,18 @@ const Signup:React.FC = () => {
 							)}
 						</div>
 					))}
-
 					<button
 						type="submit"
 						className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 cursor-pointer rounded transition duration-200"
 						>
 						Sign Up
 					</button>
+
+					{error && (
+						<div className="mt-4 text-red-400 text-center text-lg rounded py-2">
+							{error.detail}
+						</div>
+					)}
 
 					{/* {error && (
 						<div className="mt-4 text-red-600 text-center text-sm">

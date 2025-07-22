@@ -10,7 +10,7 @@ interface UsePostReturn{
 
 const usePost = (bodyFormat: BodyFormat = "JSON"): UsePostReturn => {
     const { isLoading, error, fetchData } = useFetch();
-    const postData = async (url: string, body: {}, options: RequestInit) => {
+    const postData = async (url: string, body: {}, options?: RequestInit) => {
         const serializeBody = bodyFormat === "URLSearchParams" ? new URLSearchParams(body).toString() : JSON.stringify(body);
 
         return fetchData(url, {
