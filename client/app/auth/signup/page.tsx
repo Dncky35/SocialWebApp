@@ -13,7 +13,7 @@ const Signup:React.FC = () => {
 
 	const handleOnValueChange = (key:string, value:string) => {
 		setFormData((prev) => {
-			let updated = [...prev];
+			const updated = [...prev];
 
 			updated.map((field) => {
 				if(field.name === key){
