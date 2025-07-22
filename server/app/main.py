@@ -70,7 +70,7 @@ app.include_router(admin_toggle.router)
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to the Social Web App API"}
+    return {"message": "Welcome to the Social Web App API which updated with CI/CD pipeline 🚀"}
 
 @app.middleware("http")
 async def log_request(request:Request, call_next):
@@ -84,7 +84,7 @@ async def log_request(request:Request, call_next):
 async def pymongo_exception_handler(request: Request, exc: PyMongoError):
     return JSONResponse(
         status_code=500,
-        content={"message": "Database error occurred", "details": str(exc)},
+        content={"message": "Database error occurred!", "details": str(exc)},
     )
 
 
