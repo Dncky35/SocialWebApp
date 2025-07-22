@@ -8,7 +8,7 @@ const RootPage:React.FC = () => {
   return (
     <div>
       { account ? null : (
-        <div className="p-4 rounded bg-teal-800 shadow-xl">
+        <div className="p-4 rounded bg-cyan-700 shadow-xl">
           <h1 className="text-center font-bold text-2xl mt-2">You haven't Signin yet</h1>
           <div className="mt-4 text-center">
             <p>

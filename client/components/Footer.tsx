@@ -1,10 +1,14 @@
+import Link from "next/link";
 
 const Footer:React.FC = () => {
     return (
-        <footer className="bg-teal-950 text-white py-4">
+        <footer className="bg-cyan-950 text-white py-2">
             <div className="flex items-center justify-between md:flex-row px-4">
-                <p className="text-lg font-semibold mb-4 md:mb-0">© 2025 CloudROcean</p>
                 <div></div>
+                <div>
+                    <p className="text-xs italic" >Powered by</p>
+                    <Link href={"https://cloudrocean.xyz/"} className="text-md font-semibold">© 2025 CloudROcean</Link>
+                </div>
             </div>
         </footer>
     );
