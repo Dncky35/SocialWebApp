@@ -8,8 +8,9 @@ import { ApiError } from "@/hooks/useFetch";
 interface AuthState{
     account: PrivateAccount | null;
     isLoading: boolean;
-    setAccount: React.Dispatch<React.SetStateAction<null>>
-    signUp: (email: string, username: string, password: string) => Promise<void>
+    setAccount: React.Dispatch<React.SetStateAction<null>>;
+    signUp: (email: string, username: string, password: string) => Promise<void>;
+    login: (username: string, password: string) => Promise<void>;
     error: ApiError | null | undefined;
 }
 
@@ -45,8 +46,29 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
 
     }, [postData]);
 
+    const login = useCallback(async (username:string, password:string) => {
+        const result = await postData(`/api/auth/login`, {username, password}, {
+            credentials:"include",
+        });
+
+        if(result){
+            localStorage.setItem("account", JSON.stringify(result));
+            setAccount(result);
+            window.location.href = "/";
+        }    
+    }, [postData]);
+
+    const logout = useCallback(async () => {
+        const result = await postData(`/api/auth/logout`, {}, {
+            credentials:"include",
+        });
+
+    }, [postData])
+
     return (
-        <AuthContext.Provider value={{account, error: errorPost || errorGet, isLoading: isLoadingPost || isLoadingGet, setAccount, signUp}}>
+        <AuthContext.Provider value={
+            {account, error: errorPost || errorGet, isLoading: isLoadingPost || isLoadingGet, setAccount, signUp, login
+            }}>
             {children}
         </AuthContext.Provider>
     );

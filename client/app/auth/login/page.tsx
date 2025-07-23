@@ -1,9 +1,10 @@
 "use client";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
+import { useAuth } from "@/context/AuthContext";
 
 const Login:React.FC = () => {
-
+	const { isLoading, login, error } = useAuth();
 	const [formData, setFormData] = useState([
 		{name: "email", type: "text", error:"", value:""},
 		{name: "password", type: "password", error:"", value:""},
@@ -32,10 +33,7 @@ const Login:React.FC = () => {
 			password: formData[1].value,
 		};
 
-		// const result = await postData(`${BASE_URL}auth/login`, payload);
-
-		// if(result)
-		// 	setAccount(result);
+		const result = await login(payload.username, payload.password);
 	};
 
 	return (
