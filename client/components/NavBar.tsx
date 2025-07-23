@@ -4,7 +4,7 @@ const NavBar: React.FC = () => {
     return (
         <div className="w-full bg-cyan-950 p-4">
             <div className="container ">
-                <Link href={"/"}>Social Web App</Link>
+                <Link href={"/"}>Social Web 🚀</Link>
             </div>
             <div>
             
