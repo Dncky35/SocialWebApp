@@ -4,6 +4,7 @@ import { PrivateAccount } from "@/schemas/account";
 import usePost from "@/hooks/usePost";
 import useGet from "@/hooks/useGet";
 import { ApiError } from "@/hooks/useFetch";
+import { error } from "console";
 
 interface AuthState{
     account: PrivateAccount | null;
@@ -11,6 +12,7 @@ interface AuthState{
     setAccount: React.Dispatch<React.SetStateAction<null>>;
     signUp: (email: string, username: string, password: string) => Promise<void>;
     login: (username: string, password: string) => Promise<void>;
+    logout: () => Promise<void>;
     error: ApiError | null | undefined;
 }
 
@@ -63,11 +65,22 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             credentials:"include",
         });
 
+        if(result){
+            localStorage.removeItem("account");
+            setAccount(null);
+            window.location.href = "/";
+        }
+        
+        if(errorPost){
+            console.log(JSON.stringify(errorPost));
+        }
+
     }, [postData])
 
     return (
         <AuthContext.Provider value={
-            {account, error: errorPost || errorGet, isLoading: isLoadingPost || isLoadingGet, setAccount, signUp, login
+            {account, error: errorPost || errorGet, isLoading: isLoadingPost || isLoadingGet, 
+                setAccount, signUp, login, logout
             }}>
             {children}
         </AuthContext.Provider>

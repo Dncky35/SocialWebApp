@@ -33,7 +33,7 @@ const Login:React.FC = () => {
 			password: formData[1].value,
 		};
 
-		const result = await login(payload.username, payload.password);
+		await login(payload.username, payload.password);
 	};
 
 	return (
