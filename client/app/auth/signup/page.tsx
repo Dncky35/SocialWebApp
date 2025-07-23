@@ -49,13 +49,13 @@ const Signup:React.FC = () => {
 			<div className="w-full max-w-md">
 				{isLoading && (
 					<div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
-						<div className="bg-white rounded-lg shadow-lg p-6 max-w-xl text-center text-lg font-semibold text-cyan-900">
+						<div className="bg-white rounded-lg shadow-lg p-6 max-w-xl text-center text-lg font-semibold text-emerald-900">
 							Creating account...
 						</div>
 					</div>
 				)}
 				<form
-					className="bg-cyan-900 py-6 px-8 rounded shadow-md"
+					className="bg-emerald-900 py-6 px-8 rounded shadow-md"
 					onSubmit={(e) => handleSubmit(e)}
 					>
 					<h2 className="text-2xl font-bold text-center mb-4">
@@ -77,7 +77,7 @@ const Signup:React.FC = () => {
 								required
 								value={field.value}
 								onChange={(e) => handleOnValueChange(field.name, e.target.value)}
-								className="w-full bg-white text-blue-900 border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+								className="w-full bg-white text-green-900 border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
 								/>
 							{field.error && (
 								<p className="text-red-500 text-sm mt-1">{field.error}</p>

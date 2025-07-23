@@ -13,18 +13,24 @@ const NavBar: React.FC = () => {
     }
 
     return (
-        <nav className="bg-cyan-950 py-2 px-4 flex items-center justify-between ">
-            <div className="bg-cyan-900 cursor-pointer rounded px-2 py-1 hover:bg-cyan-800 hover:text-white transition duration-200">
+        <nav className="bg-emerald-950 py-2 px-4 flex items-center justify-between ">
+            <div className="bg-emerald-900 cursor-pointer rounded px-2 py-1 hover:bg-emerald-800 hover:text-white transition duration-200">
                 <Link href={"/"}>Social Web 🚀</Link>
             </div>
            {account && (
                 <div
                     className="relative"
                     onClick={() => setDropdownVisible((prev) => !prev)}
-                >
-                    {/* Trigger */}
-                    <div className="flex items-center gap-2 cursor-pointer hover:bg-cyan-800 hover:text-white transition duration-200 rounded bg-cyan-900 px-2 py-1">
-                        <p className="text-white font-semibold text-lg">Welcome {account.username}</p>
+                    >
+                    <div className="w-12 h-12 rounded-full bg-emerald-300 overflow-hidden hover:cursor-pointer">
+                        <img
+                            src={
+                                account.avatar_url ??
+                                `https://ui-avatars.com/api/?name=${account.username}&background=50C878`
+                            }
+                            alt="Avatar"
+                            className="w-full h-full object-cover"
+                        />
                     </div>
 
                     {/* Dropdown */}
@@ -32,13 +38,13 @@ const NavBar: React.FC = () => {
                         <div className="absolute right-0 mt-1 w-40 bg-white rounded shadow-lg z-50">
                             <Link
                                 href="/profile/me"
-                                className="block px-4 py-2 text-gray-800 hover:bg-cyan-100"
+                                className="block px-4 py-2 text-gray-800 hover:bg-emerald-100"
                             >
                                 Profile
                             </Link>
                             <button
                                 onClick={handleOnLogout}
-                                className="w-full text-left px-4 py-2 text-gray-800 hover:bg-cyan-100"
+                                className="w-full text-left px-4 py-2 text-gray-800 hover:bg-emerald-100"
                             >
                                 Logout
                             </button>
