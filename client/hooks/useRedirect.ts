@@ -1,7 +1,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 
-type useRedirectOptions = "dashboard" | "home";
+type useRedirectOptions = "feed" | "home";
 
 const useRedirect = ( options?:useRedirectOptions) => {
     const router = useRouter();
@@ -11,6 +11,10 @@ const useRedirect = ( options?:useRedirectOptions) => {
             return;
 
         const token = document.cookie.split("; ").find((row) => row.startsWith("refreshToken="))?.split("=")[1];
+
+        if(token && options && options === "feed"){
+            router.push("/feed");
+        }
 
         if(!token && options && options === "home"){
            router.push("/"); 

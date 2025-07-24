@@ -5,7 +5,7 @@ import { useAuth } from "@/context/AuthContext";
 import useRedirect from "@/hooks/useRedirect";
 
 const Login:React.FC = () => {
-	useRedirect("home");
+	useRedirect("feed");
 	const { isLoading, login, error } = useAuth();
 	const [formData, setFormData] = useState([
 		{name: "email", type: "text", error:"", value:""},
@@ -44,7 +44,7 @@ const Login:React.FC = () => {
 				{isLoading && (
 					<div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
 						<div className="bg-white rounded-lg shadow-lg p-6 max-w-xl text-center text-lg font-semibold text-emerald-900">
-							Creating account...
+							Login to account...
 						</div>
 					</div>
 				)}
