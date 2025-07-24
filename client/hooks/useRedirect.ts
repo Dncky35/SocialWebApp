@@ -12,7 +12,7 @@ const useRedirect = ( options?:useRedirectOptions) => {
 
         const token = document.cookie.split("; ").find((row) => row.startsWith("refreshToken="))?.split("=")[1];
 
-        if(!token){
+        if(!token && options && options === "home"){
            router.push("/"); 
         }
 
