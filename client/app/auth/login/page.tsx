@@ -2,8 +2,10 @@
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import useRedirect from "@/hooks/useRedirect";
 
 const Login:React.FC = () => {
+	useRedirect("home");
 	const { isLoading, login, error } = useAuth();
 	const [formData, setFormData] = useState([
 		{name: "email", type: "text", error:"", value:""},
@@ -39,6 +41,13 @@ const Login:React.FC = () => {
 	return (
 		<div className="flex items-center justify-center p-4 rounded shadow-xl">
 			<div className="w-full max-w-md">
+				{isLoading && (
+					<div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
+						<div className="bg-white rounded-lg shadow-lg p-6 max-w-xl text-center text-lg font-semibold text-emerald-900">
+							Creating account...
+						</div>
+					</div>
+				)}
 				<form className="py-6 px-8 rounded shadow-md bg-emerald-900"
 					onSubmit={(e) => handleSubmit(e)}>
 					<h2 className="text-2xl font-bold text-center mb-4">

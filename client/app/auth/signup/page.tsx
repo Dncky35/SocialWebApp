@@ -2,9 +2,11 @@
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
+import useRedirect from "@/hooks/useRedirect";
 
 const Signup:React.FC = () => {
 	const { signUp, isLoading, error } = useAuth();
+	useRedirect("home");
 
 	const [formData, setFormData] = useState([
 		{name: "email", type: "email", error:"", value:""},
