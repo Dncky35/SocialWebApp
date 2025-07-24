@@ -4,6 +4,8 @@ from pydantic import Field
 from datetime import datetime, timezone
 from pydantic import BaseModel
 
+# TO DO: Add Tags for post but it could be optional
+
 class Post(Document):
     id: Optional[PydanticObjectId] = Field(default=None, alias="_id")
     author_id: str

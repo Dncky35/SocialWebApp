@@ -33,6 +33,7 @@ async def get_my_profile(current_user=Depends(oauth2.get_current_user)):
         following_count=len(account.following),
     )
 
+# Fix: endpoint as profile/{account_id}
 @router.get("/{account_id}/profile", response_model=PublicAccount)
 async def get_profile(account_id: str, current_user=Depends(oauth2.get_current_user)):
     try:
@@ -54,6 +55,7 @@ async def get_profile(account_id: str, current_user=Depends(oauth2.get_current_u
         is_following= is_following
     )
     
+# Fix: endpoint as profile/me
 @router.patch("/me/profile", status_code=status.HTTP_200_OK)
 async def update_my_profile(profile_data: UpdateProfile, current_user=Depends(oauth2.get_current_user)):
     try:
@@ -201,5 +203,7 @@ async def get_feed(offset:int = Query(0, ge=0), limit:int = Query(20, ge=1, le=1
     # GET POST THAT POSTED BY following_ids
     posts = await Post.find(Post.author_id.in_(following_ids)).sort(-Post.created_at).skip(offset).limit(limit).to_list()
     return posts
+
+# TO DO: add feed/ with most recent published posts, add feed/
 
 
