@@ -6,14 +6,14 @@ export function middleware(request: NextRequest){
     // const isProtectedRoute = request.nextUrl.pathname.startsWith("/dashboard");
     const isAuthRoute = request.nextUrl.pathname === "/login" || request.nextUrl.pathname === "/signup";
 
-    if(!token){
-        return NextResponse.redirect(new URL("/", request.url));
-    }
+    // if(!token){
+    //     return NextResponse.redirect(new URL("/", request.url));
+    // }
 
     if(token && isAuthRoute){
         return NextResponse.redirect(new URL("/", request.url));
     }
-    
+
     return NextResponse.next();
 }
 
