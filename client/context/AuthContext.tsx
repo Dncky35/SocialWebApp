@@ -13,6 +13,7 @@ interface AuthState{
     signUp: (email: string, username: string, password: string) => Promise<void>;
     login: (username: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
+    fetchWithAuth: (fetchFunc: () => Promise<any>) => Promise<any>;
     error: ApiError | null | undefined;
 }
 
@@ -75,12 +76,39 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             console.log(JSON.stringify(errorPost));
         }
 
-    }, [postData])
+    }, [postData]);
+
+    const isAccessTokenValid = async () => {
+        let isValid = await getData("/api/auth/verify_access_token", {
+            credentials:"include",
+        });
+
+        if(!isValid){
+            isValid = await postData("/api/auth/create_access_token", {},{
+                credentials:"include",
+            });
+
+            if(isValid)
+                return true;
+            else
+                return false;
+        }
+        else
+            return true;
+    };
+
+    const fetchWithAuth = async ( fetchFunc: () => Promise<any>) => {
+        const isTokenValid = await isAccessTokenValid();
+        if(!isTokenValid)
+            return null;
+        else
+            return await fetchFunc();
+    };
 
     return (
         <AuthContext.Provider value={
             {account, error: errorPost || errorGet, isLoading: isLoadingPost || isLoadingGet, 
-                setAccount, signUp, login, logout
+                setAccount, signUp, login, logout, fetchWithAuth
             }}>
             {children}
         </AuthContext.Provider>

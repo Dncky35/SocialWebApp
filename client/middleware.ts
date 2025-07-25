@@ -1,23 +1,36 @@
+// middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
+import path from "path";
 
-export function middleware(request: NextRequest){
-    const token = request.cookies.get("refreshToken")?.value;
-    // const isProtectedRoute = request.nextUrl.pathname.startsWith("/dashboard");
-    const isAuthRoute = request.nextUrl.pathname === "/login" || request.nextUrl.pathname === "/signup";
-    const isProtectedRoute = request.nextUrl.pathname.startsWith("/feed") || request.nextUrl.pathname.startsWith("profile");
+export function middleware(request: NextRequest) {
+  // console.log("✅ Middleware triggered on:", request.nextUrl.pathname);
+  // console.log("🍪 Cookies in request:", request.cookies.getAll());
+  const token = request.cookies.get("refreshToken")?.value;
+  console.log("Token:", token || "No token found");
 
-    if(!token && isProtectedRoute){
-        return NextResponse.redirect(new URL("/", request.url));
-    }
+  const pathname = request.nextUrl.pathname;
+  // console.log("Pathname:", pathname);
+  const isAuthRoute = pathname.startsWith("/auth");
+  const isProtectedRoute = pathname.startsWith("/feed") || pathname.startsWith("/profile");
 
-    if(token && isAuthRoute){
-        return NextResponse.redirect(new URL("/feed", request.url));
-    }
+  // Redirect unauthenticated users from protected routes
+  if (!token && isProtectedRoute) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
 
-    return NextResponse.next();
+  // Redirect authenticated users from auth routes
+  if (token && isAuthRoute) {
+    return NextResponse.redirect(new URL("/feed", request.url));
+  }
+
+  if(token && pathname === "/"){
+    return NextResponse.redirect(new URL("/feed", request.url));
+  }
+
+  return NextResponse.next();
 }
 
 export const config = {
-    matcher:["/login", "/signup", "/", "/feed/:path", "/profile/:path"],
+  matcher: ["/auth/:path*", "/", "/feed/:path*", "/profile/:path*"],
 };

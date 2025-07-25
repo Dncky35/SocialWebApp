@@ -1,6 +1,6 @@
 "use client";
-import React, { useState } from "react";
-import useRedirect from "@/hooks/useRedirect";
+import React, { useEffect, useState } from "react";
+import { usePostContext } from "@/context/PostContext";
 
 interface Post {
     content: string,
@@ -9,12 +9,28 @@ interface Post {
 };
 
 const FeedPage:React.FC = () => {
-    // useRedirect();
+    const { posts, isLoading, error, fetchPosts } = usePostContext();
+
     const [postForm, setPostForm] = useState<Post>({
         content: "",
         image_url: "",
         tags: [""],
     });
+
+    useEffect(() => {
+        fetchPosts();
+    }, []);
+
+    if(isLoading){
+        return <div>Loading...</div>;
+    }
+
+    if(error){
+        return <div>Error: {error.detail}</div>;
+    }
+
+    console.log(posts)
+
 
     const handleOnContentChange = (value:string) => {
         setPostForm((prev) => {

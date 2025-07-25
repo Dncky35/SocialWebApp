@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { useAuth } from "@/context/AuthContext";
-import useRedirect from "@/hooks/useRedirect";
 
 const formatDate = (date: string) =>
     new Date(date).toLocaleString('en-GB', {
@@ -13,7 +12,6 @@ const formatDate = (date: string) =>
 });
 
 const ProfilePage:React.FC = () => {
-    useRedirect("home");
     const { account } = useAuth();
 
     if(!account)

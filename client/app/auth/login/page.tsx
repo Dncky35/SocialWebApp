@@ -2,10 +2,8 @@
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import useRedirect from "@/hooks/useRedirect";
 
 const Login:React.FC = () => {
-	useRedirect("feed");
 	const { isLoading, login, error } = useAuth();
 	const [formData, setFormData] = useState([
 		{name: "email", type: "text", error:"", value:""},

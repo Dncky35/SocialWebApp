@@ -1,11 +1,9 @@
 "use client";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
-import useRedirect from "@/hooks/useRedirect";
 
 const RootPage:React.FC = () => {
   const { account } = useAuth();
-  useRedirect("feed");
 
   return (
     <div>
