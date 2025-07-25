@@ -26,10 +26,10 @@ class Settings(BaseSettings):
 
         return {
             "httponly": True,
-            "secure": True, # not is_development,
-            "samesite": "none", # "lax" if is_local else "none",
+            "secure": True if not is_development else False, # not is_development,
+            "samesite": "lax" if is_local else "none",
             "path": "/",
-            "domain": "cloudrocean.xyz", # **({"domain": self.domain} if self.domain and not is_local else {}),
+            **({"domain": self.domain} if self.domain and not is_local else {}),
         }
 
 settings = Settings()

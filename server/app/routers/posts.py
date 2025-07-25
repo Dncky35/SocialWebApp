@@ -26,7 +26,7 @@ async def create_post(post_data: PostCreate, current_user=Depends(oauth2.get_cur
 
     return post
 
-@router.get("/", response_model=List[Post])
+@router.get("", response_model=List[Post])
 async def get_all_post(offset:int = Query(0, ge=0), limit:int = Query(20, ge=1, le=100), current_user=Depends(oauth2.get_current_user)):
     # Fetch all posts with pagination and no get deleted posts
     if offset < 0 or limit < 1 or limit > 100:

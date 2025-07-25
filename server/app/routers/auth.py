@@ -99,15 +99,17 @@ async def login_account(response:Response, credentials: OAuth2PasswordRequestFor
 
 @router.post("/logout")
 async def logout(response: Response):
+    # CHECK IF ACCESS TOKEN INCLUDED
 
     response.delete_cookie(
         key="accessToken",
-        max_age=0,
+        # max_age=0,
         path="/"
     )
+
     response.delete_cookie(
         key="refreshToken",
-        max_age=0,
+        # max_age=0,
         path="/"
     )
     return {"message": "Logged out successfully"}
