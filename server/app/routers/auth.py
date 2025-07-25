@@ -123,7 +123,7 @@ async def verify_refresh_token(refresh_token: str = Cookie(None, alias="refreshT
 
 @router.post("/rotate_refresh_token")
 async def rotate_refresh_token(response: Response, current_account=Depends(oauth2.get_logged_in_user)):
-    print(f"\nCurrent Account: {current_account}\n")
+    # print(f"\nCurrent Account: {current_account}\n")
     new_refresh_token = oauth2.create_token(data={"account_id": current_account.account_id, "role":current_account.role})
     response.set_cookie(
         key="refreshToken",

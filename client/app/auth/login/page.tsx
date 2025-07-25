@@ -95,6 +95,11 @@ const Login:React.FC = () => {
 						from here.
 					</p>
 				</div>
+				{error && (
+						<div className="mt-4 text-red-400 text-center text-lg rounded py-2">
+							{error.detail}
+						</div>
+					)}
 			</div>
 		</div>
 	);

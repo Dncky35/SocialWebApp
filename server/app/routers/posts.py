@@ -14,7 +14,7 @@ router = APIRouter(
     tags=["Posts"]
 )
 
-@router.post("/", status_code=201)
+@router.post("", status_code=201)
 async def create_post(post_data: PostCreate, current_user=Depends(oauth2.get_current_user)):
     
     post = Post(
