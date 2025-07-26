@@ -68,7 +68,7 @@ const FeedPage:React.FC = () => {
             <button
             onClick={() => setIsExtended((prev) => !prev)}
             aria-label={isExtended ? "Collapse post input" : "Expand post input"}
-            className={`transform transition-transform duration-300 ease-in-out text-white text-xl select-none`}
+            className={`cursor-pointer transform transition-transform duration-300 ease-in-out text-white text-xl select-none`}
             style={{ rotate: isExtended ? "180deg" : "0deg" }}
             >
             ▼
@@ -109,7 +109,7 @@ const FeedPage:React.FC = () => {
         {/* Posts List Placeholder */}
         <div className="w-full max-w-xl mx-auto">
             {posts.map((post: Post) => (
-                <PostCard key={post._id} post={post} />
+                <PostCard key={post.id} post={post} />
             ))}
         </div>
     </div>

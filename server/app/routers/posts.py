@@ -3,7 +3,9 @@ from beanie import PydanticObjectId
 from bson import ObjectId
 from fastapi import APIRouter, Depends, Query, HTTPException, status
 from app.models.post import Post
-from app.schemas.post import PostUpdate, PostCreate
+from app.models.account import Account
+from app.schemas.post import PostUpdate, PostCreate, PostPublic
+from app.schemas.account import PublicAccount
 from app.models.comment import Comment
 from app.schemas.comment import CommentRequest
 from app.core import oauth2
@@ -14,7 +16,7 @@ router = APIRouter(
     tags=["Posts"]
 )
 
-@router.post("", status_code=201)
+@router.post("", status_code=201, response_model=PostPublic)
 async def create_post(post_data: PostCreate, current_user=Depends(oauth2.get_current_user)):
     
     post = Post(
@@ -24,9 +26,33 @@ async def create_post(post_data: PostCreate, current_user=Depends(oauth2.get_cur
 
     await post.insert()
 
-    return post
+    try:
+        owner = await Account.get(PydanticObjectId(current_user.account_id))
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid Account ID")
+    
+    if not owner:
+        raise HTTPException(status_code=404, detail="Account not found")
 
-@router.get("", response_model=List[Post])
+    return PostPublic (
+        id=str(post.id),
+        content=post.content,
+        image_url=post.image_url,
+        likes=post.likes,
+        created_at=post.created_at,
+        updated_at=post.updated_at,
+        owner = PublicAccount(
+            id=owner.id,
+            username=owner.username,
+            bio=owner.bio,
+            avatar_url=owner.avatar_url,
+            followers_count=len(owner.followers),
+            following_count=len(owner.following),
+            created_at=owner.created_at,
+        )
+    )
+
+@router.get("", response_model=List[PostPublic])
 async def get_all_post(offset:int = Query(0, ge=0), limit:int = Query(20, ge=1, le=100), current_user=Depends(oauth2.get_current_user)):
     # Fetch all posts with pagination and no get deleted posts
     if offset < 0 or limit < 1 or limit > 100:
@@ -44,9 +70,36 @@ async def get_all_post(offset:int = Query(0, ge=0), limit:int = Query(20, ge=1, 
     posts = await Post.find_all().sort(-Post.created_at).skip(offset).limit(limit).to_list()
     posts = [post for post in posts if not post.is_deleted]
 
-    return posts
+    post_list = []
+    for post in posts:
+        owner_account = await Account.get(PydanticObjectId(post.author_id))
+        if not owner_account:
+            raise HTTPException(status_code=404, detail="Account not found")
 
-@router.get("/{id}", response_model=Post)
+        owner_account = PublicAccount(
+            id=owner_account.id,
+            username=owner_account.username,
+            bio=owner_account.bio,
+            avatar_url=owner_account.avatar_url,
+            followers_count=len(owner_account.followers),
+            following_count=len(owner_account.following),
+            created_at=owner_account.created_at,
+        )
+
+        post_list.append(PostPublic(
+            id=str(post.id),
+            content=post.content,
+            image_url=post.image_url,
+            likes=post.likes,
+            created_at=post.created_at,
+            updated_at=post.updated_at,
+            owner=owner_account,
+        ))
+
+    return post_list
+
+
+@router.get("/{id}", response_model=PostPublic)
 async def get_single_post(id:str, current_account=Depends(oauth2.get_current_user)):
     try:
         post = await Post.get(PydanticObjectId(id))
@@ -58,10 +111,36 @@ async def get_single_post(id:str, current_account=Depends(oauth2.get_current_use
     
     if post.is_deleted:
         raise HTTPException(status_code=404, detail="Post not found")
+    
+    try:
+        owner = await Account.get(PydanticObjectId(post.author_id))
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid Account ID")
+    
+    if not owner:
+        raise HTTPException(status_code=404, detail="Account not found")
 
-    return post
+    post_return = PostPublic(
+        id=str(post.id),
+        content=post.content,
+        image_url=post.image_url,
+        likes=post.likes,
+        created_at=post.created_at,
+        updated_at=post.updated_at,
+        owner = PublicAccount(
+            id=owner.id,
+            username=owner.username,
+            bio=owner.bio,
+            avatar_url=owner.avatar_url,
+            followers_count=len(owner.followers),
+            following_count=len(owner.following),
+            created_at=owner.created_at,
+        )
+    )
 
-@router.patch("/{id}", response_model=Post)
+    return post_return
+
+@router.patch("/{id}", response_model=PostPublic)
 async def update_post(id:str, post_data:PostUpdate, current_user=Depends(oauth2.get_current_user)):
     post = await Post.get(PydanticObjectId(id))
     if not post:
@@ -77,8 +156,33 @@ async def update_post(id:str, post_data:PostUpdate, current_user=Depends(oauth2.
     post.image_url = post_data.image_url or post.image_url
     post.updated_at = datetime.now(timezone.utc)
     await post.save()
+
+    try:
+        owner = await Account.get(PydanticObjectId(current_user.account_id))
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid Account ID")
     
-    return post
+    if not owner:
+        raise HTTPException(status_code=404, detail="Account not found")
+    
+    
+    return PostPublic(
+        id=str(post.id),
+        content=post.content,
+        image_url=post.image_url,
+        likes=post.likes,
+        created_at=post.created_at,
+        updated_at=post.updated_at,
+        owner = PublicAccount(
+            id=owner.id,
+            username=owner.username,
+            bio=owner.bio,
+            avatar_url=owner.avatar_url,
+            followers_count=len(owner.followers),
+            following_count=len(owner.following),
+            created_at=owner.created_at,
+        )
+    )
 
 @router.delete("/{id}")
 async def delete_post(id:str, current_user=Depends(oauth2.get_current_user)):

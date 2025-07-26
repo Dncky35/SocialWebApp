@@ -1,14 +1,15 @@
 import React from 'react';
+import { PublicAccount } from '@/schemas/account';
 
 export interface Post {
-  _id: string;
-  author_id: string;
+  id: string;
   content: string;
   image_url: string;
   likes: string[];
   is_deleted: boolean;
   created_at: string;
   updated_at: string;
+  owner: PublicAccount;
 };
 
 interface PostProps {
@@ -20,7 +21,7 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
     <div className="bg-emerald-900 text-white p-4 rounded-xl shadow-md mb-4">
       <div className="text-sm text-emerald-300 mb-2 flex justify-between items-center">
         Posted on {new Date(post.created_at).toLocaleString()}{" / "}
-        Posted by: {post.author_id}
+        Posted by: {post.owner.username}
       </div>
       <div className="text-lg font-semibold mt-2 whitespace-pre-wrap break-words">
         {post.content}

@@ -1,5 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
+from app.schemas.account import PublicAccount
+from datetime import datetime
 
 class PostCreate(BaseModel):
     content: str
@@ -8,3 +10,12 @@ class PostCreate(BaseModel):
 class PostUpdate(BaseModel):
     content: Optional[str] = None
     image_url: Optional[str] = None
+
+class PostPublic(BaseModel):
+    id: str
+    content: str
+    image_url: Optional[str] = None
+    likes: list[str]
+    created_at: datetime   
+    updated_at: datetime
+    owner: PublicAccount

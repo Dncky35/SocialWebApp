@@ -1,4 +1,4 @@
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, Field
 from beanie import PydanticObjectId
 from typing import Literal, Optional
 from datetime import datetime

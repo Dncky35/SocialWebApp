@@ -1,9 +1,9 @@
-from fastapi import APIRouter, Form, HTTPException, status, Response, Depends, Cookie
+from fastapi import APIRouter, HTTPException, status, Response, Depends, Cookie
 from fastapi.security import OAuth2PasswordRequestForm
-from app.core import oauth2, database, utils, config
+from app.core import oauth2, utils, config
 from app import models
-from app.schemas.account import PublicAccount, PrivateAccount
-from datetime import datetime, timedelta
+from app.schemas.account import PrivateAccount
+
 
 router = APIRouter(
     prefix="/auth",
