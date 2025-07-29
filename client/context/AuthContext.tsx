@@ -4,6 +4,7 @@ import { PrivateAccount } from "@/schemas/account";
 import usePost from "@/hooks/usePost";
 import useGet from "@/hooks/useGet";
 import { ApiError } from "@/hooks/useFetch";
+import { BASEURL } from "./ContextProvider";
 
 interface AuthState{
     account: PrivateAccount | null;
@@ -33,7 +34,7 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
     }, []);
 
     const signUp = useCallback(async (email:string, username:string, password:string) => {
-        const result = await postData(`/api/auth/signup`, {email, username, password}, {
+        const result = await postData(`${BASEURL}auth/signup`, {email, username, password}, {
             credentials:"include",
         });
 
@@ -49,7 +50,7 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
     }, [postData]);
 
     const login = useCallback(async (username:string, password:string) => {
-        const result = await postData(`/api/auth/login`, {username, password}, {
+        const result = await postData(`${BASEURL}auth/login`, {username, password}, {
             credentials:"include",
         });
 
@@ -61,7 +62,7 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
     }, [postData]);
 
     const logout = useCallback(async () => {
-        const result = await postData(`/api/auth/logout`, {}, {
+        const result = await postData(`${BASEURL}auth/logout`, {}, {
             credentials:"include",
         });
 
@@ -78,12 +79,12 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
     }, [postData]);
 
     const isAccessTokenValid = async () => {
-        let isValid = await getData("/api/auth/verify_access_token", {
+        let isValid = await getData(`${BASEURL}auth/verify_access_token`, {
             credentials:"include",
         });
 
         if(!isValid){
-            isValid = await postData("/api/auth/create_access_token", {},{
+            isValid = await postData(`${BASEURL}auth/create_access_token`, {},{
                 credentials:"include",
             });
 

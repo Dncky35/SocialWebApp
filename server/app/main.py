@@ -50,7 +50,7 @@ origins_dev = [
     "http://localhost:3000",
     "http://127.0.0.1:3000",
     "https://3000-dncky35-socialwebapp-09hw3b6xdaz.ws-us120.gitpod.io",
-    "https://8000-dncky35-socialwebapp-09hw3b6xdaz.ws-us120.gitpod.io/",
+    "https://8000-dncky35-socialwebapp-09hw3b6xdaz.ws-us120.gitpod.io",
 ]
 
 origins = origins_prod if settings.environment  == "prod" else origins_dev
@@ -61,7 +61,7 @@ app.add_middleware(
     allow_origins=origins,  # Restrict origins for security
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],  # Only allow necessary methods
-    allow_headers=["Authorization", "Content-Type"],
+    allow_headers=["Authorization", "Content-Type", "Set-Cookie", "Cookie"],
 )
 
 app.include_router(auth.router)
