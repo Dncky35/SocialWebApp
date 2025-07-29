@@ -44,9 +44,6 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
                 image_url,
             }, {
                 credentials:"include",
-                headers:{
-                    "Content-Type":"application/json",
-                },
             });
         });
 
