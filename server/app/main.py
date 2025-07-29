@@ -47,11 +47,12 @@ origins_prod = [  # Ensure both Gitpod URLs are included
 ]
 
 origins_dev = [
-    "http://localhost:3000",
-    "http://127.0.0.1:3000",
     "https://3000-dncky35-socialwebapp-09hw3b6xdaz.ws-us120.gitpod.io",
     "https://8000-dncky35-socialwebapp-09hw3b6xdaz.ws-us120.gitpod.io",
+    "http://localhost:3000",
+    "http://localhost:8000",
 ]
+
 
 origins = origins_prod if settings.environment  == "prod" else origins_dev
 
