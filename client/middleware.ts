@@ -1,13 +1,12 @@
 // middleware.ts
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
-import path from "path";
 
 export function middleware(request: NextRequest) {
   // console.log("✅ Middleware triggered on:", request.nextUrl.pathname);
   // console.log("🍪 Cookies in request:", request.cookies.getAll());
   const token = request.cookies.get("refreshToken")?.value;
-  console.log("Token:", token || "No token found");
+  // console.log("Token:", token || "No token found");
 
   const pathname = request.nextUrl.pathname;
   // console.log("Pathname:", pathname);
@@ -15,9 +14,9 @@ export function middleware(request: NextRequest) {
   const isProtectedRoute = pathname.startsWith("/feed") || pathname.startsWith("/profile");
 
   // Redirect unauthenticated users from protected routes
-  if (!token && isProtectedRoute) {
-    return NextResponse.redirect(new URL("/", request.url));
-  }
+  // if (!token && isProtectedRoute) {
+  //   return NextResponse.redirect(new URL("/", request.url));
+  // }
 
   // Redirect authenticated users from auth routes
   if (token && isAuthRoute) {
