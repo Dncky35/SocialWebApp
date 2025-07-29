@@ -5,6 +5,7 @@ export interface Post {
   id: string;
   content: string;
   image_url: string;
+  tags: string[];
   likes: string[];
   is_deleted: boolean;
   created_at: string;

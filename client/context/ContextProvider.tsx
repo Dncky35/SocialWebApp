@@ -1,4 +1,4 @@
-
+"use client";
 import { AuthProvider } from "./AuthContext";
 import { PostProvider } from "./PostContext";
 

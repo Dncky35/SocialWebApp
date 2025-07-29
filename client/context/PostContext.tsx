@@ -1,6 +1,6 @@
 "use client";
 import React, { useContext, useState, useCallback } from "react";
-// import { useRouter } from "next/navigation";
+import { BASEURL } from "./ContextProvider";
 import useGet from "@/hooks/useGet";
 import usePost from "@/hooks/usePost";
 import { ApiError } from "@/hooks/useFetch";
@@ -25,23 +25,21 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
     const [posts, setPosts] = useState([]);   
 
     const fetchPosts = useCallback(async () => {
-            const result = await fetchWithAuth(async () => {
-                return await getData("/api/posts", {
+        const result = await fetchWithAuth(async () => {
+            return await getData(`${BASEURL}posts`, {
                 credentials:"include",
-                headers:{
-                    "Content-Type":"application/json",
-                },
             });
         });
 
         if(result){
             setPosts(result);
+        
         }
     }, [getData, fetchWithAuth]);
 
     const createPost = useCallback(async (content: string, image_url?: string,) => {
         const result:Post = await fetchWithAuth(async ()=> {
-            return await postData("/api/posts", {
+            return await postData(`${BASEURL}posts/`, {
                 content,
                 image_url,
             }, {

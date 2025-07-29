@@ -6,26 +6,29 @@ import PostCreator from "@/components/PostCreator";
 
 
 const FeedPage:React.FC = () => {
-    const { posts, isLoading, error, fetchPosts, createPost } = usePostContext();
+    const { posts, isLoading, error, fetchPosts } = usePostContext();
 
     useEffect(() => {
-        fetchPosts();
+        const updateFeed = async () => {
+            await fetchPosts();
+        };
+
+        updateFeed();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
-    if(error){
-        return <div>Error: {error.detail}</div>;
+    if(isLoading){
+        return (
+        <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
+            <div className="bg-white rounded-lg shadow-lg p-6 max-w-xl text-center text-lg font-semibold text-emerald-900">
+                Fetching posts...
+            </div>
+        </div>
+        );
     }
 
     return (
     <div className="flex-grow bg-emerald-950 p-6 lg:w-full md:max-w-2xl mx-auto rounded-2xl shadow-2xl space-y-6">
-        {isLoading && (
-            <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
-                <div className="bg-white rounded-lg shadow-lg p-6 max-w-xl text-center text-lg font-semibold text-emerald-900">
-                    Fetching posts...
-                </div>
-            </div>
-        )}
         {/* Post Input Section */}
         <div>
             <PostCreator />
@@ -33,6 +36,7 @@ const FeedPage:React.FC = () => {
 
         {/* Posts List Placeholder */}
         <div className="w-full max-w-xl mx-auto">
+            {error && (<div className="text-center font-bold">Error: {JSON.stringify(error)}</div>)}
             {posts.map((post: Post) => (
                 <PostCard key={post.id} post={post} />
             ))}
