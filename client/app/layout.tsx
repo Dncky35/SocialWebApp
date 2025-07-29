@@ -15,8 +15,8 @@ export default function RootLayout({children,}: Readonly<{ children: React.React
       <body className="bg-emerald-800 text-white h-screen flex flex-col" >
         <AppProviders>
           <NavBar />
-          <main className="flex-grow flex flex-col justify-center items-center py-2">
-            {children}
+          <main className="flex-grow flex flex-col justify-center items-center pt-[3.5rem] pb-[3rem]">
+          {children}
           </main>
           <Footer />
         </AppProviders>

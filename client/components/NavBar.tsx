@@ -13,7 +13,7 @@ const NavBar: React.FC = () => {
     }
 
     return (
-        <nav className="bg-emerald-950 py-2 px-4 flex items-center justify-between ">
+        <nav className="fixed w-full top-0 bg-emerald-950 py-2 px-4 flex items-center justify-between ">
             <div className="bg-emerald-900 cursor-pointer rounded px-2 py-1 hover:bg-emerald-800 hover:text-white transition duration-200">
                 <Link href={"/"}>Social Web 🚀</Link>
             </div>

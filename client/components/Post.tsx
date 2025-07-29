@@ -19,29 +19,17 @@ interface PostProps {
 
 const PostCard: React.FC<PostProps> = ({ post }) => {
   return (
-    <div className="bg-emerald-900 text-white p-4 rounded-xl shadow-md mb-4">
-      <div className="text-sm text-emerald-300 mb-2 flex justify-between items-center">
-        Posted on {new Date(post.created_at).toLocaleString()}{" / "}
-        Posted by: {post.owner.username}
-      </div>
-      <div className="text-lg font-semibold mt-2 whitespace-pre-wrap break-words">
+    <div className='bg-emerald-900 rounded shadow-xl mb-4 px-4 py-2'>
+      <div className='font-semibold text-lg text-emerald-300 cursor-pointer hover:underline'>{post.owner.username}</div>
+      <hr className='mb-2'></hr>
+      <div className='text-xl font-semibold whitespace-pre-wrap break-words mb-2'>
         {post.content}
       </div>
-      {post.image_url && (
-        <img
-          src={post.image_url}
-          alt="Post"
-          className="mt-3 rounded-lg max-h-60 object-cover w-full"
-        />
-      )}
-      <div className="mt-3 text-sm text-emerald-400 flex justify-between items-center">
-        <p>{post.likes.length} {post.likes.length === 1 ? 'like' : 'likes'}</p>
-        <div className='flex gap-2 justify-between items-center'>
-            <button className='bg-emerald-400 cursor-pointer py-1 px-2 rounded-lg text-white hover:bg-emerald-500 transition-colors duration-300 ease-in-out'>
-                Like</button>
-            <button className='bg-emerald-400 cursor-pointer py-1 px-2 rounded-lg text-white hover:bg-emerald-500 transition-colors duration-300 ease-in-out'>
-                Bookmark</button>
+      <div className='flex gap-x-2'>{post.tags.map((tag, index) => (
+        <div key={index} className="text-sm cursor-pointer hover:underline">
+          #{tag}
         </div>
+      ))}
       </div>
     </div>
   );
