@@ -14,9 +14,9 @@ export function middleware(request: NextRequest) {
   const isProtectedRoute = pathname.startsWith("/feed") || pathname.startsWith("/profile");
 
   // Redirect unauthenticated users from protected routes
-  // if (!token && isProtectedRoute) {
-  //   return NextResponse.redirect(new URL("/", request.url));
-  // }
+  if (!token && isProtectedRoute) {
+    return NextResponse.redirect(new URL("/", request.url));
+  }
 
   // Redirect authenticated users from auth routes
   if (token && isAuthRoute) {

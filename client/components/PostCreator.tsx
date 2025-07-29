@@ -10,7 +10,7 @@ export interface PostCreationForm {
 const tagList:string[] = ["Sport", "News", "Science", "Technology", "Politics", "Entertainment", "Health", "Travel", "Food", "Lifestyle"];
 
 const PostCreator:React.FC = () => {
-    const [ isExtended, setIsExtended ] = useState(true);
+    const [ isExtended, setIsExtended ] = useState(false);
     const [ isAddTag, setIsAddTag ] = useState(false);
     const [ isAddImage, setIsAddImage ] = useState(false);
     const [postForm, setPostForm] = useState<PostCreationForm>({
@@ -112,7 +112,7 @@ const PostCreator:React.FC = () => {
 
             {isExtended && (
                 <div className="space-y-4">
-                    <div className="bg-emerald-50 p-2 rounded-lg shadow-inner">
+                    <div className="bg-emerald-100 p-2 rounded-lg shadow-inner">
                         <textarea  id="post"
                             name="post"
                             className="w-full h-32 p-4 rounded-lg bg-emerald-50 text-emerald-950 shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500"
@@ -135,9 +135,13 @@ const PostCreator:React.FC = () => {
                             </ul>
                             <div className="flex gap-x-2 text-sm">
                                 <button onClick={() => {setIsAddTag((prev) => !prev); setIsAddImage(false);}}
-                                className="bg-emerald-500 cursor-pointer rounded py-2 hover:bg-emerald-600 px-2">Add Tag(s)</button>
+                                className="bg-emerald-500 cursor-pointer rounded py-2 hover:bg-emerald-600 px-2">
+                                    Add Tag(s)
+                                </button>
                                 <button onClick={() => {setIsAddImage((prev) => !prev); setIsAddTag(false);}} 
-                                className="bg-emerald-500 cursor-pointer rounded py-2 hover:bg-emerald-600 px-2">Add Image</button>
+                                className="bg-emerald-900 rounded py-2 hover:bg-emerald-900 px-2" disabled={true} >
+                                    Add Image
+                                </button>
                             </div>
                         </div>
                     </div>

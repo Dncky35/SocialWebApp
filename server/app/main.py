@@ -41,16 +41,19 @@ app = FastAPI(
 app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
-origins = [  # Ensure both Gitpod URLs are included
+origins_prod = [  # Ensure both Gitpod URLs are included
         "https://cloudrocean.xyz",
-        "http://localhost:3000",
-        "http://127.0.0.1:3000",
-        "https://cdpn.io",
-    ]
+        "https://socialwebapp.cloudrocean.xyz",
+]
 
-# # Enforce HTTPS only in production
-# if settings.environment == "production":
-#     app.add_middleware(HTTPSRedirectMiddleware)
+origins_dev = [
+    "http://localhost:3000",
+    "http://127.0.0.1:3000",
+    "https://3000-dncky35-socialwebapp-09hw3b6xdaz.ws-us120.gitpod.io",
+    "https://8000-dncky35-socialwebapp-09hw3b6xdaz.ws-us120.gitpod.io/",
+]
+
+origins = origins_prod if settings.environment  == "prod" else origins_dev
 
 # Enable CORS securely
 app.add_middleware(
@@ -58,7 +61,7 @@ app.add_middleware(
     allow_origins=origins,  # Restrict origins for security
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],  # Only allow necessary methods
-    allow_headers=["Authorization", "Content-Type", "Set-Cookie", "Cookie"],
+    allow_headers=["Authorization", "Content-Type"],
 )
 
 app.include_router(auth.router)

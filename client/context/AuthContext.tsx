@@ -4,7 +4,6 @@ import { PrivateAccount } from "@/schemas/account";
 import usePost from "@/hooks/usePost";
 import useGet from "@/hooks/useGet";
 import { ApiError } from "@/hooks/useFetch";
-import { error } from "console";
 
 interface AuthState{
     account: PrivateAccount | null;

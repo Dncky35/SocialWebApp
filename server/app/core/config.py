@@ -21,7 +21,7 @@ class Settings(BaseSettings):
 
     @property
     def cookie_config(self):
-        is_local = self.domain in [None, "", "localhost"]
+        is_local = self.domain in [None, "", "localhost", "socialwebapp.cloudrocean.xyz"]
         is_development = self.environment in ["dev", "development", "test"]
 
         return {
