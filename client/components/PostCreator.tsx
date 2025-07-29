@@ -81,7 +81,7 @@ const PostCreator:React.FC = () => {
 
     const handleOnPublish = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
-        await createPost(postForm.content, postForm.image_url);
+        await createPost(postForm.content, postForm.tags, postForm.image_url);
     };
 
     return(

@@ -1,5 +1,6 @@
 import React from 'react';
 import { PublicAccount } from '@/schemas/account';
+import Link from 'next/link';
 
 export interface Post {
   id: string;
@@ -20,7 +21,7 @@ interface PostProps {
 const PostCard: React.FC<PostProps> = ({ post }) => {
   return (
     <div className='bg-emerald-900 rounded shadow-xl mb-4 px-4 py-2'>
-      <div className='font-semibold text-lg text-emerald-300 cursor-pointer hover:underline'>{post.owner.username}</div>
+      <Link href={`/profile/${post.owner.username}`} className='font-semibold text-lg text-emerald-300 cursor-pointer hover:underline'>{post.owner.username}</Link>
       <hr className='mb-2'></hr>
       <div className='text-xl font-semibold whitespace-pre-wrap break-words mb-2'>
         {post.content}
