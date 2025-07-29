@@ -39,7 +39,7 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
 
     const createPost = useCallback(async (content: string, image_url?: string,) => {
         const result:Post = await fetchWithAuth(async ()=> {
-            return await postData(`${BASEURL}posts/`, {
+            return await postData(`${BASEURL}posts`, {
                 content,
                 image_url,
             }, {
