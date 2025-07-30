@@ -3,9 +3,9 @@ export interface PublicAccount{
     username: string;
     bio?: string;
     avatar_url?: string;
+    is_following?: boolean;
     followers_count: number;
     following_count: number;
-    is_following?: boolean;
     created_at: string; // Assuming ISO 8601 string (datetime)
 }
 
