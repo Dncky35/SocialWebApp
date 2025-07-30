@@ -53,7 +53,6 @@ origins_dev = [
     "http://localhost:8000",
 ]
 
-
 origins = origins_prod if settings.environment  == "prod" else origins_dev
 
 # Enable CORS securely
@@ -62,7 +61,7 @@ app.add_middleware(
     allow_origins=origins,  # Restrict origins for security
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],  # Only allow necessary methods
-    allow_headers=["Authorization", "Content-Type", "Set-Cookie", "Cookie"],
+    allow_headers=["Authorization", "Content-Type"],
 )
 
 app.include_router(auth.router)

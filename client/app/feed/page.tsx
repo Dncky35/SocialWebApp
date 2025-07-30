@@ -9,13 +9,15 @@ const FeedPage:React.FC = () => {
     const { posts, isLoading, error, fetchPosts } = usePostContext();
 
     useEffect(() => {
+        if(posts.length > 0)
+            return;
+        
         const updateFeed = async () => {
             await fetchPosts();
         };
 
         updateFeed();
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, []);
+    }, [posts]);
 
     if(isLoading){
         return (

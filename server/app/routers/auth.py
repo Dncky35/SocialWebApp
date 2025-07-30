@@ -97,21 +97,20 @@ async def login_account(response:Response, credentials: OAuth2PasswordRequestFor
 
     return private_account
 
+
 @router.post("/logout")
 async def logout(response: Response):
-    # CHECK IF ACCESS TOKEN INCLUDED
-
     response.delete_cookie(
         key="accessToken",
-        # max_age=0,
-        path="/"
+        path="/",
+        domain=config.settings.domain
     )
-
     response.delete_cookie(
         key="refreshToken",
-        # max_age=0,
-        path="/"
+        path="/",
+        domain=config.settings.domain
     )
+
     return {"message": "Logged out successfully"}
 
 @router.get("/verify_refresh_token")
