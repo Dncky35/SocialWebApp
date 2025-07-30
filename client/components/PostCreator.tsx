@@ -112,7 +112,7 @@ const PostCreator:React.FC = () => {
 
             {isExtended && (
                 <div className="space-y-4">
-                    <div className="bg-emerald-100 p-2 rounded-lg shadow-inner">
+                    <div className="bg-emerald-800 p-2 rounded-lg shadow-inner">
                         <textarea  id="post"
                             name="post"
                             className="w-full h-32 p-4 rounded-lg bg-emerald-50 text-emerald-950 shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500"

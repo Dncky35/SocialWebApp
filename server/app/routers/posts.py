@@ -7,8 +7,7 @@ from app.models.account import Account
 from app.models.comment import Comment
 from app.schemas.post import PostUpdate, PostCreate, PostPublic
 from app.schemas.account import PublicAccount
-from app.models.comment import Comment
-from app.schemas.comment import CommentRequest
+from app.schemas.comment import CommentRequest, CommentResponse
 from app.core import oauth2
 from typing import List
 
@@ -16,6 +15,49 @@ router = APIRouter(
     prefix="/posts",
     tags=["Posts"]
 )
+
+def create_post_response(post:Post, account:Account, comments:List[Comment], current_account):
+    public_account = PublicAccount(
+        id=account.id,
+        username=account.username,
+        bio=account.bio,
+        avatar_url=account.avatar_url,
+        followers_count=len(account.followers),
+        following_count=len(account.following),
+        is_following = PydanticObjectId(current_account.account_id) in account.followers if current_account else False,
+        created_at=account.created_at,
+    )
+
+    public_comments = [comment for comment in post_comments if not comment.is_deleted]
+
+    comment_list = []
+    for comment in public_comments:
+        comment_list.append(CommentResponse(
+            id=str(comment.id),
+            content=comment.content,
+            created_at=comment.created_at,
+            updated_at=comment.updated_at,
+            author_id=comment.author_id,
+            post_id=comment.post_id,
+            parent_comment_id=comment.parent_comment_id if comment.parent_comment_id else None,
+            child_commets=comment.child_commets if comment.child_commets else [],
+            likes=comment.likes,
+            is_liked = PydanticObjectId(current_account.account_id) in comment.likes if current_account else False,
+
+        ))
+
+    return PostPublic(
+        id=str(post.id),
+        content=post.content,
+        image_url=post.image_url,
+        tags=post.tags,
+        likes=post.likes,
+        comments = comment_list,
+        is_liked = PydanticObjectId(current_user.account_id) in post.likes if current_user else False,
+        created_at=post.created_at,
+        updated_at=post.updated_at,
+        owner=public_account,
+    )
 
 @router.post("", status_code=201, response_model=PostPublic)
 async def create_post(post_data: PostCreate, current_user=Depends(oauth2.get_current_user)):
@@ -35,26 +77,8 @@ async def create_post(post_data: PostCreate, current_user=Depends(oauth2.get_cur
     if not owner:
         raise HTTPException(status_code=404, detail="Account not found")
 
-    return PostPublic (
-        id=str(post.id),
-        content=post.content,
-        image_url=post.image_url,
-        tags=post.tags,
-        likes=post.likes,
-        is_liked = PydanticObjectId(current_user.account_id) in post.likes if current_user else False,
-        created_at=post.created_at,
-        updated_at=post.updated_at,
-        owner = PublicAccount(
-            id=owner.id,
-            username=owner.username,
-            bio=owner.bio,
-            avatar_url=owner.avatar_url,
-            is_following= PydanticObjectId(current_user.account_id) in owner_account.followers if current_user else False, 
-            followers_count=len(owner.followers),
-            following_count=len(owner.following),
-            created_at=owner.created_at,
-        )
-    )
+    return create_post_response(post, owner, [], current_user)
+
 
 @router.get("", response_model=List[PostPublic])
 async def get_all_post(offset:int = Query(0, ge=0), limit:int = Query(20, ge=1, le=100), current_user=Depends(oauth2.get_current_user)):
@@ -82,34 +106,7 @@ async def get_all_post(offset:int = Query(0, ge=0), limit:int = Query(20, ge=1, 
 
         post_comments = await Comment.find_all(Comment.post_id == post.id).sort(-Post.created_at).skip(offset).limit(limit).to_list()
 
-        if not post_comments:
-            post_comments = []
-        else:
-            post_comments = [comment for comment in post_comments if not comment.is_deleted]
-
-        owner_account = PublicAccount(
-            id=owner_account.id,
-            username=owner_account.username,
-            bio=owner_account.bio,
-            is_following= PydanticObjectId(current_user.account_id) in owner_account.followers if current_user else False, 
-            avatar_url=owner_account.avatar_url,
-            followers_count=len(owner_account.followers),
-            following_count=len(owner_account.following),
-            created_at=owner_account.created_at,
-        )
-
-        post_list.append(PostPublic(
-            id=str(post.id),
-            content=post.content,
-            image_url=post.image_url,
-            tags=post.tags,
-            likes=post.likes,
-            comments = post_comments,
-            is_liked = PydanticObjectId(current_user.account_id) in post.likes if current_user else False,
-            created_at=post.created_at,
-            updated_at=post.updated_at,
-            owner=owner_account,
-        ))
+        post_list.append(create_post_response(post, owner_account, post_comments, current_user))
 
     return post_list
 
@@ -142,29 +139,7 @@ async def get_single_post(id:str, current_account=Depends(oauth2.get_current_use
     else:
         post_comments = [comment for comment in post_comments if not comment.is_deleted]
 
-    post_return = PostPublic(
-        id=str(post.id),
-        content=post.content,
-        image_url=post.image_url,
-        tags=post.tags,
-        likes=post.likes,
-        is_liked = PydanticObjectId(current_user.account_id) in post.likes if current_user else False,
-        comments = post_comments,
-        created_at=post.created_at,
-        updated_at=post.updated_at,
-        owner = PublicAccount(
-            id=owner.id,
-            username=owner.username,
-            bio=owner.bio,
-            avatar_url=owner.avatar_url,
-            is_following= PydanticObjectId(current_user.account_id) in owner_account.followers if current_user else False, 
-            followers_count=len(owner.followers),
-            following_count=len(owner.following),
-            created_at=owner.created_at,
-        )
-    )
-
-    return post_return
+    return create_post_response(post, owner, post_comments, current_account)
 
 @router.patch("/{id}", response_model=PostPublic)
 async def update_post(id:str, post_data:PostUpdate, current_user=Depends(oauth2.get_current_user)):
@@ -198,27 +173,7 @@ async def update_post(id:str, post_data:PostUpdate, current_user=Depends(oauth2.
     else:
         post_comments = [comment for comment in post_comments if not comment.is_deleted]
     
-    return PostPublic(
-        id=str(post.id),
-        content=post.content,
-        image_url=post.image_url,
-        tags=post.tags,
-        likes=post.likes,
-        is_liked = PydanticObjectId(current_user.account_id) in post.likes if current_user else False,
-        comments = post_comments,
-        created_at=post.created_at,
-        updated_at=post.updated_at,
-        owner = PublicAccount(
-            id=owner.id,
-            username=owner.username,
-            bio=owner.bio,
-            is_following= PydanticObjectId(current_user.account_id) in owner_account.followers if current_user else False, 
-            avatar_url=owner.avatar_url,
-            followers_count=len(owner.followers),
-            following_count=len(owner.following),
-            created_at=owner.created_at,
-        )
-    )
+    return create_post_response(post, owner, post_comments, current_user)
 
 @router.delete("/{id}")
 async def delete_post(id:str, current_user=Depends(oauth2.get_current_user)):
