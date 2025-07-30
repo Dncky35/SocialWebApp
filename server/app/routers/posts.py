@@ -4,6 +4,7 @@ from bson import ObjectId
 from fastapi import APIRouter, Depends, Query, HTTPException, status
 from app.models.post import Post
 from app.models.account import Account
+from app.models.comment import Comment
 from app.schemas.post import PostUpdate, PostCreate, PostPublic
 from app.schemas.account import PublicAccount
 from app.models.comment import Comment
@@ -40,6 +41,7 @@ async def create_post(post_data: PostCreate, current_user=Depends(oauth2.get_cur
         image_url=post.image_url,
         tags=post.tags,
         likes=post.likes,
+        is_liked = PydanticObjectId(current_user.account_id) in post.likes if current_user else False,
         created_at=post.created_at,
         updated_at=post.updated_at,
         owner = PublicAccount(
@@ -78,6 +80,13 @@ async def get_all_post(offset:int = Query(0, ge=0), limit:int = Query(20, ge=1, 
         if not owner_account:
             raise HTTPException(status_code=404, detail="Account not found")
 
+        post_comments = await Comment.find_all(Comment.post_id == post.id).sort(-Post.created_at).skip(offset).limit(limit).to_list()
+
+        if not post_comments:
+            post_comments = []
+        else:
+            post_comments = [comment for comment in post_comments if not comment.is_deleted]
+
         owner_account = PublicAccount(
             id=owner_account.id,
             username=owner_account.username,
@@ -95,6 +104,8 @@ async def get_all_post(offset:int = Query(0, ge=0), limit:int = Query(20, ge=1, 
             image_url=post.image_url,
             tags=post.tags,
             likes=post.likes,
+            comments = post_comments,
+            is_liked = PydanticObjectId(current_user.account_id) in post.likes if current_user else False,
             created_at=post.created_at,
             updated_at=post.updated_at,
             owner=owner_account,
@@ -124,12 +135,21 @@ async def get_single_post(id:str, current_account=Depends(oauth2.get_current_use
     if not owner:
         raise HTTPException(status_code=404, detail="Account not found")
 
+    post_comments = await Comment.find_all(Comment.post_id == post.id).sort(-Post.created_at).skip(offset).limit(limit).to_list()
+
+    if not post_comments:
+        post_comments = []
+    else:
+        post_comments = [comment for comment in post_comments if not comment.is_deleted]
+
     post_return = PostPublic(
         id=str(post.id),
         content=post.content,
         image_url=post.image_url,
         tags=post.tags,
         likes=post.likes,
+        is_liked = PydanticObjectId(current_user.account_id) in post.likes if current_user else False,
+        comments = post_comments,
         created_at=post.created_at,
         updated_at=post.updated_at,
         owner = PublicAccount(
@@ -170,7 +190,13 @@ async def update_post(id:str, post_data:PostUpdate, current_user=Depends(oauth2.
     
     if not owner:
         raise HTTPException(status_code=404, detail="Account not found")
-    
+
+    post_comments = await Comment.find_all(Comment.post_id == post.id).sort(-Post.created_at).skip(offset).limit(limit).to_list()
+
+    if not post_comments:
+        post_comments = []
+    else:
+        post_comments = [comment for comment in post_comments if not comment.is_deleted]
     
     return PostPublic(
         id=str(post.id),
@@ -178,6 +204,8 @@ async def update_post(id:str, post_data:PostUpdate, current_user=Depends(oauth2.
         image_url=post.image_url,
         tags=post.tags,
         likes=post.likes,
+        is_liked = PydanticObjectId(current_user.account_id) in post.likes if current_user else False,
+        comments = post_comments,
         created_at=post.created_at,
         updated_at=post.updated_at,
         owner = PublicAccount(
