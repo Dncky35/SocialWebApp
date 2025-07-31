@@ -32,7 +32,10 @@ const PostCreator:React.FC = () => {
     };
 
     const handleOnImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-
+        e.preventDefault();
+        const file = e.target.files?.[0];
+        if(!file)
+            return;
     }
 
     const handleOnTagChange = (e: React.ChangeEvent<HTMLInputElement>) => {

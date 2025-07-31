@@ -1,6 +1,7 @@
 import React from 'react';
 import { PublicAccount } from '@/schemas/account';
 import Link from 'next/link';
+import { Comment } from './Comment';
 
 export interface Post {
   id: string;
@@ -9,7 +10,7 @@ export interface Post {
   tags: string[];
   likes: string[];
   is_liked?: boolean;
-  comments: any[]; // CREATE A SCHEMA FOR COMMENT AND USE HERE AS TYPE
+  comments: Comment[]; // CREATE A SCHEMA FOR COMMENT AND USE HERE AS TYPE
   is_deleted: boolean;
   created_at: string;
   updated_at: string;
