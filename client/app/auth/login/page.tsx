@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import LoadingComponent from "@/components/Loading";
 
 const Login:React.FC = () => {
 	const { isLoading, login, error } = useAuth();
@@ -40,11 +41,7 @@ const Login:React.FC = () => {
 		<div className="flex items-center justify-center p-4 rounded shadow-xl">
 			<div className="w-full max-w-md">
 				{isLoading && (
-					<div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
-						<div className="bg-white rounded-lg shadow-lg p-6 max-w-xl text-center text-lg font-semibold text-emerald-900">
-							Login to account...
-						</div>
-					</div>
+					<LoadingComponent />
 				)}
 				<form className="py-6 px-8 rounded shadow-md bg-emerald-900"
 					onSubmit={(e) => handleSubmit(e)}>

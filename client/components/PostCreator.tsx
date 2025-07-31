@@ -1,5 +1,6 @@
 import React, { useState} from "react";
 import { usePostContext } from "@/context/PostContext";
+import LoadingComponent from "./Loading";
 
 export interface PostCreationForm {
     content: string,
@@ -90,11 +91,7 @@ const PostCreator:React.FC = () => {
     return(
         <div className="bg-emerald-900 px-6 py-2 rounded-xl shadow-xl w-full max-w-xl mx-auto">
             {isLoading && (
-                <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
-                    <div className="bg-white rounded-lg shadow-lg p-6 max-w-xl text-center text-lg font-semibold text-emerald-900">
-                        Publishin Post...
-                    </div>
-                </div>
+               <LoadingComponent />
             )}
             <div className="flex justify-between items-center mb-4">
                 <label

@@ -3,6 +3,7 @@ import React, { useEffect } from "react";
 import { usePostContext } from "@/context/PostContext";
 import PostCard, { Post } from "@/components/Post";
 import PostCreator from "@/components/PostCreator";
+import LoadingComponent from "@/components/Loading";
 
 
 const FeedPage:React.FC = () => {
@@ -21,11 +22,7 @@ const FeedPage:React.FC = () => {
 
     if(isLoading){
         return (
-        <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
-            <div className="bg-white rounded-lg shadow-lg p-6 max-w-xl text-center text-lg font-semibold text-emerald-900">
-                Fetching posts...
-            </div>
-        </div>
+            <LoadingComponent />
         );
     }
 

@@ -1,6 +1,6 @@
 "use client";
 import Link from "next/link";
-import React, { use, useState } from "react";
+import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
 
 const NavBar: React.FC = () => {
