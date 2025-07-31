@@ -21,13 +21,13 @@ class Settings(BaseSettings):
 
     @property
     def cookie_config(self):
-        is_local = self.domain in [None, "", "localhost", "socialwebapp.cloudrocean.xyz"]
-        is_development = self.environment in ["dev", "development", "test"]
+        is_local = self.domain in [None, "", "localhost"]
+        is_prod = self.domain in ["socialwebapp.cloudrocean.xyz"]
 
         return {
             "httponly": True,
             "secure": True, # True if not is_development else False, # not is_development,
-            "samesite": "lax" if is_local else "none",
+            "samesite": "lax" if is_local or is_prod else "none",
             "path": "/",
             **({"domain": self.domain} if self.domain and not is_local else {}),
         }
