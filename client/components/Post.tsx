@@ -22,7 +22,7 @@ interface PostProps {
 };
 
 const PostCard: React.FC<PostProps> = ({ post }) => {
-  console.log(JSON.stringify(post));
+  // console.log(JSON.stringify(post));
   return (
     <div className='bg-emerald-900 rounded shadow-xl mb-4 px-4 py-2'>
       <div className='border-b border-emerald-700 py-1 mb-1'>
