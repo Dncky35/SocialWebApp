@@ -28,7 +28,7 @@ def create_post_response(post:Post, account:Account, comments:List[Comment], cur
         created_at=account.created_at,
     )
 
-    public_comments = [comment for comment in post_comments if not comment.is_deleted]
+    public_comments = [comment for comment in comments if not comment.is_deleted]
 
     comment_list = []
     for comment in public_comments:
@@ -53,7 +53,7 @@ def create_post_response(post:Post, account:Account, comments:List[Comment], cur
         tags=post.tags,
         likes=post.likes,
         comments = comment_list,
-        is_liked = PydanticObjectId(current_user.account_id) in post.likes if current_user else False,
+        is_liked = PydanticObjectId(current_account.account_id) in post.likes if current_account else False,
         created_at=post.created_at,
         updated_at=post.updated_at,
         owner=public_account,
@@ -132,7 +132,7 @@ async def get_single_post(id:str, current_account=Depends(oauth2.get_current_use
     if not owner:
         raise HTTPException(status_code=404, detail="Account not found")
 
-    post_comments = await Comment.find_all(Comment.post_id == post.id).sort(-Post.created_at).skip(offset).limit(limit).to_list()
+    post_comments = await Comment.find_all(Comment.post_id == post.id).sort(-Post.created_at).skip(0).limit(10).to_list()
 
     if not post_comments:
         post_comments = []
@@ -166,7 +166,7 @@ async def update_post(id:str, post_data:PostUpdate, current_user=Depends(oauth2.
     if not owner:
         raise HTTPException(status_code=404, detail="Account not found")
 
-    post_comments = await Comment.find_all(Comment.post_id == post.id).sort(-Post.created_at).skip(offset).limit(limit).to_list()
+    post_comments = await Comment.find_all(Comment.post_id == post.id).sort(-Post.created_at).skip(0).limit(10).to_list()
 
     if not post_comments:
         post_comments = []
