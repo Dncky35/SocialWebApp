@@ -13,6 +13,13 @@ interface PostContext{
     error: ApiError | null;
     fetchPosts: () => Promise<void>;
     createPost: (content: string, tags?: string[] | undefined, image_url?: string | undefined) => Promise<void>;
+    likePost: (postId: string) => Promise<any>;
+}
+
+interface LikeType{
+    message: string;
+    likes_count: number;
+    liked: boolean;
 }
 
 const PostContext = React.createContext<PostContext | undefined>(undefined);
@@ -22,7 +29,7 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
     const { isLoading:isLoadingGet, error:errorGet, getData } = useGet();
     const { fetchWithAuth } = useAuth();
 
-    const [posts, setPosts] = useState([]);   
+    const [posts, setPosts] = useState<Post[]>([]);   
 
     const fetchPosts = useCallback(async () => {
         const result = await fetchWithAuth(async () => {
@@ -51,9 +58,40 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
         if(result){
             const postTemp = posts;
             // set as first element
-            postTemp.unshift(result as never);
+            postTemp.unshift(result);
             setPosts(postTemp);
         }
+    }, [postData, fetchWithAuth]);
+
+    const likePost = useCallback(async (postId: string) => {
+        const result = await fetchWithAuth(() =>
+            postData(`${BASEURL}posts/${postId}/like`, {}, {
+                credentials: "include",
+            })
+        );
+
+        if (result) {
+            const likeResult: LikeType = result;
+
+            setPosts((prevPosts) =>
+                prevPosts.map((post) => {
+                    if (post.id !== postId) return post;
+
+                    // Toggle user ID in likes list
+                    const updatedLikes = likeResult.liked
+                        ? [...post.likes, post.owner.id]
+                        : post.likes.filter((id) => id !== post.owner.id);
+
+                    return {
+                        ...post,
+                        is_liked: likeResult.liked,
+                        likes: updatedLikes,
+                    };
+                })
+            );
+        }
+
+        return result;
     }, [postData, fetchWithAuth]);
 
     return(
@@ -63,6 +101,7 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             error: errorPost || errorGet,
             fetchPosts,
             createPost,
+            likePost,
             }}>
             {children}
         </PostContext.Provider>

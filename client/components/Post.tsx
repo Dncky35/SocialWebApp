@@ -2,6 +2,7 @@ import React from 'react';
 import { PublicAccount } from '@/schemas/account';
 import Link from 'next/link';
 import { Comment } from './Comment';
+import { usePostContext } from '@/context/PostContext';
 
 export interface Post {
   id: string;
@@ -22,7 +23,17 @@ interface PostProps {
 };
 
 const PostCard: React.FC<PostProps> = ({ post }) => {
-  // console.log(JSON.stringify(post));
+  const { likePost, error, isLoading } = usePostContext();
+  
+  const handleOnLike = async( e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+    const result = await likePost(post.id);
+
+    if(result){
+      console.log(JSON.stringify(result));
+    }
+  };
+  
   return (
     <div className='bg-emerald-900 rounded shadow-xl mb-4 px-4 py-2'>
       <div className='border-b border-emerald-700 py-1 mb-1'>
@@ -41,7 +52,9 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
       <div className='flex items-center justify-between px-2'>
         <div className='flex space-x-4 items-center'> 
           <p className='text-sm text-emerald-300'>{post.likes.length}</p>
-          <button className='bg-emerald-600 text-white px-1 py-1 cursor-pointer rounded-full hover:bg-emerald-700 transition duration-300'>
+          <button
+          onClick={(e) => handleOnLike(e)} 
+          className='bg-emerald-600 text-white px-1 py-1 cursor-pointer rounded-full hover:bg-emerald-700 transition duration-300'>
             {post.is_liked ? "❤️" : "🤍"}
           </button>
           <p className='text-sm text-emerald-300'>{post.comments.length}</p>

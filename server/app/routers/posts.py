@@ -46,6 +46,8 @@ def create_post_response(post:Post, account:Account, comments:List[Comment], cur
 
         ))
 
+    # comments = [comment for comment in comments if not comment.is_deleted]
+    post.likes = [str(like) for like in post.likes]
     return PostPublic(
         id=str(post.id),
         content=post.content,
@@ -53,7 +55,7 @@ def create_post_response(post:Post, account:Account, comments:List[Comment], cur
         tags=post.tags,
         likes=post.likes,
         comments = comment_list,
-        is_liked = PydanticObjectId(current_account.account_id) in post.likes if current_account else False,
+        is_liked = str(current_account.account_id) in post.likes if current_account else False,
         created_at=post.created_at,
         updated_at=post.updated_at,
         owner=public_account,
