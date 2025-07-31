@@ -14,6 +14,7 @@ interface PostContext{
     fetchPosts: () => Promise<void>;
     createPost: (content: string, tags?: string[] | undefined, image_url?: string | undefined) => Promise<void>;
     likePost: (postId: string) => Promise<any>;
+    addComment: (postId: string, content: string, parent_comment_id?: string | undefined) => Promise<void>;
 }
 
 interface LikeType{
@@ -94,6 +95,34 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
         return result;
     }, [postData, fetchWithAuth]);
 
+    const addComment = useCallback(async (postId:string, content:string, parent_comment_id?:string) => {
+        const result = await fetchWithAuth(async () => {
+            return await postData(`${BASEURL}posts/${postId}/comment`, {
+                content,
+                parent_comment_id,
+            }, {
+                credentials:"include",
+            });
+        });
+
+        if(result){
+            // console.log(JSON.stringify(result));
+            setPosts((prevPosts) =>
+                prevPosts.map((post) => {
+                    if (post.id !== postId) return post;
+
+                    const updatedComments = [...post.comments, result];
+
+                    return {
+                        ...post,
+                        comments: updatedComments,
+                    };
+                })
+            );
+        }
+
+    }, [postData, fetchWithAuth]);
+
     return(
         <PostContext.Provider value={{
             posts, 
@@ -102,6 +131,7 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             fetchPosts,
             createPost,
             likePost,
+            addComment,
             }}>
             {children}
         </PostContext.Provider>

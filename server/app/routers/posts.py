@@ -224,16 +224,30 @@ async def toogle_like_post(id:str, current_user=Depends(oauth2.get_current_user)
         "liked": account_id in post.likes, 
     }
 
-@router.post("/{post_id}/comment", status_code=status.HTTP_201_CREATED)
+@router.post("/{post_id}/comment", status_code=status.HTTP_201_CREATED, response_model=CommentResponse)
 async def create_comment(post_id:str, comment_data:CommentRequest, current_account=Depends(oauth2.get_current_user)):
+    print(f"parrent_comment_id: {comment_data.parent_comment_id}")
     comment = Comment(
-        **comment_data.dict(exclude_unset=True),
+        content=comment_data.content,
+        parent_comment_id= ObjectId(comment_data.parent_comment_id) if comment_data.parent_comment_id else None,
         author_id=current_account.account_id,
         post_id=post_id,
     )
 
     await comment.insert()
-    return comment
+
+    return CommentResponse(
+        id=str(comment.id),
+        content=comment.content,
+        created_at=comment.created_at,
+        updated_at=comment.updated_at,
+        author_id=comment.author_id,
+        post_id=comment.post_id,
+        parent_comment_id=comment.parent_comment_id,
+        child_commets=comment.child_commets,
+        likes=comment.likes,
+        is_liked= PydanticObjectId(current_account.account_id) in comment.likes if current_account else False,
+    )
 
 @router.get("/{post_id}/comment", response_model=List[Comment])
 async def get_comments(post_id:str, offset:int = Query(0, ge=0), limit:int = Query(20, ge=1, le=100), 

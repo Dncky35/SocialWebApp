@@ -1,8 +1,10 @@
-import React from 'react';
+"use client";
+import React, { useState } from 'react';
 import { PublicAccount } from '@/schemas/account';
 import Link from 'next/link';
 import { Comment } from './Comment';
 import { usePostContext } from '@/context/PostContext';
+import CommentCreator from './CommentCreator';
 
 export interface Post {
   id: string;
@@ -24,6 +26,7 @@ interface PostProps {
 
 const PostCard: React.FC<PostProps> = ({ post }) => {
   const { likePost, error, isLoading } = usePostContext();
+  const [ isCommentAdding, setIsCommentAdding ] = useState(false);
   
   const handleOnLike = async( e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
@@ -51,20 +54,27 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
       </div>
       <div className='flex items-center justify-between px-2'>
         <div className='flex space-x-4 items-center'> 
-          <p className='text-sm text-emerald-300'>{post.likes.length}</p>
+          <Link href={`/profile/${post.owner.username}`} className='text-sm text-emerald-300 hover:underline cursor-pointer'>{post.likes.length}</Link>
           <button
           onClick={(e) => handleOnLike(e)} 
           className='bg-emerald-600 text-white px-1 py-1 cursor-pointer rounded-full hover:bg-emerald-700 transition duration-300'>
             {post.is_liked ? "❤️" : "🤍"}
           </button>
-          <p className='text-sm text-emerald-300'>{post.comments.length}</p>
-          <button className='bg-emerald-600 text-white px-1 py-1 cursor-pointer rounded-full hover:bg-emerald-700 transition duration-300'>
+          <Link href={"/posts/" + post.id + "/comments"} className='text-sm text-emerald-300 hover:underline cursor-pointer'>{post.comments.length}</Link>
+          <button 
+          onClick={() => setIsCommentAdding((prev) => !prev)}
+          className='bg-emerald-600 text-white px-1 py-1 cursor-pointer rounded-full hover:bg-emerald-700 transition duration-300'>
             ✍
             </button>
         </div>
         <div>
           <p className='text-sm text-emerald-300'>Posted on: {new Date(post.created_at).toLocaleDateString()}</p>
         </div>
+      </div>
+      <div className='mt-2 py-2 px-4 border-t border-emerald-700'>
+        {isCommentAdding &&(
+          <CommentCreator postID={post.id} />
+        )}
       </div>
     </div>
   );
