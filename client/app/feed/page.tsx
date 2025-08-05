@@ -4,10 +4,11 @@ import { usePostContext } from "@/context/PostContext";
 import PostCard, { Post } from "@/components/Post";
 import PostCreator from "@/components/PostCreator";
 import LoadingComponent from "@/components/Loading";
+import ErrorComponent from "@/components/Error";
 
 
 const FeedPage:React.FC = () => {
-    const { posts, isLoading, error, fetchPosts } = usePostContext();
+    const { posts, isLoading, error, fetchPosts, setError } = usePostContext();
 
     useEffect(() => {
         if(posts.length > 0)
@@ -35,7 +36,9 @@ const FeedPage:React.FC = () => {
 
         {/* Posts List Placeholder */}
         <div className="w-full max-w-xl mx-auto">
-            {error && (<div className="text-center font-bold">Error: {JSON.stringify(error)}</div>)}
+            {error && (
+                <ErrorComponent detail={error.detail} status={error.status} setError={setError} />
+            )}
             {posts.map((post: Post) => (
                 <PostCard key={post.id} post={post} />
             ))}

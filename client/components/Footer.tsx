@@ -7,7 +7,7 @@ const Footer:React.FC = () => {
                 <div></div>
                 <div>
                     <p className="text-xs italic" >Powered by</p>
-                    <Link href={"https://cloudrocean.xyz/"} className="text-md font-semibold">© 2025 CloudROcean</Link>
+                    <Link href={"https://cloudrocean.xyz/"} className="text-md font-semibold hover:underline">© 2025 CloudROcean</Link>
                 </div>
             </div>
         </footer>

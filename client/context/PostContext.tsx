@@ -15,6 +15,7 @@ interface PostContext{
     createPost: (content: string, tags?: string[] | undefined, image_url?: string | undefined) => Promise<void>;
     likePost: (postId: string) => Promise<any>;
     addComment: (postId: string, content: string, parent_comment_id?: string | undefined) => Promise<void>;
+    setError: React.Dispatch<React.SetStateAction<ApiError | null>>
 }
 
 interface LikeType{
@@ -26,8 +27,8 @@ interface LikeType{
 const PostContext = React.createContext<PostContext | undefined>(undefined);
 
 export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) => {
-    const { isLoading:isLoadingPost, error:errorPost, postData } = usePost();
-    const { isLoading:isLoadingGet, error:errorGet, getData } = useGet();
+    const { isLoading:isLoadingPost, error:errorPost, postData, setError:setErrorPost } = usePost();
+    const { isLoading:isLoadingGet, error:errorGet, getData, setError:setErrorGet } = useGet();
     const { fetchWithAuth } = useAuth();
 
     const [posts, setPosts] = useState<Post[]>([]);   
@@ -132,6 +133,7 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             createPost,
             likePost,
             addComment,
+            setError: setErrorPost
             }}>
             {children}
         </PostContext.Provider>

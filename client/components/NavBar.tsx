@@ -13,16 +13,19 @@ const NavBar: React.FC = () => {
     }
 
     return (
-        <nav className="fixed w-full top-0 bg-emerald-950 py-2 px-4 flex items-center justify-between ">
-            <div className="bg-emerald-900 cursor-pointer rounded px-2 py-1 hover:bg-emerald-800 hover:text-white transition duration-200">
-                <Link href={"/"}>Social Web 🚀</Link>
+        <nav className="fixed w-full top-0 bg-emerald-950 py-2 px-8 flex items-center justify-between">
+            <div></div>
+            <div className="bg-emerald-900 cursor-pointer rounded flex items-center justify-center rounded-full 
+            text-2xl w-12 h-12 hover:bg-emerald-800 hover:text-white transition duration-200">
+                <Link href={"/"}>🐤</Link>
             </div>
-           {account && (
+           <div>
+            {account && (
                 <div
                     className="relative"
                     onClick={() => setDropdownVisible((prev) => !prev)}
                     >
-                    <div className="w-12 h-12 rounded-full bg-emerald-300 overflow-hidden hover:cursor-pointer">
+                    <div className="w-12 h-12 rounded-full bg-emerald-300 overflow-hidden cursor-pointer">
                         <img
                             src={
                                 account.avatar_url ??
@@ -52,6 +55,7 @@ const NavBar: React.FC = () => {
                     )}
                 </div>
             )}
+           </div>
         </nav>
     );
 };

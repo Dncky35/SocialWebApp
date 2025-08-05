@@ -33,18 +33,18 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
     const result = await likePost(post.id);
 
     if(result){
-      console.log(JSON.stringify(result));
+      // console.log(JSON.stringify(result));
     }
   };
   
   return (
-    <div className='bg-emerald-900 rounded shadow-xl mb-4 px-4 py-2'>
+    <div className='bg-emerald-900 rounded shadow-xl px-4 py-2'>
       <div className='border-b border-emerald-700 py-1 mb-1'>
         <Link href={`/profile/${post.owner.username}`} className='font-semibold text-lg text-emerald-300 cursor-pointer hover:underline'>{post.owner.username}</Link>
       </div>
-      <div className='text-xl font-semibold whitespace-pre-wrap break-words mb-2'>
+      <Link href={`/posts/${post.id}`} className='text-xl font-semibold whitespace-pre-wrap break-words mb-2'>
         {post.content}
-      </div>
+      </Link>
       <div className='flex gap-x-2 border-b border-emerald-700 py-1 mb-1'>
         {post.tags.map((tag, index) => (
         <div key={index} className="text-sm cursor-pointer hover:underline">
@@ -54,13 +54,13 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
       </div>
       <div className='flex items-center justify-between px-2'>
         <div className='flex space-x-4 items-center'> 
-          <Link href={`/profile/${post.owner.username}`} className='text-sm text-emerald-300 hover:underline cursor-pointer'>{post.likes.length}</Link>
+          <p className='text-sm text-emerald-300 cursor-default'>{post.likes.length}</p>
           <button
           onClick={(e) => handleOnLike(e)} 
           className='bg-emerald-600 text-white px-1 py-1 cursor-pointer rounded-full hover:bg-emerald-700 transition duration-300'>
             {post.is_liked ? "❤️" : "🤍"}
           </button>
-          <Link href={"/posts/" + post.id + "/comments"} className='text-sm text-emerald-300 hover:underline cursor-pointer'>{post.comments.length}</Link>
+          <p className='text-sm text-emerald-300 cursor-default'>{post.comments.length}</p>
           <button 
           onClick={() => setIsCommentAdding((prev) => !prev)}
           className='bg-emerald-600 text-white px-1 py-1 cursor-pointer rounded-full hover:bg-emerald-700 transition duration-300'>
