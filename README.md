@@ -100,20 +100,14 @@ Create a `.env` file in the `server/` directory. This file will hold your secret
 **`.env.example`:**
 ```ini
 # --- Database Configuration ---
-# Replace with your MongoDB connection string
-DATABASE_URL=mongodb://localhost:27017/social_app
-
-# --- JWT Authentication ---
+MONGODB_USERNAME= Replace with your MongoDB usernaame string
+MONGODB_PASSWORD=Replace with your MongoDB password string
 SECRET_KEY=a_very_secret_key_that_should_be_long_and_random
 ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=15
-REFRESH_TOKEN_EXPIRE_DAYS=7
-
-# --- Cookie Settings ---
+SECRET_KEY_REFRESH=a_very_secret_key_that_should_be_long_and_random
 # For local development, 'localhost' is fine. For production, use your domain.
-COOKIE_DOMAIN=localhost
-COOKIE_SECURE=False
-COOKIE_SAMESITE=lax
+DOMAIN=localhost
+ENVIRONMENT=development
 ```
 
 ### 6. Run the Application
