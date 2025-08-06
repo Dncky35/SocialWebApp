@@ -1,6 +1,9 @@
-# Social Web App - Backend API
+# Social Web App - Full Stack
 
-This is the backend server for a modern social web application. It's built with Python using the FastAPI framework and MongoDB as the database. The API provides functionalities for user authentication, post management, and social interactions like following users and liking posts.
+This is a full-stack social web application built with a modern technology stack.
+
+- The **backend** is a robust API built with Python, FastAPI, and MongoDB, providing all the core functionalities for a social media platform.
+- The **frontend** is a responsive and interactive web client built with Next.js, React, and Tailwind CSS.
 
 ## Features
 
@@ -19,25 +22,36 @@ This is the backend server for a modern social web application. It's built with 
 
 ## Technology Stack
 
-- **Framework**: [FastAPI](https://fastapi.tiangolo.com/)
-- **Database**: [MongoDB](https://www.mongodb.com/)
-- **ODM (Object-Document Mapper)**: [Beanie](https://beanie-odm.dev/)
+### Backend (Server)
+
+- **Framework**: FastAPI
+- **Database**: MongoDB
+- **ODM (Object-Document Mapper)**: Beanie
 - **Authentication**: JWT with `python-jose`
 - **Password Hashing**: `passlib` with `bcrypt`
 - **Async Server**: Uvicorn
+
+### Frontend (Client)
+
+- **Framework**: Next.js
+- **Library**: React
+- **Styling**: Tailwind CSS
+- **Language**: TypeScript
 
 ---
 
 ## Project Setup
 
-Follow these steps to get the project running on your local machine.
+### Backend (Server) Setup
 
-### 1. Prerequisites
+Follow these steps to get the backend server running on your local machine.
+
+#### 1. Prerequisites
 
 - Python 3.8+
 - A running MongoDB instance (local or on a service like MongoDB Atlas).
 
-### 2. Clone the Repository
+#### 2. Navigate to Server Directory
 
 ```bash
 git clone <your-repository-url>
@@ -112,6 +126,66 @@ uvicorn app.main:app --reload
 ```
 
 The API will be available at `http://127.0.0.1:8000`.
+
+### Frontend (Client) Setup
+
+Follow these steps to get the frontend client running.
+
+#### 1. Prerequisites
+
+- Node.js (v18 or newer)
+- npm or yarn
+
+#### 2. Navigate to Client Directory
+
+```bash
+# From the root of the project (e.g., SocailWebApp/)
+cd client
+```
+
+#### 3. Install Dependencies
+
+```bash
+npm install
+```
+
+#### 4. Configure Environment Variables
+
+Create a `.env.local` file in the `client/` directory. This file tells the Next.js app where to find the backend API. For the variable to be exposed to the browser, it must be prefixed with `NEXT_PUBLIC_`.
+
+**`.env.local`:**
+```
+NEXT_PUBLIC_BACKEND_URL=http://127.0.0.1:8000
+```
+
+#### 5. Run the Application
+
+```bash
+npm run dev
+```
+
+The client application will be available at `http://localhost:3000`.
+
+---
+
+## Running with Docker (Backend Only)
+
+If you have Docker installed, you can build and run the backend server in a container using the provided PowerShell script (`docker.ps1`).
+
+1.  **Navigate to the project root.**
+2.  **Ensure you have a `.env` file inside the `server/` directory as described in the backend setup.**
+3.  **Use the script with one of the following commands:**
+
+    ```powershell
+    # Build and run the container in detached mode
+    .\docker.ps1 -Command run
+
+    # View the container logs
+    .\docker.ps1 -Command logs
+
+    # Stop and remove the container
+    .\docker.ps1 -Command stop
+    ```
 
 ---
 
