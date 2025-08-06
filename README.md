@@ -4,13 +4,16 @@ This is the backend server for a modern social web application. It's built with 
 
 ## Features
 
-- **User Authentication**: Secure signup and login using JWT (Access & Refresh Tokens stored in HTTPOnly cookies).
+- **User Authentication**: Secure signup and login using JWT (Access & Refresh Tokens stored in HTTPOnly cookies). Includes token verification and rotation.
 - **Password Management**: Passwords are securely hashed before being stored.
+- **User Profile Management**: Users can view and update their own profiles, and view public profiles of other users.
 - **Post Management**: Full CRUD (Create, Read, Update, Delete) functionality for user posts.
 - **Comment Management**: Full CRUD for comments on posts, including replies (nested comments).
 - **Social Graph**: Users can follow and unfollow each other.
 - **Engagement**: Users can like and unlike posts and comments.
-- **Pagination**: Implemented for feed and list endpoints (followers, following) to handle large datasets efficiently.
+- **Personalized Feed**: Get a feed of posts from followed users.
+- **User Search**: Search for other users by their username.
+- **Pagination**: Implemented for feed and list endpoints (followers, following, posts, comments) to handle large datasets efficiently.
 - **Data Validation**: Pydantic models are used for robust request data validation.
 - **Interactive API Docs**: Automatic, interactive API documentation powered by Swagger UI and ReDoc.
 
@@ -127,7 +130,20 @@ FastAPI automatically generates interactive API documentation. Once the server i
 | `POST` | `/auth/signup`               | Create a new user account.                |
 | `POST` | `/auth/login`                | Log in to get access/refresh tokens.      |
 | `POST` | `/auth/logout`               | Log out and clear session cookies.        |
-| `POST` | `/auth/create_access_token`  | Create a new access token.                |
+| `POST` | `/auth/create_access_token`  | Create a new access token using a refresh token. |
+| `POST` | `/auth/rotate_refresh_token` | Rotate the refresh token.                 |
+| `GET`  | `/auth/verify_access_token`  | Verify the current access token.          |
+| `GET`  | `/auth/verify_refresh_token` | Verify the current refresh token.         |
+| **Accounts** |                           |                                           |
+| `GET`  | `/accounts/me/profile`       | Get the current user's profile.           |
+| `PATCH`| `/accounts/me/profile`       | Update the current user's profile.        |
+| `GET`  | `/accounts/{id}/profile`     | Get a user's public profile by ID.        |
+| `GET`  | `/accounts/search`           | Search for accounts by username.          |
+| `POST` | `/accounts/follow/{id}`      | Follow another user.                      |
+| `POST` | `/accounts/unfollow/{id}`    | Unfollow another user.                    |
+| `GET`  | `/accounts/followers`        | Get a list of your followers.             |
+| `GET`  | `/accounts/following`        | Get a list of users you are following.    |
+| `GET`  | `/accounts/feed/following`   | Get a personalized feed from followed users. |
 | **Posts** |                              |                                           |
 | `POST` | `/posts/`                    | Create a new post.                        |
 | `GET`  | `/posts/`                    | Get a paginated list of all posts.        |
@@ -136,14 +152,11 @@ FastAPI automatically generates interactive API documentation. Once the server i
 | `DELETE`| `/posts/{id}`               | Delete a post you authored.               |
 | `POST` | `/posts/{id}/like`           | Toggle like/unlike on a post.             |
 | `POST` | `/posts/{id}/comment`        | Create a new comment on a post.           |
+| `GET`  | `/posts/{id}/comment`        | Get all comments for a post.              |
 | **Comments** |                           |                                           |
 | `GET`  | `/comments/{id}`             | Get a single comment by its ID.           |
 | `PATCH`| `/comments/{id}`             | Update a comment you authored.            |
 | `DELETE`| `/comments/{id}`            | Delete a comment you authored.            |
 | `POST` | `/comments/{id}/like`        | Toggle like/unlike on a comment.          |
 | `POST` | `/comments/{id}/comment`     | Reply to another comment.                 |
-| **Accounts** |                           |                                           |
-| `POST` | `/accounts/follow/{id}`      | Follow another user.                      |
-| `POST` | `/accounts/unfollow/{id}`    | Unfollow another user.                    |
-| `GET`  | `/accounts/followers`        | Get a list of your followers.             |
-| `GET`  | `/accounts/following`        | Get a list of users you are following.    |
+| `GET`  | `/comments/{id}/replies`     | Get replies for a specific comment.       |
