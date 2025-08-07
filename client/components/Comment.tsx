@@ -1,6 +1,8 @@
 "use client";
+import { PublicAccount } from "@/schemas/account";
 import Link from "next/link";
-import React from "react";
+import React, { useEffect, useState } from "react";
+import { usePostContext } from "@/context/PostContext";
 
 export interface Comment {
     id: string;
@@ -20,11 +22,31 @@ interface CommentProps {
 };
 
 const CommentCard:React.FC<CommentProps> = ({ comment }) => {
+    
+    const { posts, likeComment } = usePostContext();
+    const [owner, setOwner] = useState<PublicAccount | null>(() => {
+        return posts.find((post) => post.owner.id === comment.author_id)?.owner || null;
+    });
+
+    useEffect(() => {
+        if(owner)
+            return;
+
+        // TO DO: fetch owner info
+
+    }, [owner]);
+
+    const handleOnLike = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+        await likeComment(comment.id);
+    };
 
     return (
         <div className="bg-emerald-800 rounded shadow-xl px-4 py-2">
            <div className='border-b border-emerald-700 py-1 mb-1'>
-                <Link href={`/profile/${comment.author_id}`} className='font-semibold text-lg text-emerald-300 cursor-pointer hover:underline'>{comment.author_id}</Link>
+                <Link href={`/profile/${comment.author_id}`} className='font-semibold text-lg text-emerald-300 cursor-pointer hover:underline'>
+                {owner?.username || comment.author_id}
+                </Link>
             </div>
             <div className='text-xl font-semibold whitespace-pre-wrap break-words mb-2 cursor-default'>
                 {comment.content}
@@ -33,7 +55,9 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
                 <div className="flex items-center gap-x-4">
                     <div className="flex items-center gap-x-2">
                         <p>{comment.Likes?.length || 0}</p>
-                        <button className='bg-emerald-600 text-white px-1 py-1 cursor-pointer rounded-full hover:bg-emerald-700 transition duration-300'>
+                        <button 
+                        onClick={(e) => handleOnLike(e)}
+                        className='bg-emerald-600 text-white px-1 py-1 cursor-pointer rounded-full hover:bg-emerald-700 transition duration-300'>
                             {comment.is_liked ? "❤️" : "🤍"}
                         </button>
                     </div>

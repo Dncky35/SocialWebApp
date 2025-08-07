@@ -15,7 +15,8 @@ interface PostContext{
     createPost: (content: string, tags?: string[] | undefined, image_url?: string | undefined) => Promise<void>;
     likePost: (postId: string) => Promise<any>;
     addComment: (postId: string, content: string, parent_comment_id?: string | undefined) => Promise<void>;
-    setError: React.Dispatch<React.SetStateAction<ApiError | null>>
+    setError: React.Dispatch<React.SetStateAction<ApiError | null>>;
+    likeComment: (commentID: string) => Promise<void>;
 }
 
 interface LikeType{
@@ -65,9 +66,44 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
         }
     }, [postData, fetchWithAuth]);
 
+    const likeComment = useCallback(async(commentID:string) => {
+        const result = await fetchWithAuth(async() => {
+            return await postData(`${BASEURL}comments/${commentID}/like`, {}, {
+                credentials:"include",
+            });
+        });
+
+        if(result){
+            const likeResult:LikeType = result;
+            const comment = posts.find((post) => post.comments.find((comment) => comment.id === commentID));
+            if(!comment)
+                return;
+
+            setPosts((prevPosts) => 
+                prevPosts.map((post) => {
+                    post.comments = post.comments.map((comment) => {
+                        if(comment.id === commentID){
+                            return {
+                                ...comment,
+                                is_liked: likeResult.liked,
+                                likes: likeResult.liked ? 
+                                [...[comment.Likes || []], post.owner.id] : 
+                                comment.Likes?.filter((id) => id !== post.owner.id) || [], 
+                            }
+                        }
+
+                        return comment;
+                    });
+
+                    return post;
+                })
+            );
+        }
+    }, [postData])
+
     const likePost = useCallback(async (postId: string) => {
-        const result = await fetchWithAuth(() =>
-            postData(`${BASEURL}posts/${postId}/like`, {}, {
+        const result = await fetchWithAuth(async() =>
+            await postData(`${BASEURL}posts/${postId}/like`, {}, {
                 credentials: "include",
             })
         );
@@ -133,7 +169,8 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             createPost,
             likePost,
             addComment,
-            setError: setErrorPost
+            setError: setErrorPost,
+            likeComment,
             }}>
             {children}
         </PostContext.Provider>

@@ -3,7 +3,6 @@ from app.models.comment import Comment
 from beanie import PydanticObjectId
 from app.core import oauth2
 from app.schemas.comment import CommentRequest
-from bson import ObjectId
 
 router = APIRouter(
     prefix="/comments",

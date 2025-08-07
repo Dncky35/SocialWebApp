@@ -35,7 +35,7 @@ const FeedPage:React.FC = () => {
         </div>
 
         {/* Posts List Placeholder */}
-        <div className="w-full max-w-xl mx-auto">
+        <div className="w-full max-w-xl mx-auto space-y-4">
             {error && (
                 <ErrorComponent detail={error.detail} status={error.status} setError={setError} />
             )}
