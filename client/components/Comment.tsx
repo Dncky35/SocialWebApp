@@ -13,7 +13,8 @@ export interface Comment {
     post_id: string;
     parent_comment_id?:string;
     child_commets?:Comment[];
-    Likes?:string[];
+    likes:string[];
+    like_counter?:number;
     is_liked: boolean;
 }
 
@@ -38,7 +39,8 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
 
     const handleOnLike = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
-        await likeComment(comment.id);
+        const result = await likeComment(comment.id);
+        console.log(result);
     };
 
     return (
@@ -54,7 +56,7 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
             <div className="flex items-center justify-between border-t border-emerald-700 py-2">
                 <div className="flex items-center gap-x-4">
                     <div className="flex items-center gap-x-2">
-                        <p>{comment.Likes?.length || 0}</p>
+                        <p>{comment.like_counter || 0}</p>
                         <button 
                         onClick={(e) => handleOnLike(e)}
                         className='bg-emerald-600 text-white px-1 py-1 cursor-pointer rounded-full hover:bg-emerald-700 transition duration-300'>

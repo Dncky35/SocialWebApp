@@ -75,24 +75,18 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
 
         if(result){
             const likeResult:LikeType = result;
-            const comment = posts.find((post) => post.comments.find((comment) => comment.id === commentID));
-            if(!comment)
-                return;
 
             setPosts((prevPosts) => 
                 prevPosts.map((post) => {
-                    post.comments = post.comments.map((comment) => {
+                    post.comments.forEach((comment) => {
                         if(comment.id === commentID){
-                            return {
-                                ...comment,
-                                is_liked: likeResult.liked,
-                                likes: likeResult.liked ? 
-                                [...[comment.Likes || []], post.owner.id] : 
-                                comment.Likes?.filter((id) => id !== post.owner.id) || [], 
-                            }
+                            comment.is_liked = likeResult.liked;
+                            comment.likes = likeResult.liked ? [...comment.likes, comment.author_id] : comment.likes.filter((id) => id !== comment.author_id);
+                            comment.like_counter = likeResult.likes_count;
+                            return comment;
                         }
-
-                        return comment;
+                        else
+                            return comment;
                     });
 
                     return post;

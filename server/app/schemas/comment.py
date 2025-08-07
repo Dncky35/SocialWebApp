@@ -12,7 +12,7 @@ class CommentResponse(BaseModel):
     post_id: PydanticObjectId
     parent_comment_id: Optional[PydanticObjectId] = None
     child_commets: List[PydanticObjectId] = Field(default_factory=list)
-    likes: List[str] = Field(default_factory=list)
+    likes: List[PydanticObjectId] = Field(default_factory=list)
     is_liked: Optional[bool] = None
 
 class CommentRequest(BaseModel):

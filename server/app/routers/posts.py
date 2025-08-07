@@ -106,7 +106,8 @@ async def get_all_post(offset:int = Query(0, ge=0), limit:int = Query(20, ge=1, 
         if not owner_account:
             raise HTTPException(status_code=404, detail="Account not found")
 
-        post_comments = await Comment.find_all(Comment.post_id == post.id).sort(-Post.created_at).skip(offset).limit(limit).to_list()
+        # post_comments = await Comment.find(Comment.post_id == post.id).sort(-Comment.created_at).to_list()
+        post_comments = await Comment.find(Comment.post_id == post.id).sort(-Comment.created_at).skip(offset).limit(limit).to_list()
 
         post_list.append(create_post_response(post, owner_account, post_comments, current_user))
 
