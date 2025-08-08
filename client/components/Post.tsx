@@ -22,18 +22,27 @@ export interface Post {
 
 interface PostProps {
   post: Post;
+  setPost: React.Dispatch<React.SetStateAction<Post | null>>;
 };
 
-const PostCard: React.FC<PostProps> = ({ post }) => {
-  const { likePost, error, isLoading } = usePostContext();
+const PostCard: React.FC<PostProps> = ({ post, setPost }) => {
+  const { likePost } = usePostContext();
   const [ isCommentAdding, setIsCommentAdding ] = useState(false);
   
   const handleOnLike = async( e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     const result = await likePost(post.id);
 
-    if(result){
-      // console.log(JSON.stringify(result));
+    // If result is not null, update the post state of the POST
+    if(result) {
+      setPost((prevPost) => {
+        if (!prevPost) return null;
+        return {
+          ...prevPost,
+          is_liked: result.liked,
+          likes: result.likes_count > 0 ? Array(result.likes_count).fill('') : [],
+        };
+      });
     }
   };
   

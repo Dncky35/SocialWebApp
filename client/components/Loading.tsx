@@ -1,7 +1,7 @@
 const LoadingComponent:React.FC = () => {
     return (  
         <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
-            <div className="rounded-lg shadow-lg p-6 max-w-xl text-center text-lg font-semibold text-emerald-900 flex items-center space-x-4">
+            <div className="rounded-lg shadow-lg p-6 max-w-xl text-center text-2xl font-semibold text-emerald-900 flex items-center space-x-4">
             <svg
                 className="animate-spin h-6 w-6 text-emerald-600"
                 xmlns="http://www.w3.org/2000/svg"

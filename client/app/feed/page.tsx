@@ -28,7 +28,7 @@ const FeedPage:React.FC = () => {
     }
 
     return (
-    <div className="flex-grow  p-6 lg:w-full md:max-w-2xl mx-auto rounded-2xl shadow-2xl space-y-6">
+    <div className="flex-grow p-6 w-full max-w-2xl mx-auto rounded-2xl shadow-2xl space-y-6">
         {/* Post Input Section */}
         <div>
             <PostCreator />

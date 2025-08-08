@@ -125,8 +125,8 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
         );
 
         if (result) {
-            const likeResult: LikeType = result;
-
+            const likeResult = result;
+            console.log(JSON.stringify(likeResult));
             setPosts((prevPosts) =>
                 prevPosts.map((post) => {
                     if (post.id !== postId) return post;

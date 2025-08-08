@@ -15,10 +15,11 @@ const PostPage:React.FC = () => {
     });
 
     useEffect(() => {
-        if(post)
+        if(post !== null)
             return;
-
+        // If post is not found in the context, fetch it
         const getPost = async () => {
+            
             const result = await fetchPostWithID(params.postid as string);
             if(result)
                 setPost(result);
@@ -29,7 +30,10 @@ const PostPage:React.FC = () => {
     }, [post]);
 
     return(
-        <div className="flex-grow p-6 lg:w-full md:max-w-2xl mx-auto rounded-2xl shadow-2xl">
+        <div className="flex-grow p-6 w-full max-w-2xl mx-auto rounded-2xl shadow-2xl">
+            {isLoading && (
+                <LoadingComponent />
+            )}
             {error && (
                 <ErrorComponent status={error.status} detail={error.detail} setError={setError} />
             )}
@@ -39,7 +43,7 @@ const PostPage:React.FC = () => {
                 </div>
             ): (
                 <div>
-                    <PostCard post={post} />
+                    <PostCard post={post} setPost={setPost} />
                     <ul className="bg-emerald-900 px-6">
                         {post.comments?.map((comment, index) => {
                             if(comment.parent_comment_id !== null)
