@@ -1,7 +1,8 @@
 "use client";
 import { useState } from "react";
 import { usePostContext } from "@/context/PostContext";
-import LoadingComponent from "./Loading";
+import LoadingComponent from "@/components/Loading";
+import ErrorComponent from "@/components/Error";
 
 interface CommentRequest {
     content: string;
@@ -10,14 +11,15 @@ interface CommentRequest {
 
 interface CommentCreatorProps {
     postID: string;
+    commentID?: string;
 }
 
 
-const CommentCreator:React.FC<CommentCreatorProps> = ({postID}:CommentCreatorProps) => {
-    const { addComment, error, isLoading } = usePostContext();
+const CommentCreator:React.FC<CommentCreatorProps> = ({postID, commentID = ""}:CommentCreatorProps) => {
+    const { addComment, error, isLoading, setError } = usePostContext();
     const [commentForm, setCommentForm] = useState<CommentRequest>({
         content: "",
-        parent_comment_id: "",
+        parent_comment_id: commentID,
     });
 
     const handleOnContentChange = (value:string) => {
@@ -38,6 +40,9 @@ const CommentCreator:React.FC<CommentCreatorProps> = ({postID}:CommentCreatorPro
         <div className="space-y-4">
             {isLoading && (
                 <LoadingComponent />
+            )}
+            {error && (
+                <ErrorComponent status={error.status} detail={error.detail} setError={setError} />
             )}
 
             <label htmlFor="post" className="text-white font-semibold text-lg">

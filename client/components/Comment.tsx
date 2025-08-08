@@ -3,6 +3,8 @@ import { PublicAccount } from "@/schemas/account";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { usePostContext } from "@/context/PostContext";
+import CommentCreator from "@/components/CommentCreator";
+import { Post } from "@/components/Post";
 
 export interface Comment {
     id: string;
@@ -28,6 +30,10 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
     const [owner, setOwner] = useState<PublicAccount | null>(() => {
         return posts.find((post) => post.owner.id === comment.author_id)?.owner || null;
     });
+    const [post, setPost] = useState<Post | null>(() => {
+        return posts.find((p) => p.id === comment.post_id) || null;
+    });
+    const [isCommentAdding, setIsCommentAdding] = useState(false);
 
     useEffect(() => {
         if(owner)
@@ -65,14 +71,20 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
                     </div>
                     <div className="flex items-center gap-x-2">
                         <p>{comment.child_commets?.length || 0}</p>
-                        <button className='bg-emerald-600 text-white px-1 py-1 cursor-pointer rounded-full hover:bg-emerald-700 transition duration-300'>
+                        <button 
+                        onClick={() => setIsCommentAdding(prev => !prev)}
+                        className='bg-emerald-600 text-white px-1 py-1 cursor-pointer rounded-full hover:bg-emerald-700 transition duration-300'>
                             ✍
                         </button>
                     </div>
                 </div>
                 <p className='text-sm text-emerald-300'>Posted On: {new Date(comment.created_at).toLocaleDateString()}</p>
             </div>
-            <div></div>
+            <div className='mt-2 py-2 px-4 border-t border-emerald-700'>
+            {isCommentAdding && post && (
+                <CommentCreator postID={post.id} commentID={comment.id} />
+            )}
+        </div>
         </div>
     );
 };

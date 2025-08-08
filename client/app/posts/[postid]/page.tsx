@@ -1,6 +1,6 @@
 'use client';
 import { useParams } from "next/navigation";
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { usePostContext } from "@/context/PostContext";
 import PostCard from "@/components/Post";
 import CommentCard from "@/components/Comment";
