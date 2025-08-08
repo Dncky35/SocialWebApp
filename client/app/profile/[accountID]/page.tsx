@@ -18,6 +18,7 @@ const ProfilePage:React.FC = () => {
     useEffect(() => {
         if(account)
             return;
+        
         const getAccount = async () => {
             const result = await fetchAccountWithId(params.accountID as string);
             if(result)
