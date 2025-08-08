@@ -40,7 +40,7 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
   return (
     <div className='bg-emerald-900 rounded shadow-xl px-4 py-2'>
       <div className='border-b border-emerald-700 py-1 mb-1'>
-        <Link href={`/profile/${post.owner.username}`} className='font-semibold text-lg text-emerald-300 cursor-pointer hover:underline'>{post.owner.username}</Link>
+        <Link href={`/profile/${post.owner.id}`} className='font-semibold text-lg text-emerald-300 cursor-pointer hover:underline'>{post.owner.username}</Link>
       </div>
       <Link href={`/posts/${post.id}`} className='text-xl font-semibold whitespace-pre-wrap break-words mb-2'>
         {post.content}

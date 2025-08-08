@@ -1,14 +1,41 @@
 'use client';
-import React from "react";
+import React, {useState, useEffect} from "react";
 import { useParams } from "next/navigation";
 import { usePostContext } from "@/context/PostContext";
 import PostCard from "@/components/Post";
+import { PublicAccount } from "@/schemas/account";
+import { useAuth } from "@/context/AuthContext";
+import LoadingComponent from "@/components/Loading";
 
 const ProfilePage:React.FC = () => {
     const params = useParams();
+    const { fetchAccountWithId, isLoading } = useAuth();
     const { posts } = usePostContext();
-    const account = posts.find((post) => post.owner.username === params.username)?.owner;
-    const postsOfUser = posts.filter((post) => post.owner.username === params.username);
+    const [account, setAccount] = useState<PublicAccount | null>(() => {
+        return posts.find((post) => post.owner.id === params.accountID)?.owner || null;
+    });
+
+    useEffect(() => {
+        if(account)
+            return;
+        const getAccount = async () => {
+            const result = await fetchAccountWithId(params.accountID as string);
+            if(result)
+                setAccount(result);
+
+        };
+        // TO DO: fetch owner info
+        getAccount();
+    }, [account]);
+
+    const postsOfUser = posts.filter((post) => post.owner.id === params.accountID);
+    
+    if(isLoading)
+        return(
+            <div>
+                <LoadingComponent />
+            </div>
+        );
 
     if(!account){
         return(

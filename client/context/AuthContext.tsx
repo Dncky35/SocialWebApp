@@ -1,6 +1,6 @@
 "use client";
 import React, { useState, createContext, useContext, useCallback, useEffect } from "react";
-import { PrivateAccount } from "@/schemas/account";
+import { PrivateAccount, PublicAccount } from "@/schemas/account";
 import usePost from "@/hooks/usePost";
 import useGet from "@/hooks/useGet";
 import { ApiError } from "@/hooks/useFetch";
@@ -15,13 +15,14 @@ interface AuthState{
     logout: () => Promise<void>;
     fetchWithAuth: (fetchFunc: () => Promise<any>) => Promise<any>;
     error: ApiError | null | undefined;
+    fetchAccountWithId: (account_id: string) => Promise<PublicAccount | null>;
 }
 
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
 export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) => {
-    const { isLoading:isLoadingPost, error:errorPost, postData } = usePost("URLSearchParams");
-    const { isLoading:isLoadingGet, error:errorGet, getData } = useGet();
+    const { isLoading:isLoadingPost, error:errorPost, postData, setError } = usePost("URLSearchParams");
+    const { isLoading:isLoadingGet, error:errorGet, getData, setError:setErrorGet } = useGet();
     const [account, setAccount] = useState(null);
 
     useEffect(() => {
@@ -105,10 +106,24 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             return await fetchFunc();
     };
 
+    const fetchAccountWithId = useCallback(async (account_id:string) => {
+        const result = await fetchWithAuth(async () => {
+            return await getData(`${BASEURL}/accounts/profile/${account_id}`, {
+                credentials:"include",
+            });
+        });
+
+        if(result){
+            return result as PublicAccount;
+        }
+        else
+            return null;
+    }, [getData, fetchWithAuth]);
+
     return (
         <AuthContext.Provider value={
             {account, error: errorPost || errorGet, isLoading: isLoadingPost || isLoadingGet, 
-                setAccount, signUp, login, logout, fetchWithAuth
+                setAccount, signUp, login, logout, fetchWithAuth, fetchAccountWithId
             }}>
             {children}
         </AuthContext.Provider>

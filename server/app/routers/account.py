@@ -34,7 +34,7 @@ async def get_my_profile(current_user=Depends(oauth2.get_current_user)):
     )
 
 # Fix: endpoint as profile/{account_id}
-@router.get("/{account_id}/profile", response_model=PublicAccount)
+@router.get("/profile/{account_id}", response_model=PublicAccount)
 async def get_profile(account_id: str, current_user=Depends(oauth2.get_current_user)):
     try:
         account = await Account.get(account_id)
@@ -44,15 +44,26 @@ async def get_profile(account_id: str, current_user=Depends(oauth2.get_current_u
     if not account or account.is_deleted:
         raise HTTPException(status_code=404, detail="Account not found")
 
+#     id: PydanticObjectId
+    # username: str
+    # bio: Optional[str]
+    # avatar_url: Optional[str]
+    # followers_count: int
+    # following_count: int
+    # is_following: Optional[bool] = None  # Only set when viewing others
+    # created_at: datetime
+
     is_following = PydanticObjectId(current_user.account_id) in account.followers if current_user else None
 
     return PublicAccount(
+        id=account.id,
         username=account.username,
         bio=account.bio,
-        profile_image_url=account.avatar_url,
+        avatar_url=account.avatar_url,
         followers_count=len(account.followers),
         following_count=len(account.following),
-        is_following= is_following
+        is_following= is_following,
+        created_at = account.created_at
     )
     
 # Fix: endpoint as profile/me
