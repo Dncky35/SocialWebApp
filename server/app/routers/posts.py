@@ -135,7 +135,7 @@ async def get_single_post(id:str, current_account=Depends(oauth2.get_current_use
     if not owner:
         raise HTTPException(status_code=404, detail="Account not found")
 
-    post_comments = await Comment.find_all(Comment.post_id == post.id).sort(-Post.created_at).skip(0).limit(10).to_list()
+    post_comments = await Comment.find(Comment.post_id == post.id).sort(-Post.created_at).skip(0).limit(10).to_list()
 
     if not post_comments:
         post_comments = []
