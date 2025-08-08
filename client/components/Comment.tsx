@@ -25,13 +25,12 @@ interface CommentProps {
 };
 
 const CommentCard:React.FC<CommentProps> = ({ comment }) => {
+
+    // console.log(JSON.stringify(comment));
     
     const { posts, likeComment } = usePostContext();
     const [owner, setOwner] = useState<PublicAccount | null>(() => {
         return posts.find((post) => post.owner.id === comment.author_id)?.owner || null;
-    });
-    const [post, setPost] = useState<Post | null>(() => {
-        return posts.find((p) => p.id === comment.post_id) || null;
     });
     const [isCommentAdding, setIsCommentAdding] = useState(false);
 
@@ -45,8 +44,8 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
 
     const handleOnLike = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
-        const result = await likeComment(comment.id);
-        console.log(result);
+        await likeComment(comment.id);
+        // console.log(result);
     };
 
     return (
@@ -62,7 +61,7 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
             <div className="flex items-center justify-between border-t border-emerald-700 py-2">
                 <div className="flex items-center gap-x-4">
                     <div className="flex items-center gap-x-2">
-                        <p>{comment.like_counter || 0}</p>
+                        <p>{comment.likes.length || 0}</p>
                         <button 
                         onClick={(e) => handleOnLike(e)}
                         className='bg-emerald-600 text-white px-1 py-1 cursor-pointer rounded-full hover:bg-emerald-700 transition duration-300'>
@@ -81,8 +80,8 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
                 <p className='text-sm text-emerald-300'>Posted On: {new Date(comment.created_at).toLocaleDateString()}</p>
             </div>
             <div className='mt-2 py-2 px-4 border-t border-emerald-700'>
-            {isCommentAdding && post && (
-                <CommentCreator postID={post.id} commentID={comment.id} />
+            {isCommentAdding  && (
+                <CommentCreator commentID={comment.id} />
             )}
         </div>
         </div>

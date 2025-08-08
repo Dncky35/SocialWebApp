@@ -10,7 +10,7 @@ interface CommentRequest {
 }
 
 interface CommentCreatorProps {
-    postID: string;
+    postID?: string;
     commentID?: string;
 }
 
@@ -33,7 +33,7 @@ const CommentCreator:React.FC<CommentCreatorProps> = ({postID, commentID = ""}:C
 
     const handleOnPublish = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
-        await addComment(postID, commentForm.content, commentForm.parent_comment_id);
+        await addComment( commentForm.content, postID || "", commentForm.parent_comment_id);
     }
 
     return(

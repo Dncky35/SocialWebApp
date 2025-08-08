@@ -96,7 +96,14 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
                     post.comments.forEach((comment) => {
                         if(comment.id === commentID){
                             comment.is_liked = likeResult.liked;
-                            comment.likes = likeResult.liked ? [...comment.likes, comment.author_id] : comment.likes.filter((id) => id !== comment.author_id);
+                            // Somehow it is increasing the likes count x2
+                            // comment.likes = likeResult.liked ? [...comment.likes, comment.author_id] : comment.likes.filter((id) => id !== comment.author_id);
+                            if(likeResult.liked){
+                                if(!comment.likes.includes(comment.author_id))
+                                    comment.likes.push(comment.author_id);
+                            }
+                            else
+                                comment.likes = comment.likes.filter((id) => id !== comment.author_id);
                             comment.like_counter = likeResult.likes_count;
                             return comment;
                         }
@@ -141,9 +148,11 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
         return result;
     }, [postData, fetchWithAuth]);
 
-    const addComment = useCallback(async (postId:string, content:string, parent_comment_id?:string) => {
+    const addComment = useCallback(async (content:string, postId?:string, parent_comment_id?:string) => {
+        const URL = parent_comment_id ? `${BASEURL}comments/${parent_comment_id}/comment` : `${BASEURL}posts/${postId}/comment`;
+
         const result = await fetchWithAuth(async () => {
-            return await postData(`${BASEURL}posts/${postId}/comment`, {
+            return await postData(URL, {
                 content,
                 parent_comment_id,
             }, {

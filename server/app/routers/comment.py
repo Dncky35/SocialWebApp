@@ -77,10 +77,13 @@ async def create_sub_comment(comment_id:str, sub_comment_data:CommentRequest,
         **sub_comment_data.dict(exclude_unset=True),
         author_id=current_account.account_id,
         post_id=comment.post_id,
-        parent_comment_id=comment.id,
     )
 
     await sub_commnet.insert()
+
+    comment.child_commets.append(sub_commnet.id)
+    await comment.save()
+
     return sub_commnet
 
 @router.post("/{comment_id}/like", status_code=status.HTTP_200_OK)
