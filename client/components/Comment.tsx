@@ -3,6 +3,7 @@ import { PublicAccount } from "@/schemas/account";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { usePostContext } from "@/context/PostContext";
+import { useAuth } from "@/context/AuthContext";
 import CommentCreator from "@/components/CommentCreator";
 
 export interface Comment {
@@ -13,7 +14,7 @@ export interface Comment {
     author_id:string
     post_id: string;
     parent_comment_id?:string;
-    child_commets?:Comment[];
+    child_commets?:string[];
     likes:string[];
     like_counter?:number;
     is_liked: boolean;
@@ -26,8 +27,8 @@ interface CommentProps {
 const CommentCard:React.FC<CommentProps> = ({ comment }) => {
 
     // console.log(JSON.stringify(comment));
-    
-    const { posts, likeComment } = usePostContext();
+    const { fetchAccountWithId, error:errorAuth } = useAuth();
+    const { posts, likeComment, error:errorPost } = usePostContext();
     const [owner, setOwner] = useState<PublicAccount | null>(() => {
         return posts.find((post) => post.owner.id === comment.author_id)?.owner || null;
     });
@@ -37,7 +38,18 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
         if(owner)
             return;
 
+        if(errorAuth || errorPost)
+            return;
+
         // TO DO: fetch owner info
+        const fetchOwnerAccount = async () => {
+            const result = await fetchAccountWithId(comment.author_id);
+            if(result)
+                setOwner(result);
+            else
+                setOwner(null);
+        };
+        fetchOwnerAccount();
 
     }, [owner]);
 

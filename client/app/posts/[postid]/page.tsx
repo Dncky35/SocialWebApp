@@ -42,9 +42,9 @@ const PostPage:React.FC = () => {
                     <LoadingComponent />
                 </div>
             ): (
-                <div>
+                <div className="bg-emerald-900">
                     <PostCard post={post} setPost={setPost} />
-                    <ul className="bg-emerald-900 px-6">
+                    <ul className="w-[calc(100%-20px)] ml-auto px-2">
                         {post.comments?.map((comment, index) => {
                             if(comment.parent_comment_id !== null)
                                 return null;
