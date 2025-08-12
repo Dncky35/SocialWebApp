@@ -4,7 +4,6 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { usePostContext } from "@/context/PostContext";
 import CommentCreator from "@/components/CommentCreator";
-import { Post } from "@/components/Post";
 
 export interface Comment {
     id: string;
@@ -55,9 +54,9 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
                 {owner?.username || comment.author_id}
                 </Link>
             </div>
-            <div className='text-xl font-semibold whitespace-pre-wrap break-words mb-2 cursor-default'>
+            <Link href={`/posts/${comment.post_id}/comments/${comment.id}`} className='cursor-pointer text-xl font-semibold whitespace-pre-wrap break-words mb-2'>
                 {comment.content}
-            </div>
+            </Link>
             <div className="flex items-center justify-between border-t border-emerald-700 py-2">
                 <div className="flex items-center gap-x-4">
                     <div className="flex items-center gap-x-2">

@@ -47,8 +47,8 @@ origins_prod = [  # Ensure both Gitpod URLs are included
 ]
 
 origins_dev = [
-    "https://3000-dncky35-socialwebapp-09hw3b6xdaz.ws-us120.gitpod.io",
-    "https://8000-dncky35-socialwebapp-09hw3b6xdaz.ws-us120.gitpod.io",
+    "https://3000-dncky35-socialwebapp-09hw3b6xdaz.ws-us121.gitpod.io",
+    "https://8000-dncky35-socialwebapp-09hw3b6xdaz.ws-us121.gitpod.io",
     "http://localhost:3000",
     "http://localhost:8000",
 ]

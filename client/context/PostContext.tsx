@@ -18,6 +18,7 @@ interface PostContext{
     setError: React.Dispatch<React.SetStateAction<ApiError | null>>;
     likeComment: (commentID: string) => Promise<void>;
     fetchPostWithID: (postID: string) => Promise<any> | null;
+    fetchCommentWithId: (commentID: string) => Promise<any> | null;
 }
 
 interface LikeType{
@@ -61,6 +62,19 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             return null;
 
     }, [getData, fetchWithAuth]);
+
+    const fetchCommentWithId = useCallback((commentID:string) => {
+        const result = fetchWithAuth(async () => {
+            return await getData(`${BASEURL}comments/${commentID}`, {
+                credentials:"include",
+            });
+        });
+
+        if(result)
+            return result;
+        else
+            return null;
+    }, [getData, fetchWithAuth])
 
     const createPost = useCallback(async (content: string, tags?: string[], image_url?: string,) => {
         const result:Post = await fetchWithAuth(async ()=> {
@@ -190,6 +204,7 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             setError: setErrorPost,
             likeComment,
             fetchPostWithID,
+            fetchCommentWithId,
             }}>
             {children}
         </PostContext.Provider>
