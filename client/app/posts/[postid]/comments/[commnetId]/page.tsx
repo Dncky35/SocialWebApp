@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect, useState } from "react";
 import { usePostContext } from "@/context/PostContext";
-import CommentCard, { Comment } from "@/components/Comment";
+import CommentCard, { Comment } from "@/components/CommentCard";
 import { useParams } from "next/navigation";
 import LoadingComponent from "@/components/Loading";
 
@@ -18,10 +18,9 @@ const CommentsPage:React.FC = () => {
 
     // Fetch main comment if null 
     useEffect(() => {
-        if(comment)
-            return;
 
-        const fetchComment = async () => {
+        if(!comment){
+            const fetchComment = async () => {
             const result = await fetchCommentWithId(params.commnetId as string);
 
             if(result){
@@ -36,14 +35,19 @@ const CommentsPage:React.FC = () => {
                     const validComments = fetchedComments.filter((comment) => comment !== null);
                     setChildComments(validComments);
                 }; 
-                fetchChildComments();
-                setComment(result);
+
+                if(!isLoading){
+                    fetchChildComments();
+                    setComment(result);
+                }
+
             }
             else
                 setComment(null);
         };
 
         fetchComment();
+        }
 
     }, [comment]);
 
@@ -60,19 +64,16 @@ const CommentsPage:React.FC = () => {
 
     return(
         <div className="flex-grow w-full max-w-2xl mx-auto rounded-2xl shadow-2xl p-6">
-            <button className="bg-emerald-500 rounded py-1 px-4 cursor-pointer hover:bg-emerald-600 text-white font-semibold transition duration-300">
-                ≪ Back
-            </button>
-            <div className="bg-emerald-900">
-                <CommentCard comment={comment} />                
-                <div className="w-[calc(100%-20px)] ml-auto px-2">
-
-                    {childComments.map((comment, index) => (
-                    <div key={index} className="border-b border-emerald-700 py-2">
+            {/* <button className="bg-emerald-500 rounded py-1 px-4 cursor-pointer hover:bg-emerald-600 text-white font-semibold transition duration-300">
+            ≪ Back
+            </button> */}
+            <CommentCard comment={comment} />                
+            <div className="w-[calc(100%-30px)] ml-auto mt-4 space-y-4">
+                {childComments.map((comment, index) => (
+                    <div key={index} className="">
                         <CommentCard  comment={comment} />
                     </div>
                 ))}
-                </div>
             </div>
         </div> 
     );

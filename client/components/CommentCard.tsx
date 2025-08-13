@@ -60,7 +60,7 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
     };
 
     return (
-        <div className="bg-emerald-800 rounded shadow-xl px-4 py-2">
+        <div className="bg-emerald-900 rounded shadow-xl px-4 py-2">
            <div className='border-b border-emerald-700 py-1 mb-1'>
                 <Link href={`/profile/${comment.author_id}`} className='font-semibold text-lg text-emerald-300 cursor-pointer hover:underline'>
                 {owner?.username || comment.author_id}

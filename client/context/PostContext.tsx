@@ -5,7 +5,7 @@ import useGet from "@/hooks/useGet";
 import usePost from "@/hooks/usePost";
 import { ApiError } from "@/hooks/useFetch";
 import { useAuth } from "./AuthContext";
-import { Post } from "@/components/Post";
+import { Post } from "@/components/PostCard";
 
 interface PostContext{
     posts: Post[];

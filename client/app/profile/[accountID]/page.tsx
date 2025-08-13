@@ -2,7 +2,7 @@
 import React, {useState, useEffect} from "react";
 import { useParams } from "next/navigation";
 import { usePostContext } from "@/context/PostContext";
-import PostCard from "@/components/Post";
+import PostCard from "@/components/PostCard";
 import { PublicAccount } from "@/schemas/account";
 import { useAuth } from "@/context/AuthContext";
 import LoadingComponent from "@/components/Loading";

@@ -1,11 +1,10 @@
 "use client";
 import React, { useEffect } from "react";
 import { usePostContext } from "@/context/PostContext";
-import PostCard, { Post } from "@/components/Post";
+import PostCard, { Post } from "@/components/PostCard";
 import PostCreator from "@/components/PostCreator";
 import LoadingComponent from "@/components/Loading";
 import ErrorComponent from "@/components/Error";
-
 
 const FeedPage:React.FC = () => {
     const { posts, isLoading, error, fetchPosts, setError } = usePostContext();
@@ -13,37 +12,33 @@ const FeedPage:React.FC = () => {
     useEffect(() => {
         if(posts.length > 0)
             return;
-        
-        const updateFeed = async () => {
+
+        const fetchingPost = async () => {
             await fetchPosts();
         };
 
-        updateFeed();
+        if(!isLoading)
+            fetchingPost();
+
     }, [posts]);
 
-    if(isLoading){
-        return (
-            <LoadingComponent />
-        );
-    }
+    if(isLoading)
+        return (<LoadingComponent />);
+
+    if(error)
+        return (<ErrorComponent status={error.status} detail={error.detail} setError={setError} />);
 
     return (
-    <div className="flex-grow p-6 w-full max-w-2xl mx-auto rounded-2xl shadow-2xl space-y-6">
-        {/* Post Input Section */}
-        <div>
-            <PostCreator />
+        <div className="flex-grow flex flex-col gap-y-4 p-4 w-full max-w-2xl mx-auto rounded-xl shadow-xl">
+            <div>
+                <PostCreator />
+                <div className="w-full mt-4 max-w-xl mx-auto space-y-4">
+                    {posts && posts.map((post:Post, index) => (
+                        <PostCard key={index} post={post} />
+                    ))}
+                </div>
+            </div>
         </div>
-
-        {/* Posts List Placeholder */}
-        <div className="w-full max-w-xl mx-auto space-y-4">
-            {error && (
-                <ErrorComponent detail={error.detail} status={error.status} setError={setError} />
-            )}
-            {posts.map((post: Post) => (
-                <PostCard key={post.id} post={post} />
-            ))}
-        </div>
-    </div>
     );
 
 };

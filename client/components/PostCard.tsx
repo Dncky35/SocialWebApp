@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { PublicAccount } from '@/schemas/account';
 import Link from 'next/link';
-import { Comment } from './Comment';
+import { Comment } from './CommentCard';
 import { usePostContext } from '@/context/PostContext';
 import CommentCreator from './CommentCreator';
 
@@ -22,10 +22,9 @@ export interface Post {
 
 interface PostProps {
   post: Post;
-  setPost: React.Dispatch<React.SetStateAction<Post | null>>;
 };
 
-const PostCard: React.FC<PostProps> = ({ post, setPost }) => {
+const PostCard: React.FC<PostProps> = ({ post }) => {
   const { likePost } = usePostContext();
   const [ isCommentAdding, setIsCommentAdding ] = useState(false);
   
@@ -35,14 +34,7 @@ const PostCard: React.FC<PostProps> = ({ post, setPost }) => {
 
     // If result is not null, update the post state of the POST
     if(result) {
-      setPost((prevPost) => {
-        if (!prevPost) return null;
-        return {
-          ...prevPost,
-          is_liked: result.liked,
-          likes: result.likes_count > 0 ? Array(result.likes_count).fill('') : [],
-        };
-      });
+      
     }
   };
   
