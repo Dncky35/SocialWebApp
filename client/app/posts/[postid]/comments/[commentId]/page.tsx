@@ -8,7 +8,7 @@ import { Post } from "@/components/PostCard";
 
 const CommentsPage:React.FC = () => {
     const params = useParams();
-    const { posts, fetchCommentWithId, isLoading } = usePostContext();
+    const { posts, fetchPostWithID, fetchCommentWithId, isLoading } = usePostContext();
     const [post, setPost] = useState<Post|null>(null);
     const [comment, setComment] = useState<Comment|null>(null);
     const [childComments, setChildComments] = useState<Comment[]>([]);
@@ -18,8 +18,10 @@ const CommentsPage:React.FC = () => {
         if(posts.length === 0){
             const fetchComment = async () => {
                 // TO DO: FETCH POST with postid and add posts on postContext
-                
+                await fetchPostWithID(params.postid as string);
             }
+
+            fetchComment();
         }
         else{
             // Find the post
@@ -33,9 +35,7 @@ const CommentsPage:React.FC = () => {
                 setChildComments(_childComments);
             }
         }
-        
-
-    }, [comment]);
+    }, [comment, posts]);
 
     if(isLoading)
         return ( <LoadingComponent />);

@@ -49,15 +49,23 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
         }
     }, [getData, fetchWithAuth]);
 
-    const fetchPostWithID = useCallback((postID:string) => {
-        const result = fetchWithAuth(async () => {
+    const fetchPostWithID = useCallback(async (postID:string) => {
+        const result = await fetchWithAuth(async () => {
             return await getData(`${BASEURL}posts/${postID}`, {
                 credentials:"include",
             });
         });
 
-        if(result)
+        if(result){
+            setPosts((prev) => {
+                const postExists = prev.find((p) => p.id === postID) || null;
+                if(!postExists){
+                    return [...prev, result];
+                }
+                return prev;
+            });
             return result;
+        }
         else
             return null;
 
@@ -163,15 +171,20 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
     }, [postData, fetchWithAuth]);
 
     const addComment = useCallback(async (content:string, postId?:string, parent_comment_id?:string) => {
+
+        // TO DO: check if adding sub comment or main comment to post
+        
         const URL = parent_comment_id ? `${BASEURL}comments/${parent_comment_id}/comment` : `${BASEURL}posts/${postId}/comment`;
 
         const result = await fetchWithAuth(async () => {
-            return await postData(URL, {
+            const result = await postData(URL, {
                 content,
                 parent_comment_id,
             }, {
                 credentials:"include",
             });
+
+            return result;
         });
 
         if(result){
