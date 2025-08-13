@@ -60,7 +60,7 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
     };
 
     return (
-        <div className="bg-emerald-900 rounded shadow-xl px-4 py-2">
+        <div className="bg-emerald-800 rounded shadow-xl px-4 py-2">
            <div className='border-b border-emerald-700 py-1 mb-1'>
                 <Link href={`/profile/${comment.author_id}`} className='font-semibold text-lg text-emerald-300 cursor-pointer hover:underline'>
                 {owner?.username || comment.author_id}
@@ -72,7 +72,7 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
             <div className="flex items-center justify-between border-t border-emerald-700 py-2">
                 <div className="flex items-center gap-x-4">
                     <div className="flex items-center gap-x-2">
-                        <p>{comment.likes.length || 0}</p>
+                        <p>{comment.likes?.length || 0}</p>
                         <button 
                         onClick={(e) => handleOnLike(e)}
                         className='bg-emerald-600 text-white px-1 py-1 cursor-pointer rounded-full hover:bg-emerald-700 transition duration-300'>

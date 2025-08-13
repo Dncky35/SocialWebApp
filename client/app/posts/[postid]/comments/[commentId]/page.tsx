@@ -4,50 +4,36 @@ import { usePostContext } from "@/context/PostContext";
 import CommentCard, { Comment } from "@/components/CommentCard";
 import { useParams } from "next/navigation";
 import LoadingComponent from "@/components/Loading";
+import { Post } from "@/components/PostCard";
 
 const CommentsPage:React.FC = () => {
     const params = useParams();
     const { posts, fetchCommentWithId, isLoading } = usePostContext();
-    const [comment, setComment] = useState<Comment | null>(() => {
-        const _post = posts.find((p) => p.id === params.postid);
-        const _comment = _post?.comments.find((c) => c.id === params.commnetId);
-        return _comment || null;
-    });
-
+    const [post, setPost] = useState<Post|null>(null);
+    const [comment, setComment] = useState<Comment|null>(null);
     const [childComments, setChildComments] = useState<Comment[]>([]);
 
     // Fetch main comment if null 
     useEffect(() => {
-
-        if(!comment){
+        if(posts.length === 0){
             const fetchComment = async () => {
-            const result = await fetchCommentWithId(params.commnetId as string);
-
-            if(result){
-                const fetchChildComments = async() => {
-                    if(!result.child_commets) return;
-
-                    const childCommentPromises = result.child_commets.map(() => {
-                        return fetchCommentWithId(result.child_commets[0]);
-                    
-                    });
-                    const fetchedComments = await Promise.all(childCommentPromises);
-                    const validComments = fetchedComments.filter((comment) => comment !== null);
-                    setChildComments(validComments);
-                }; 
-
-                if(!isLoading){
-                    fetchChildComments();
-                    setComment(result);
-                }
-
+                // TO DO: FETCH POST with postid and add posts on postContext
+                
             }
-            else
-                setComment(null);
-        };
-
-        fetchComment();
         }
+        else{
+            // Find the post
+            const _post = posts.find((p) => p.id === params.postid) || null;
+            setPost(_post);
+
+            if(_post){
+                const _comment = _post.comments.find((c) => c.id === params.commentId) || null;
+                setComment(_comment);
+                const _childComments = _post.comments.filter((c) => c.parent_comment_id === params.commentId);
+                setChildComments(_childComments);
+            }
+        }
+        
 
     }, [comment]);
 
