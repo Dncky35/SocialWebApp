@@ -12,7 +12,7 @@ const ProfilePage:React.FC = () => {
     const { fetchAccountWithId, isLoading } = useAuth();
     const { posts } = usePostContext();
     const [account, setAccount] = useState<PublicAccount | null>(() => {
-        return posts.find((post) => post.owner.id === params.accountID)?.owner || null;
+        return posts?.find((post) => post.owner.id === params.accountID)?.owner || null;
     });
 
     useEffect(() => {
@@ -29,7 +29,7 @@ const ProfilePage:React.FC = () => {
         getAccount();
     }, [account]);
 
-    const postsOfUser = posts.filter((post) => post.owner.id === params.accountID);
+    const postsOfUser = posts?.filter((post) => post.owner.id === params.accountID) || null;
     
     if(isLoading)
         return(
@@ -92,7 +92,7 @@ const ProfilePage:React.FC = () => {
                 <div className="text-sm text-emerald-300">Following</div>
                 </div>
             </div>
-            {postsOfUser.map((post) => (
+            {postsOfUser?.map((post) => (
                 <PostCard key={post.id} post={post} />
             ))}
         </div>
