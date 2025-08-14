@@ -18,7 +18,7 @@ const ProfilePage:React.FC = () => {
         return null;
 
         return (
-        <main className="bg-emerald-900 py-10 px-4 sm:px-8 rounded shadow-xl w-full">
+        <main className="flex-grow bg-emerald-900 py-10 px-4 sm:px-8 rounded shadow-xl w-full">
             <div className="max-w-4xl mx-auto bg-emerald-50 shadow-lg rounded-lg p-8">
                 <div className="flex flex-col sm:flex-row items-center gap-6">
                     <div className="w-32 h-32 rounded-full bg-emerald-300 overflow-hidden">

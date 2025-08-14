@@ -45,7 +45,7 @@ const ProfilePage:React.FC = () => {
     }
 
     return (
-        <div className="flex-grow p-6 lg:w-full md:max-w-2xl mx-auto rounded-2xl shadow-2xl space-y-6">
+        <div className="flex-grow p-6 w-full max-w-2xl mx-auto rounded-2xl shadow-2xl space-y-6">
             <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                     <div className="w-16 h-16 rounded-full bg-emerald-300 overflow-hidden hover:cursor-pointer">

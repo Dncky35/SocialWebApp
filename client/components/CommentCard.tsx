@@ -5,6 +5,7 @@ import React, { useEffect, useState } from "react";
 import { usePostContext } from "@/context/PostContext";
 import { useAuth } from "@/context/AuthContext";
 import CommentCreator from "@/components/CommentCreator";
+import LoadingComponent from "./Loading";
 
 export interface Comment {
     id: string;
@@ -27,37 +28,36 @@ interface CommentProps {
 const CommentCard:React.FC<CommentProps> = ({ comment }) => {
 
     // console.log(JSON.stringify(comment));
-    const { fetchAccountWithId, error:errorAuth } = useAuth();
-    const { posts, likeComment, error:errorPost } = usePostContext();
+    const { fetchAccountWithId, error:errorAuth, isLoading:isLoadingAUTH } = useAuth();
+    const { posts, likeComment, error:errorPost, isLoading:isLoadingPOST } = usePostContext();
     const [owner, setOwner] = useState<PublicAccount | null>(() => {
         return posts?.find((post) => post.owner.id === comment.author_id)?.owner || null;
     });
     const [isCommentAdding, setIsCommentAdding] = useState(false);
 
     useEffect(() => {
-        if(owner)
-            return;
+        if(!owner && !isLoadingPOST && !isLoadingAUTH){
+            const getAccount = async () => {
+                const result = await fetchAccountWithId(comment.author_id);
+                if(result)
+                    setOwner(result);
+            };
+            getAccount();
+        }
 
-        if(errorAuth || errorPost)
-            return;
-
-        // TO DO: fetch owner info
-        const fetchOwnerAccount = async () => {
-            const result = await fetchAccountWithId(comment.author_id);
-            if(result)
-                setOwner(result);
-            else
-                setOwner(null);
-        };
-        fetchOwnerAccount();
-
-    }, [owner]);
+    }, [owner, fetchAccountWithId,]);
 
     const handleOnLike = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
         await likeComment(comment.id);
         // console.log(result);
     };
+
+    if(isLoadingAUTH || isLoadingPOST){
+        return (
+            <LoadingComponent />
+        );
+    }
 
     return (
         <div className="bg-emerald-800 rounded shadow-xl px-4 py-2">
