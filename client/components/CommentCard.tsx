@@ -30,7 +30,7 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
     const { fetchAccountWithId, error:errorAuth } = useAuth();
     const { posts, likeComment, error:errorPost } = usePostContext();
     const [owner, setOwner] = useState<PublicAccount | null>(() => {
-        return posts.find((post) => post.owner.id === comment.author_id)?.owner || null;
+        return posts?.find((post) => post.owner.id === comment.author_id)?.owner || null;
     });
     const [isCommentAdding, setIsCommentAdding] = useState(false);
 
@@ -92,7 +92,7 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
             </div>
             <div className='mt-2 py-2 px-4 border-t border-emerald-700'>
             {isCommentAdding  && (
-                <CommentCreator commentID={comment.id} />
+                <CommentCreator commentID={comment.id} postID={comment.post_id} />
             )}
         </div>
         </div>

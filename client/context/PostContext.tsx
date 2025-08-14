@@ -6,9 +6,10 @@ import usePost from "@/hooks/usePost";
 import { ApiError } from "@/hooks/useFetch";
 import { useAuth } from "./AuthContext";
 import { Post } from "@/components/PostCard";
+import { Comment } from "@/components/CommentCard";
 
 interface PostContext{
-    posts: Post[];
+    posts: Post[] | null;
     isLoading: boolean;
     error: ApiError | null;
     fetchPosts: () => Promise<void>;
@@ -34,7 +35,7 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
     const { isLoading:isLoadingGet, error:errorGet, getData, setError:setErrorGet } = useGet();
     const { fetchWithAuth } = useAuth();
 
-    const [posts, setPosts] = useState<Post[]>([]);   
+    const [posts, setPosts] = useState<Post[] | null>(null);   
 
     const fetchPosts = useCallback(async () => {
         const result = await fetchWithAuth(async () => {
@@ -58,9 +59,9 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
 
         if(result){
             setPosts((prev) => {
-                const postExists = prev.find((p) => p.id === postID) || null;
+                const postExists = prev?.find((p) => p.id === postID) || null;
                 if(!postExists){
-                    return [...prev, result];
+                    return [...(prev || []), result];
                 }
                 return prev;
             });
@@ -96,8 +97,9 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
         });
 
         if(result){
-            const postTemp = posts;
+            const postTemp = posts || [];
             // set as first element
+
             postTemp.unshift(result);
             setPosts(postTemp);
         }
@@ -113,8 +115,9 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
         if(result){
             const likeResult:LikeType = result;
 
-            setPosts((prevPosts) => 
-                prevPosts.map((post) => {
+            setPosts((prevPosts) => {
+                if(!prevPosts) return prevPosts;
+                return prevPosts.map((post) => {
                     post.comments.forEach((comment) => {
                         if(comment.id === commentID){
                             comment.is_liked = likeResult.liked;
@@ -135,7 +138,7 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
 
                     return post;
                 })
-            );
+            });
         }
     }, [postData])
 
@@ -148,9 +151,11 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
 
         if (result) {
             const likeResult = result;
-            console.log(JSON.stringify(likeResult));
-            setPosts((prevPosts) =>
-                prevPosts.map((post) => {
+
+            setPosts((prevPosts) => {
+                if (!prevPosts) return prevPosts;
+
+                return prevPosts.map((post) => {
                     if (post.id !== postId) return post;
 
                     // Toggle user ID in likes list
@@ -163,20 +168,20 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
                         is_liked: likeResult.liked,
                         likes: updatedLikes,
                     };
-                })
-            );
+                });
+            });
         }
 
         return result;
     }, [postData, fetchWithAuth]);
 
     const addComment = useCallback(async (content:string, postId?:string, parent_comment_id?:string) => {
-
+       //  console.log(`content: ${content}, postId: ${postId}, parent_comment_id: ${parent_comment_id}`);
+        const isChildComment = parent_comment_id?.trim() !== "";
         // TO DO: check if adding sub comment or main comment to post
-        
-        const URL = parent_comment_id ? `${BASEURL}comments/${parent_comment_id}/comment` : `${BASEURL}posts/${postId}/comment`;
+        const URL =  isChildComment ? `${BASEURL}comments/${parent_comment_id}/comment` : `${BASEURL}posts/${postId}/comment`;
 
-        const result = await fetchWithAuth(async () => {
+        const result: Comment = await fetchWithAuth(async () => {
             const result = await postData(URL, {
                 content,
                 parent_comment_id,
@@ -189,18 +194,34 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
 
         if(result){
             // console.log(JSON.stringify(result));
-            setPosts((prevPosts) =>
-                prevPosts.map((post) => {
+            setPosts((prevPosts) => {
+                if(!prevPosts) return prevPosts;
+
+                return prevPosts.map((post) => {
                     if (post.id !== postId) return post;
-
+                    // If it's a child comment, find the parent comment to add the new comment
                     const updatedComments = [...post.comments, result];
-
+                    if(isChildComment){
+                        const parentComment = updatedComments.find(c => c.id === parent_comment_id);
+                        if(parentComment){
+                            const updatedChildComments = [...(parentComment.child_commets || []), result.id];
+                            
+                            return{
+                                ...post,
+                                comments: post.comments.map(comment => 
+                                    comment.id === parent_comment_id ? {...comment,
+                                        child_commets: updatedChildComments,
+                                    } : comment
+                                )
+                            }
+                        }
+                    }
                     return {
                         ...post,
                         comments: updatedComments,
                     };
                 })
-            );
+            });
         }
 
     }, [postData, fetchWithAuth]);

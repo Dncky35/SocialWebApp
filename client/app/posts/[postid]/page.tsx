@@ -1,8 +1,8 @@
 'use client';
 import { useParams } from "next/navigation";
-import React, { useState, useEffect } from 'react';
+import React, { useEffect } from 'react';
 import { usePostContext } from "@/context/PostContext";
-import PostCard, { Post } from "@/components/PostCard";
+import PostCard from "@/components/PostCard";
 import CommentCard from "@/components/CommentCard";
 import LoadingComponent from "@/components/Loading";
 import ErrorComponent from "@/components/Error";
@@ -10,26 +10,13 @@ import ErrorComponent from "@/components/Error";
 const PostPage:React.FC = () => {
     const params = useParams(); // postid
     const { posts, isLoading, fetchPostWithID, error, setError } = usePostContext();
-    const [post, setPost] = useState<Post | null>(
-        posts.find((post) => post.id === params.postid) || null
-    );
+    const post = posts?.find((p) => p.id === params.postid) || null;
 
     useEffect(() => {
-        if(!post){
-            const fetchPost = async () => {
-                const result = await fetchPostWithID(params.postid as string);
-
-                if(result)
-                    setPost(result);
-                else
-                    setPost(null);
-            };
-
-            if(!isLoading){
-                fetchPost();
-            }
+        if (!post && !isLoading) {
+            fetchPostWithID(params.postid as string);
         }
-    }, [post]);
+    }, [post, isLoading, params.postid, fetchPostWithID]);
 
     if(isLoading)
         return (<LoadingComponent />);

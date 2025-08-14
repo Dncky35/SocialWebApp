@@ -1,41 +1,28 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { usePostContext } from "@/context/PostContext";
 import CommentCard, { Comment } from "@/components/CommentCard";
 import { useParams } from "next/navigation";
 import LoadingComponent from "@/components/Loading";
-import { Post } from "@/components/PostCard";
 
 const CommentsPage:React.FC = () => {
     const params = useParams();
     const { posts, fetchPostWithID, fetchCommentWithId, isLoading } = usePostContext();
-    const [post, setPost] = useState<Post|null>(null);
-    const [comment, setComment] = useState<Comment|null>(null);
-    const [childComments, setChildComments] = useState<Comment[]>([]);
+    const post = posts?.find((p) => p.id === params.postid) || null;
+    const comment = post?.comments.find((c) => c.id === params.commentId) || null;
+    const childComments = post?.comments.filter((c) => c.parent_comment_id === params.commentId) || [];
 
-    // Fetch main comment if null 
     useEffect(() => {
-        if(posts.length === 0){
-            const fetchComment = async () => {
-                // TO DO: FETCH POST with postid and add posts on postContext
-                await fetchPostWithID(params.postid as string);
-            }
-
-            fetchComment();
+        if(!post && !isLoading) {
+            fetchPostWithID(params.postid as string);
         }
-        else{
-            // Find the post
-            const _post = posts.find((p) => p.id === params.postid) || null;
-            setPost(_post);
 
-            if(_post){
-                const _comment = _post.comments.find((c) => c.id === params.commentId) || null;
-                setComment(_comment);
-                const _childComments = _post.comments.filter((c) => c.parent_comment_id === params.commentId);
-                setChildComments(_childComments);
-            }
+        if(!comment && !isLoading){
+            fetchCommentWithId(params.commentId as string);
         }
-    }, [comment, posts]);
+
+
+    }, [post, comment, isLoading, params.postid, params.commentId, fetchPostWithID, fetchCommentWithId]);
 
     if(isLoading)
         return ( <LoadingComponent />);

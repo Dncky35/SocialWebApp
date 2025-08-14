@@ -10,7 +10,7 @@ interface CommentRequest {
 }
 
 interface CommentCreatorProps {
-    postID?: string;
+    postID: string;
     commentID?: string;
 }
 

@@ -10,17 +10,11 @@ const FeedPage:React.FC = () => {
     const { posts, isLoading, error, fetchPosts, setError } = usePostContext();
 
     useEffect(() => {
-        if(posts.length > 0)
-            return;
+       if(!posts && !isLoading) {
+            fetchPosts();
+        }
 
-        const fetchingPost = async () => {
-            await fetchPosts();
-        };
-
-        if(!isLoading)
-            fetchingPost();
-
-    }, [posts]);
+    }, [posts, fetchPosts, isLoading]);
 
     if(isLoading)
         return (<LoadingComponent />);
