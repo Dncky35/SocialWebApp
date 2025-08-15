@@ -91,8 +91,11 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
 
             if(isValid)
                 return true;
-            else
+            else{
+                await logout();
                 return false;
+            }
+                
         }
         else
             return true;

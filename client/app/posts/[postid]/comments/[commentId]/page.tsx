@@ -14,11 +14,19 @@ const CommentsPage:React.FC = () => {
 
     useEffect(() => {
         if(!post && !isLoading) {
-            fetchPostWithID(params.postid as string);
+            const fetchPost = async () => {
+                await fetchPostWithID(params.postid as string);
+            };
+
+            fetchPost();
         }
 
         if(!comment && !isLoading){
-            fetchCommentWithId(params.commentId as string);
+            const fetchComment = async () => {
+                await fetchCommentWithId(params.commentId as string);
+            };
+
+            fetchComment();
         }
 
 

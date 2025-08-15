@@ -11,7 +11,11 @@ const FeedPage:React.FC = () => {
 
     useEffect(() => {
        if(!posts && !isLoading) {
-            fetchPosts();
+            const fetchingposts = async () => {
+                await fetchPosts();
+            }
+
+            fetchingposts();
         }
 
     }, [posts, fetchPosts, isLoading]);
