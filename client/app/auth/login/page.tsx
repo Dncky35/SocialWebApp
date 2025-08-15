@@ -34,7 +34,8 @@ const Login:React.FC = () => {
 			password: formData[1].value,
 		};
 
-		await login(payload.username, payload.password);
+		if(!isLoading)
+			await login(payload.username, payload.password);
 	};
 
 	return (

@@ -1,6 +1,7 @@
 "use client";
 import React from "react";
 import { useAuth } from "@/context/AuthContext";
+import LoadingComponent from "@/components/Loading";
 
 const formatDate = (date: string) =>
     new Date(date).toLocaleString('en-GB', {
@@ -12,7 +13,10 @@ const formatDate = (date: string) =>
 });
 
 const ProfilePage:React.FC = () => {
-    const { account } = useAuth();
+    const { account, pageState } = useAuth();
+
+    if(pageState === "Initializing")
+        return (<LoadingComponent />)
 
     if(!account)
         return null;

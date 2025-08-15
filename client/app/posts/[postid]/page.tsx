@@ -6,11 +6,13 @@ import PostCard from "@/components/PostCard";
 import CommentCard from "@/components/CommentCard";
 import LoadingComponent from "@/components/Loading";
 import ErrorComponent from "@/components/Error";
+import { useAuth } from "@/context/AuthContext";
 
 const PostPage:React.FC = () => {
     const params = useParams(); // postid
     const { posts, isLoading, fetchPostWithID, error, setError } = usePostContext();
     const post = posts?.find((p) => p.id === params.postid) || null;
+    const { pageState } = useAuth();
 
     useEffect(() => {
         if (!post && !isLoading && !error) {
@@ -22,8 +24,8 @@ const PostPage:React.FC = () => {
         }
     }, [post, error]);
 
-    if(isLoading)
-        return (<LoadingComponent />);
+    if(isLoading || pageState === "Initializing")
+        return ( <LoadingComponent />);
 
     if(error)
         return (<ErrorComponent status={error.status} detail={error.detail} setError={setError} />);

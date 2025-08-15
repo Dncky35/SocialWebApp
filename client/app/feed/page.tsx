@@ -5,9 +5,11 @@ import PostCard, { Post } from "@/components/PostCard";
 import PostCreator from "@/components/PostCreator";
 import LoadingComponent from "@/components/Loading";
 import ErrorComponent from "@/components/Error";
+import { useAuth } from "@/context/AuthContext";
 
 const FeedPage:React.FC = () => {
     const { posts, isLoading, error, fetchPosts, setError } = usePostContext();
+    const { pageState } = useAuth();
 
     useEffect(() => {
        if(!posts && !isLoading && !error) {
@@ -25,6 +27,10 @@ const FeedPage:React.FC = () => {
 
     if(isLoading)
         return (<LoadingComponent />);
+
+    if( pageState === "Initializing"){
+        return (<LoadingComponent />);
+    }
 
     return (
         <div className="flex-grow flex flex-col gap-y-4 p-4 w-full max-w-2xl mx-auto rounded-xl shadow-xl">

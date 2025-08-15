@@ -9,7 +9,7 @@ import LoadingComponent from "@/components/Loading";
 
 const ProfilePage:React.FC = () => {
     const params = useParams();
-    const { fetchAccountWithId, isLoading } = useAuth();
+    const { fetchAccountWithId, isLoading, pageState } = useAuth();
     const { posts } = usePostContext();
     const [account, setAccount] = useState<PublicAccount | null>(() => {
         return posts?.find((post) => post.owner.id === params.accountID)?.owner || null;
@@ -31,7 +31,7 @@ const ProfilePage:React.FC = () => {
 
     const postsOfUser = posts?.filter((post) => post.owner.id === params.accountID) || null;
     
-    if(isLoading)
+    if(isLoading || pageState === "Initializing")
         return(
             <div>
                 <LoadingComponent />

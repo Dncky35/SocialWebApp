@@ -1,14 +1,15 @@
 "use client";
 import React, { useEffect } from "react";
 import { usePostContext } from "@/context/PostContext";
-import CommentCard, { Comment } from "@/components/CommentCard";
+import CommentCard from "@/components/CommentCard";
 import { useParams } from "next/navigation";
 import LoadingComponent from "@/components/Loading";
-import { error } from "console";
 import ErrorComponent from "@/components/Error";
+import { useAuth } from "@/context/AuthContext";
 
 const CommentsPage:React.FC = () => {
     const params = useParams();
+    const { pageState } = useAuth();
     const { posts, fetchPostWithID, fetchCommentWithId, isLoading, error, setError } = usePostContext();
     const post = posts?.find((p) => p.id === params.postid) || null;
     const comment = post?.comments.find((c) => c.id === params.commentId) || null;
@@ -34,12 +35,12 @@ const CommentsPage:React.FC = () => {
 
     }, [post, comment, error]);
 
-    if(isLoading)
+    if(isLoading || pageState === "Initializing")
         return ( <LoadingComponent />);
 
     if(error)
         return (<ErrorComponent status={error.status} detail={error.detail} setError={setError} />);
-    
+
     if(comment === null){
         return (
             <div>
@@ -47,6 +48,9 @@ const CommentsPage:React.FC = () => {
             </div>
         );
     }
+
+
+
 
     return(
         <div className="flex-grow w-full max-w-2xl mx-auto rounded-2xl shadow-2xl p-6">

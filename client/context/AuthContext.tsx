@@ -16,7 +16,11 @@ interface AuthState{
     fetchWithAuth: (fetchFunc: () => Promise<any>) => Promise<any>;
     error: ApiError | null;
     fetchAccountWithId: (account_id: string) => Promise<PublicAccount | null>;
+    pageState: PageState;
+    setPageState: React.Dispatch<React.SetStateAction<PageState>>;
 }
+
+export type PageState = "Completed" | "Initializing";
 
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
@@ -24,12 +28,14 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
     const { isLoading:isLoadingPost, error:errorPost, postData, setError:setErrorPost } = usePost("URLSearchParams");
     const { isLoading:isLoadingGet, error:errorGet, getData, setError:setErrorGet } = useGet();
     const [account, setAccount] = useState(null);
+    const [pageState, setPageState] = useState<PageState>("Initializing");
 
     useEffect(() => {
         // Getting account from local storage
         const account = localStorage.getItem("account");
         if(account){
             setAccount(JSON.parse(account));
+            setPageState("Completed")
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
@@ -120,8 +126,18 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
 
     return (
         <AuthContext.Provider value={
-            {account, error: errorPost || errorGet, isLoading: isLoadingPost || isLoadingGet, 
-                setAccount, signUp, login, logout, fetchWithAuth, fetchAccountWithId
+            {
+                account, 
+                error: errorPost || errorGet, 
+                isLoading: isLoadingPost || isLoadingGet,
+                pageState,
+                setPageState,
+                setAccount, 
+                signUp, 
+                login, 
+                logout, 
+                fetchWithAuth, 
+                fetchAccountWithId
             }}>
             {children}
         </AuthContext.Provider>
