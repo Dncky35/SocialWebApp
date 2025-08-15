@@ -14,14 +14,14 @@ interface AuthState{
     login: (username: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
     fetchWithAuth: (fetchFunc: () => Promise<any>) => Promise<any>;
-    error: ApiError | null | undefined;
+    error: ApiError | null;
     fetchAccountWithId: (account_id: string) => Promise<PublicAccount | null>;
 }
 
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
 export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) => {
-    const { isLoading:isLoadingPost, error:errorPost, postData, setError } = usePost("URLSearchParams");
+    const { isLoading:isLoadingPost, error:errorPost, postData, setError:setErrorPost } = usePost("URLSearchParams");
     const { isLoading:isLoadingGet, error:errorGet, getData, setError:setErrorGet } = useGet();
     const [account, setAccount] = useState(null);
 
@@ -72,10 +72,6 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             setAccount(null);
             window.location.href = "/";
         }
-        
-        if(errorPost){
-            console.log(JSON.stringify(errorPost));
-        }
 
     }, [postData]);
 
@@ -95,7 +91,6 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
                 await logout();
                 return false;
             }
-                
         }
         else
             return true;

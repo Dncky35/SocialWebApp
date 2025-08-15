@@ -36,7 +36,7 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
     const [isCommentAdding, setIsCommentAdding] = useState(false);
 
     useEffect(() => {
-        if(!owner && !isLoadingPOST && !isLoadingAUTH){
+        if(!owner && !isLoadingPOST && !isLoadingAUTH && !errorAuth && !errorPost){
             const getAccount = async () => {
                 const result = await fetchAccountWithId(comment.author_id);
                 if(result)
@@ -45,7 +45,7 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
             getAccount();
         }
 
-    }, [owner, fetchAccountWithId,]);
+    }, [owner, fetchAccountWithId, errorAuth, errorPost]);
 
     const handleOnLike = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();

@@ -4,16 +4,18 @@ import { usePostContext } from "@/context/PostContext";
 import CommentCard, { Comment } from "@/components/CommentCard";
 import { useParams } from "next/navigation";
 import LoadingComponent from "@/components/Loading";
+import { error } from "console";
+import ErrorComponent from "@/components/Error";
 
 const CommentsPage:React.FC = () => {
     const params = useParams();
-    const { posts, fetchPostWithID, fetchCommentWithId, isLoading } = usePostContext();
+    const { posts, fetchPostWithID, fetchCommentWithId, isLoading, error, setError } = usePostContext();
     const post = posts?.find((p) => p.id === params.postid) || null;
     const comment = post?.comments.find((c) => c.id === params.commentId) || null;
     const childComments = post?.comments.filter((c) => c.parent_comment_id === params.commentId) || [];
 
     useEffect(() => {
-        if(!post && !isLoading) {
+        if(!post && !isLoading && !error) {
             const fetchPost = async () => {
                 await fetchPostWithID(params.postid as string);
             };
@@ -21,7 +23,7 @@ const CommentsPage:React.FC = () => {
             fetchPost();
         }
 
-        if(!comment && !isLoading){
+        if(!comment && !isLoading && !error){
             const fetchComment = async () => {
                 await fetchCommentWithId(params.commentId as string);
             };
@@ -30,10 +32,13 @@ const CommentsPage:React.FC = () => {
         }
 
 
-    }, [post, comment, isLoading, params.postid, params.commentId, fetchPostWithID, fetchCommentWithId]);
+    }, [post, comment, error]);
 
     if(isLoading)
         return ( <LoadingComponent />);
+
+    if(error)
+        return (<ErrorComponent status={error.status} detail={error.detail} setError={setError} />);
     
     if(comment === null){
         return (

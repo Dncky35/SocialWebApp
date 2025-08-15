@@ -16,6 +16,7 @@ const useFetch = () => {
             const response = await fetch(url, options);
             if (!response.ok) {
                 const errorResponse = await response.json().catch(() => null);
+                
                 setError({
                     status: response.status, 
                     detail: errorResponse?.detail || "Unknown Error Occured",

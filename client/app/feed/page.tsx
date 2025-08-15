@@ -10,7 +10,7 @@ const FeedPage:React.FC = () => {
     const { posts, isLoading, error, fetchPosts, setError } = usePostContext();
 
     useEffect(() => {
-       if(!posts && !isLoading) {
+       if(!posts && !isLoading && !error) {
             const fetchingposts = async () => {
                 await fetchPosts();
             }
@@ -18,13 +18,13 @@ const FeedPage:React.FC = () => {
             fetchingposts();
         }
 
-    }, [posts, fetchPosts, isLoading]);
-
-    if(isLoading)
-        return (<LoadingComponent />);
+    }, [posts, error]);
 
     if(error)
         return (<ErrorComponent status={error.status} detail={error.detail} setError={setError} />);
+
+    if(isLoading)
+        return (<LoadingComponent />);
 
     return (
         <div className="flex-grow flex flex-col gap-y-4 p-4 w-full max-w-2xl mx-auto rounded-xl shadow-xl">

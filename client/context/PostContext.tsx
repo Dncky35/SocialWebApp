@@ -46,8 +46,8 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
 
         if(result){
             setPosts(result);
-        
         }
+        
     }, [getData, fetchWithAuth]);
 
     const fetchPostWithID = useCallback(async (postID:string) => {

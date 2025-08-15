@@ -13,14 +13,14 @@ const PostPage:React.FC = () => {
     const post = posts?.find((p) => p.id === params.postid) || null;
 
     useEffect(() => {
-        if (!post && !isLoading) {
+        if (!post && !isLoading && !error) {
             const fetchPost = async () => {
                 await fetchPostWithID(params.postid as string);
             };
 
             fetchPost();
         }
-    }, [post, isLoading, params.postid, fetchPostWithID]);
+    }, [post, error]);
 
     if(isLoading)
         return (<LoadingComponent />);

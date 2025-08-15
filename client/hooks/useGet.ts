@@ -13,7 +13,7 @@ const useGet = (): UseGetReturn => {
     const { isLoading, error, fetchData, setError } = useFetch();
     
     const getData = async (url:string, options?: RequestInit ) =>{
-        return fetchData(url, {
+        return await fetchData(url, {
             method: "GET",
             ...options,
         });
