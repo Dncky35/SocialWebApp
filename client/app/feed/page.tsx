@@ -35,6 +35,7 @@ const FeedPage:React.FC = () => {
     return (
         <div className="flex-grow flex flex-col gap-y-4 p-4 w-full max-w-2xl mx-auto rounded-xl shadow-xl">
             <div>
+                {/* TO DO: Add a header for filter, search and feed */}
                 <PostCreator />
                 <div className="w-full mt-4 max-w-xl mx-auto space-y-4">
                     {posts && posts.map((post:Post, index) => (

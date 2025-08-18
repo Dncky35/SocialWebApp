@@ -45,15 +45,6 @@ async def get_profile(account_id: str, current_user=Depends(oauth2.get_current_u
     if not account or account.is_deleted:
         raise HTTPException(status_code=404, detail="Account not found")
 
-#     id: PydanticObjectId
-    # username: str
-    # bio: Optional[str]
-    # avatar_url: Optional[str]
-    # followers_count: int
-    # following_count: int
-    # is_following: Optional[bool] = None  # Only set when viewing others
-    # created_at: datetime
-
     is_following = PydanticObjectId(current_user.account_id) in account.followers if current_user else None
 
     return PublicAccount(
@@ -63,7 +54,7 @@ async def get_profile(account_id: str, current_user=Depends(oauth2.get_current_u
         avatar_url=account.avatar_url,
         followers_count=len(account.followers),
         following_count=len(account.following),
-        is_following= account.is_following,
+        is_following= is_following,
         created_at = account.created_at
     )
 
@@ -147,10 +138,12 @@ async def update_my_profile(profile_data: UpdateProfile, current_user=Depends(oa
     return { "message": "Profile updated successfully" }
 
 
+# Toggle follow/unfollow
 @router.post("/follow/{account_id}", status_code=status.HTTP_200_OK)
-async def follow_account(account_id: str, current_account=Depends(oauth2.get_current_user)):
-    if account_id == current_account.account_id:
-        raise HTTPException(status_code=400, detail="You cannot follow yourself.")
+async def toggle_follow(account_id: str, current_user=Depends(oauth2.get_current_user)):
+    # check if user trying to follow/unfollow themselves
+    if str(current_user.account_id) == account_id:
+        raise HTTPException(status_code=400, detail="You cannot follow/unfollow yourself")
 
     try:
         account_to_follow = await Account.get(account_id)
@@ -160,37 +153,18 @@ async def follow_account(account_id: str, current_account=Depends(oauth2.get_cur
     if not account_to_follow:
         raise HTTPException(status_code=404, detail="User not found.")
 
-    current_user_doc = await Account.get(current_account.account_id)
+    current_user_doc = await Account.get(current_user.account_id)
     if not current_user_doc:
         raise HTTPException(status_code=404, detail="Current user not found.")
 
-    await account_to_follow.update(AddToSet({Account.followers: current_user_doc.id}))
-    await current_user_doc.update(AddToSet({Account.following: account_to_follow.id}))
-
-    return {"message": f"Successfully followed {account_to_follow.username}."}
-
-
-@router.post("/unfollow/{account_id}", status_code=status.HTTP_200_OK)
-async def unfollow_user(account_id: str, current_account=Depends(oauth2.get_current_user)):
-    if account_id == current_account.account_id:
-        raise HTTPException(status_code=400, detail="You cannot unfollow yourself.")
-
-    try:
-        account_to_unfollow = await Account.get(account_id)
-    except (InvalidId, Exception):
-        raise HTTPException(status_code=400, detail="Invalid account ID.")
-
-    if not account_to_unfollow:
-        raise HTTPException(status_code=404, detail="User not found.")
-
-    current_user_doc = await Account.get(current_account.account_id)
-    if not current_user_doc:
-        raise HTTPException(status_code=404, detail="Current user not found.")
-
-    await account_to_unfollow.update(Pull({Account.followers: current_user_doc.id}))
-    await current_user_doc.update(Pull({Account.following: account_to_unfollow.id}))
-
-    return {"message": f"Successfully unfollowed {account_to_unfollow.username}."}
+    if account_to_follow.id in current_user_doc.following:
+        await account_to_follow.update(Pull({Account.followers: current_user_doc.id}))
+        await current_user_doc.update(Pull({Account.following: account_to_follow.id}))
+        return {"message": f"Successfully unfollowed {account_to_follow.username}."}
+    else:
+        await account_to_follow.update(AddToSet({Account.followers: current_user_doc.id}))
+        await current_user_doc.update(AddToSet({Account.following: account_to_follow.id}))
+        return {"message": f"Successfully followed {account_to_follow.username}."}
 
 
 @router.get("/followers", response_model=List[PublicAccount])

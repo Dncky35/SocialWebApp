@@ -1,20 +1,22 @@
 'use client';
-import React, {useState, useEffect} from "react";
+import React, { useEffect } from "react";
 import { useParams } from "next/navigation";
 import { usePostContext } from "@/context/PostContext";
 import PostCard from "@/components/PostCard";
-import { PublicAccount } from "@/schemas/account";
 import { useAuth } from "@/context/AuthContext";
 import LoadingComponent from "@/components/Loading";
+import ErrorComponent from "@/components/Error";
 
 const ProfilePage:React.FC = () => {
     const params = useParams();
     const { isLoading, pageState, error:errorAuth} = useAuth();
-    const { fetchAccountWithId, posts, followAccount, error:errorPost } = usePostContext();
+    const { isLoading:isLoadingPost, fetchAccountWithId, posts, followAccount, error:errorPost, setError } = usePostContext();
+    
     const account = posts?.find((post) => post.owner.id === params.accountID)?.owner || null;
+    const postsOfUser = posts?.filter((post) => post.owner.id === params.accountID) || null;
 
     useEffect(() => {
-        if(isLoading || errorAuth || errorPost)
+        if(isLoading || errorAuth || errorPost || isLoadingPost)
             return;
 
         if(account === null){
@@ -24,9 +26,15 @@ const ProfilePage:React.FC = () => {
 
     }, [account, errorPost, errorAuth]);
 
-    const postsOfUser = posts?.filter((post) => post.owner.id === params.accountID) || null;
-    
-    if(isLoading || pageState === "Initializing")
+    if(errorPost){
+        return(
+            <div>
+                <ErrorComponent status={errorPost.status} detail={errorPost.detail} setError={setError} />
+            </div>
+        )
+    }
+
+    if(isLoading || isLoadingPost || pageState === "Initializing" || !posts || !account)
         return(
             <div>
                 <LoadingComponent />

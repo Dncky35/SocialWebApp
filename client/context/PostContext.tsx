@@ -7,6 +7,7 @@ import { ApiError } from "@/hooks/useFetch";
 import { useAuth } from "./AuthContext";
 import { Post } from "@/components/PostCard";
 import { Comment } from "@/components/CommentCard";
+import { json } from "stream/consumers";
 
 interface PostContext{
     posts: Post[] | null;
@@ -179,13 +180,29 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
 
     const followAccount = useCallback(async (accountID: string) => {
         const result = await fetchWithAuth(async() => {
-            await postData(`${BASEURL}accounts/follow/${accountID}`, {}, {
+            return await postData(`${BASEURL}accounts/follow/${accountID}`, {}, {
                 credentials: "include",
             });
         });
 
         if(result){
-            console.log(result);
+            // Update the posts state to reflect the new follow status
+            setPosts((prevPosts) => {
+                if (!prevPosts) return prevPosts;
+
+                return prevPosts.map((post) => {
+                    if (post.owner.id !== accountID) return post;
+
+                    return {
+                        ...post,
+                        owner: {
+                            ...post.owner,
+                            is_following: !post.owner.is_following,
+                            followers_count: post.owner.is_following ? post.owner.followers_count - 1 : post.owner.followers_count + 1
+                        },
+                    };
+                });
+            });
             return true;
         }
         else{
