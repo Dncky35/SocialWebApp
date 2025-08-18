@@ -20,6 +20,8 @@ interface PostContext{
     likeComment: (commentID: string) => Promise<void>;
     fetchPostWithID: (postID: string) => Promise<any> | null;
     fetchCommentWithId: (commentID: string) => Promise<any> | null;
+    followAccount: (accountID: string) => Promise<boolean>;
+    fetchAccountWithId: (account_id: string) => Promise<void>;
 }
 
 interface LikeType{
@@ -71,7 +73,7 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             return null;
 
     }, [getData, fetchWithAuth]);
-
+    
     const fetchCommentWithId = useCallback((commentID:string) => {
         const result = fetchWithAuth(async () => {
             return await getData(`${BASEURL}comments/${commentID}`, {
@@ -175,6 +177,23 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
         return result;
     }, [postData, fetchWithAuth]);
 
+    const followAccount = useCallback(async (accountID: string) => {
+        const result = await fetchWithAuth(async() => {
+            await postData(`${BASEURL}accounts/follow/${accountID}`, {}, {
+                credentials: "include",
+            });
+        });
+
+        if(result){
+            console.log(result);
+            return true;
+        }
+        else{
+            return false;
+        }
+
+    }, [postData, fetchWithAuth])
+
     const addComment = useCallback(async (content:string, postId?:string, parent_comment_id?:string) => {
        //  console.log(`content: ${content}, postId: ${postId}, parent_comment_id: ${parent_comment_id}`);
         const isChildComment = parent_comment_id?.trim() !== "";
@@ -226,6 +245,28 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
 
     }, [postData, fetchWithAuth]);
 
+    // profile/{account_id}/posts
+    // fethcing posts instead of account, the account will get from posts
+    const fetchAccountWithId = useCallback(async (account_id:string) => {
+        const result:Post[] = await fetchWithAuth(async () => {
+            // return await getData(`${BASEURL}/accounts/profile/${account_id}`, {
+            //     credentials:"include",
+            // });
+            return await getData(`${BASEURL}/accounts/profile/${account_id}/posts`, {
+                credentials:"include",
+            });
+        });
+
+        if(result){
+            result.map((post) => {
+                setPosts((prev) => {
+                    return ([...(prev || []), post])
+                });
+            });
+        }
+
+    }, [getData, fetchWithAuth]);
+
     return(
         <PostContext.Provider value={{
             posts, 
@@ -239,6 +280,8 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             likeComment,
             fetchPostWithID,
             fetchCommentWithId,
+            followAccount,
+            fetchAccountWithId,
             }}>
             {children}
         </PostContext.Provider>

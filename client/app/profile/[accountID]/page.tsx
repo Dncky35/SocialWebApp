@@ -9,25 +9,20 @@ import LoadingComponent from "@/components/Loading";
 
 const ProfilePage:React.FC = () => {
     const params = useParams();
-    const { fetchAccountWithId, isLoading, pageState } = useAuth();
-    const { posts } = usePostContext();
-    const [account, setAccount] = useState<PublicAccount | null>(() => {
-        return posts?.find((post) => post.owner.id === params.accountID)?.owner || null;
-    });
+    const { isLoading, pageState, error:errorAuth} = useAuth();
+    const { fetchAccountWithId, posts, followAccount, error:errorPost } = usePostContext();
+    const account = posts?.find((post) => post.owner.id === params.accountID)?.owner || null;
 
     useEffect(() => {
-        if(account)
+        if(isLoading || errorAuth || errorPost)
             return;
-        
-        const getAccount = async () => {
-            const result = await fetchAccountWithId(params.accountID as string);
-            if(result)
-                setAccount(result);
 
-        };
-        // TO DO: fetch owner info
-        getAccount();
-    }, [account]);
+        if(account === null){
+            const fetchAccount = async () =>  await fetchAccountWithId(params.accountID as string);
+            fetchAccount();
+        }
+
+    }, [account, errorPost, errorAuth]);
 
     const postsOfUser = posts?.filter((post) => post.owner.id === params.accountID) || null;
     
@@ -42,6 +37,11 @@ const ProfilePage:React.FC = () => {
         return(
             <div>No Data</div>
         );
+    }
+
+    const handleOnFollow = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+        await followAccount(params.accountID as string);
     }
 
     return (
@@ -66,7 +66,9 @@ const ProfilePage:React.FC = () => {
                     </div>
                 </div>
                 <div>
-                    <button className="bg-emerald-600 text-white px-4 py-2 cursor-pointer rounded-full hover:bg-emerald-700 transition duration-300">
+                    <button 
+                    onClick={(e) => handleOnFollow(e)}
+                    className="bg-emerald-600 text-white px-4 py-2 cursor-pointer rounded-full hover:bg-emerald-700 transition duration-300">
                         {account.is_following !== null && account.is_following ? (
                             <span>Following</span>
                         ) : (

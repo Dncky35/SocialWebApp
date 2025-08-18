@@ -15,7 +15,6 @@ interface AuthState{
     logout: () => Promise<void>;
     fetchWithAuth: (fetchFunc: () => Promise<any>) => Promise<any>;
     error: ApiError | null;
-    fetchAccountWithId: (account_id: string) => Promise<PublicAccount | null>;
     pageState: PageState;
     setPageState: React.Dispatch<React.SetStateAction<PageState>>;
 }
@@ -110,20 +109,6 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             return await fetchFunc();
     };
 
-    const fetchAccountWithId = useCallback(async (account_id:string) => {
-        const result = await fetchWithAuth(async () => {
-            return await getData(`${BASEURL}/accounts/profile/${account_id}`, {
-                credentials:"include",
-            });
-        });
-
-        if(result){
-            return result as PublicAccount;
-        }
-        else
-            return null;
-    }, [getData, fetchWithAuth]);
-
     return (
         <AuthContext.Provider value={
             {
@@ -136,8 +121,7 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
                 signUp, 
                 login, 
                 logout, 
-                fetchWithAuth, 
-                fetchAccountWithId
+                fetchWithAuth
             }}>
             {children}
         </AuthContext.Provider>

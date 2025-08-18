@@ -9,6 +9,7 @@ from bson import ObjectId
 from bson.errors import InvalidId
 from beanie.operators import AddToSet, Pull
 from app.schemas.account import PublicAccount, PrivateAccount, UpdateProfile
+from app.schemas.post import PostPublic
 
 router = APIRouter(
     prefix="/accounts",
@@ -31,7 +32,7 @@ async def get_my_profile(current_user=Depends(oauth2.get_current_user)):
         profile_image_url=account.avatar_url,
         followers_count=len(account.followers),
         following_count=len(account.following),
-    )
+    )    
 
 # Fix: endpoint as profile/{account_id}
 @router.get("/profile/{account_id}", response_model=PublicAccount)
@@ -62,9 +63,65 @@ async def get_profile(account_id: str, current_user=Depends(oauth2.get_current_u
         avatar_url=account.avatar_url,
         followers_count=len(account.followers),
         following_count=len(account.following),
+        is_following= account.is_following,
+        created_at = account.created_at
+    )
+
+@router.get("/profile/{account_id}/posts", response_model=List[PostPublic])
+async def get_profile_posts(account_id: str, current_user=Depends(oauth2.get_current_user), offset: int = Query(0, ge=0), limit: int = Query(10, le=100)):
+    try:
+        account = await Account.get(PydanticObjectId(account_id))
+    except (InvalidId, Exception):
+        raise HTTPException(status_code=400, detail="Invalid account ID.")
+
+    if not account or account.is_deleted:
+        raise HTTPException(status_code=404, detail="Account not found")
+
+    if offset < 0 or limit < 1 or limit > 100:
+        raise HTTPException(status_code=400, detail="Invalid offset or limit")
+
+    if limit == 0 or limit < 0:
+        return []
+
+    try:
+        posts = await Post.find(Post.author_id == str(account.id)).sort(-Post.created_at).skip(offset).limit(limit).to_list()
+    except (InvalidId, Exception):
+        raise HTTPException(status_code=400, detail="Invalid post ID")
+
+    print(f"Posts: {posts}")
+
+    is_following = PydanticObjectId(current_user.account_id) in account.followers if current_user else None
+    public_account = PublicAccount(
+        id=account.id,
+        username=account.username,
+        bio=account.bio,
+        avatar_url=account.avatar_url,
+        followers_count=len(account.followers),
+        following_count=len(account.following),
         is_following= is_following,
         created_at = account.created_at
     )
+
+    post_list = []
+    for post in posts:
+        post.likes = [str(like) for like in post.likes]
+        public_post = PostPublic(
+            id=str(post.id),
+            content=post.content,
+            image_url=post.image_url,
+            tags=post.tags,
+            likes=post.likes,
+            comments = [],
+            is_liked = str(current_user.account_id) in post.likes if current_user else False,
+            created_at=post.created_at,
+            updated_at=post.updated_at,
+            owner=public_account,
+        )
+
+        post_list.append(public_post)
+
+    return post_list
+
     
 # Fix: endpoint as profile/me
 @router.patch("/me/profile", status_code=status.HTTP_200_OK)
