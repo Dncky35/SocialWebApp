@@ -8,7 +8,7 @@ export interface PostCreationForm {
     tags?: string[],
 };
 
-const tagList:string[] = ["Sport", "News", "Science", "Technology", "Politics", "Entertainment", "Health", "Travel", "Food", "Lifestyle"];
+export const tagList:string[] = ["Sport", "News", "Science", "Technology", "Politics", "Entertainment", "Health", "Travel", "Food", "Lifestyle"];
 
 const PostCreator:React.FC = () => {
     const [ isExtended, setIsExtended ] = useState(false);
