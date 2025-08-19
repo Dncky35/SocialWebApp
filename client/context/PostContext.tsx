@@ -7,7 +7,6 @@ import { ApiError } from "@/hooks/useFetch";
 import { useAuth } from "./AuthContext";
 import { Post } from "@/components/PostCard";
 import { Comment } from "@/components/CommentCard";
-import { json } from "stream/consumers";
 
 interface PostContext{
     posts: Post[] | null;
@@ -31,16 +30,20 @@ interface LikeType{
     liked: boolean;
 }
 
+interface FetchPostOptions{
+    tag?:string;
+    feed?:string;
+};
+
 const PostContext = React.createContext<PostContext | undefined>(undefined);
 
 export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) => {
     const { isLoading:isLoadingPost, error:errorPost, postData, setError:setErrorPost } = usePost();
     const { isLoading:isLoadingGet, error:errorGet, getData, setError:setErrorGet } = useGet();
     const { fetchWithAuth } = useAuth();
-
     const [posts, setPosts] = useState<Post[] | null>(null);   
 
-    const fetchPosts = useCallback(async () => {
+    const fetchPosts = useCallback(async (options?:FetchPostOptions) => {
         const result = await fetchWithAuth(async () => {
             return await getData(`${BASEURL}posts`, {
                 credentials:"include",
