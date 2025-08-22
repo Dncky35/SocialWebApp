@@ -12,14 +12,17 @@ export const metadata: Metadata = {
 export default function RootLayout({children,}: Readonly<{ children: React.ReactNode; }>) {
   return (
     <html lang="en">
-      <body className="bg-emerald-800 text-white h-screen flex flex-col" >
-        <AppProviders>
-          <NavBar />
-          <main className="flex-grow flex flex-col justify-center items-center pt-[3.5rem] pb-[3rem]">
-          {children}
-          </main>
-          <Footer />
-        </AppProviders>
+      <body className="bg-gradient-to-br from-emerald-700 to-emerald-900 text-white min-h-screen " >
+        <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/food.png')] opacity-25"></div>
+        <div className="relative z-10 flex flex-col min-h-screen">
+            <AppProviders>
+              <NavBar />
+              <main className="flex-grow flex flex-col justify-center items-center pt-[3.5rem] pb-[3rem]">
+              {children}
+              </main>
+            <Footer />
+          </AppProviders>
+        </div>
       </body>
     </html>
   );

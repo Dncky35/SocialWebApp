@@ -48,27 +48,28 @@ const FeedPage:React.FC = () => {
     };
 
     return (
-        <div className="flex-grow flex flex-col gap-y-4 p-4 w-full max-w-2xl mx-auto rounded-xl shadow-xl">
-            <div className="max-w-xl mx-auto grid grid-cols-4 px-2 py-1 bg-emerald-900 gap-x-4 items-center justify-between rounded-xl">
-                    <div className="bg-emerald-800 p-2 rounded-xl">
+        <div className="flex-grow flex flex-col gap-y-4 p-4 w-full max-w-2xl mx-auto rounded-xl shadow-xl bg-emerald-800/50 backdrop-blur-sm mt-2">
+            <div className="bg-gradient-to-b from-emerald-800 to-emerald-700 grid grid-cols-4 gap-4 p-2 rounded-xl shadow-inner">
+                    <div className="p-2 bg-emerald-800 rounded-xl">
                         <select
                         value={feedValue} 
                         onChange={(e) => handleOnValueChange("Feed", e.target.value)}
-                        className="bg-emerald-800 rounded p-2 w-full shadow-inner">
+                        className="bg-emerald-100 rounded p-2 w-full shadow-inner text-emerald-950">
                             {FeedOptions.map((option, index) => (
                                 <option key={index}>{option}</option>
                             ))}
                         </select>
                     </div>
                     <div className="col-span-2 flex items-center gap-x-2 bg-emerald-800 rounded-xl py-2 px-2 shadow-inner">
-                        <input className="w-full text-white bg-emerald-800 rounded py-2 px-4 shadow-inner" type="text" placeholder="Search" />
-                        <button className="cursor-pointer rounded-full bg-emerald-500 hover:bg-emerald-600 text-white px-2 py-1">🔎</button>
+                        <input className="w-full text-emerald-950 bg-emerald-100 rounded py-2 px-4 shadow-inner " type="text" placeholder="Search" />
+                        <button className="cursor-pointer rounded-full bg-gradient-to-b 
+                        from-emerald-500 to-emerald-600 p-2 shadow-inner text-white hover:opacity-80 hover:shadow-none hover:scale-105">🔎</button>
                     </div>
                     <div className="p-2 bg-emerald-800 rounded-xl">
                         <select 
                         value={tagValue} 
                         onChange={(e) => handleOnValueChange("Tags", e.target.value)}
-                        className="bg-emerald-800 rounded p-2 w-full shadow-inner">
+                        className="bg-emerald-100 rounded p-2 w-full shadow-inner text-emerald-950">
                             {tagList.map((tag, index) => (
                                 <option key={index}>{tag}</option>
                             ))}

@@ -89,7 +89,7 @@ const PostCreator:React.FC = () => {
     };
 
     return(
-        <div className="bg-emerald-900 px-6 py-2 rounded-xl shadow-xl w-full max-w-xl mx-auto">
+        <div className="bg-gradient-to-b from-emerald-700 to-emerald-900 px-6 py-2 rounded-xl shadow-xl w-full max-w-xl mx-auto">
             {isLoading && (
                <LoadingComponent />
             )}
@@ -103,7 +103,7 @@ const PostCreator:React.FC = () => {
                 <button
                 onClick={() => setIsExtended((prev) => !prev)}
                 aria-label={isExtended ? "Collapse post input" : "Expand post input"}
-                className={`cursor-pointer transform transition-transform duration-300 ease-in-out text-white text-xl select-none`}
+                className={`cursor-pointer hover:scale-110 transform transition-transform duration-300 ease-in-out text-white text-xl select-none`}
                 style={{ rotate: isExtended ? "180deg" : "0deg" }}
                 >
                 ▼
@@ -115,7 +115,8 @@ const PostCreator:React.FC = () => {
                     <div className="bg-emerald-800 p-2 rounded-lg shadow-inner">
                         <textarea  id="post"
                             name="post"
-                            className="w-full h-32 p-4 rounded-lg bg-emerald-50 text-emerald-950 shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            className="w-full h-32 p-4 rounded-lg 
+                            bg-emerald-100 text-emerald-950 shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500"
                             placeholder="What's on your mind?"
                             maxLength={500}
                             value={postForm.content}
@@ -135,7 +136,8 @@ const PostCreator:React.FC = () => {
                             </ul>
                             <div className="flex gap-x-2 text-sm">
                                 <button onClick={() => {setIsAddTag((prev) => !prev); setIsAddImage(false);}}
-                                className="bg-emerald-500 cursor-pointer rounded py-2 hover:bg-emerald-600 px-2">
+                                className="bg-gradient-to-b from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 
+                                text-white cursor-pointer rounded py-2 px-2 hover:shadow-lg transition duration-300 hover:scale-105"  >
                                     Add Tag(s)
                                 </button>
                                 <button onClick={() => {setIsAddImage((prev) => !prev); setIsAddTag(false);}} 
@@ -175,7 +177,11 @@ const PostCreator:React.FC = () => {
                             />
                         )}      
                     </div>
-                    <button onClick={handleOnPublish} className="w-full bg-emerald-600 hover:bg-emerald-700 cursor-pointer text-white font-semibold py-2 rounded transition duration-200" >Publish</button>
+                    <button onClick={handleOnPublish} 
+                    className="w-full bg-gradient-to-b from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 
+                    text-white cursor-pointer rounded py-2 hover:shadow-lg transition duration-300 hover:scale-105" >
+                        Publish
+                    </button>
                 </div>
             )}
         </div>

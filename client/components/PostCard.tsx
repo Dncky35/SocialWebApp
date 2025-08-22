@@ -32,14 +32,10 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
     e.preventDefault();
     const result = await likePost(post.id);
 
-    // If result is not null, update the post state of the POST
-    if(result) {
-      
-    }
   };
   
   return (
-    <div className='bg-emerald-900 rounded shadow-xl px-4 py-2'>
+    <div className='bg-gradient-to-br from-emerald-700 to-emerald-900 rounded shadow-xl px-4 py-2 hover:scale-[1.01] transform transition duration-300 w-full'>
       <div className='border-b border-emerald-700 py-1 mb-1'>
         <Link href={`/profile/${post.owner.id}`} className='font-semibold text-lg text-emerald-300 cursor-pointer hover:underline'>{post.owner.username}</Link>
       </div>
