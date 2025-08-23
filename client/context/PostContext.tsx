@@ -280,7 +280,10 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
         if(result){
             result.map((post) => {
                 setPosts((prev) => {
-                    return ([...(prev || []), post])
+                    // Avoid duplicates
+                    const postExists = prev?.find((p) => p.id === post.id) || null;
+                    if(postExists) return prev;
+                        return ([...(prev || []), post])
                 });
             });
         }
