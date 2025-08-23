@@ -13,7 +13,7 @@ const NavBar: React.FC = () => {
     }
 
     return (
-        <nav className="fixed w-full top-0 bg-emerald-950 py-2 px-8 flex items-center justify-between">
+        <nav className="fixed w-full top-0 bg-emerald-950/50 py-2 px-8 flex items-center justify-between backdrop-blur-sm">
             <div></div>
             <div className="bg-emerald-900 cursor-pointer rounded flex items-center justify-center rounded-full 
             text-2xl w-12 h-12 hover:bg-emerald-800 hover:text-white transition duration-200">

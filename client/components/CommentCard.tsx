@@ -30,22 +30,18 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
     // console.log(JSON.stringify(comment));
     const { error:errorAuth, isLoading:isLoadingAUTH } = useAuth();
     const { fetchAccountWithId, posts, likeComment, error:errorPost, isLoading:isLoadingPOST } = usePostContext();
-    const [owner, setOwner] = useState<PublicAccount | null>(() => {
-        return posts?.find((post) => post.owner.id === comment.author_id)?.owner || null;
-    });
+    const owner = posts?.find((post) => post.owner.id === comment.author_id)?.owner || null;
     const [isCommentAdding, setIsCommentAdding] = useState(false);
 
-    // useEffect(() => {
-    //     if(!owner && !isLoadingPOST && !isLoadingAUTH && !errorAuth && !errorPost){
-    //         const getAccount = async () => {
-    //             const result = await fetchAccountWithId(comment.author_id);
-    //             if(result)
-    //                 setOwner(result);
-    //         };
-    //         getAccount();
-    //     }
+    useEffect(() => {
+        if(!owner && !isLoadingPOST && !isLoadingAUTH && !errorAuth && !errorPost){
+            const getAccount = async () => {
+                await fetchAccountWithId(comment.author_id);
+            };
+            getAccount();
+        }
 
-    // }, [owner, fetchAccountWithId, errorAuth, errorPost]);
+    }, [owner, fetchAccountWithId, errorAuth, errorPost]);
 
     const handleOnLike = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();

@@ -48,7 +48,7 @@ const FeedPage:React.FC = () => {
     };
 
     return (
-        <div className="flex-grow flex flex-col gap-y-4 p-4 w-full max-w-2xl mx-auto rounded-xl shadow-xl bg-emerald-800/50 backdrop-blur-sm mt-2">
+        <div className="flex-grow flex flex-col gap-y-4 p-4 w-full max-w-2xl mx-auto rounded-xl shadow-xl bg-emerald-800/50 backdrop-blur-sm mt-2 mb-2">
             <div className="bg-gradient-to-b from-emerald-800 to-emerald-700 grid grid-cols-4 gap-4 p-2 rounded-xl shadow-inner">
                     <div className="p-2 bg-emerald-800 rounded-xl">
                         <select
