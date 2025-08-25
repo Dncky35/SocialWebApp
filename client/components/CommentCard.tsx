@@ -1,11 +1,11 @@
 "use client";
-import { PublicAccount } from "@/schemas/account";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { usePostContext } from "@/context/PostContext";
 import { useAuth } from "@/context/AuthContext";
 import CommentCreator from "@/components/CommentCreator";
 import LoadingComponent from "./Loading";
+import { MessageSquarePlus, Heart } from "lucide-react";
 
 export interface Comment {
     id: string;
@@ -56,7 +56,7 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
     }
 
     return (
-        <div className="bg-emerald-800 rounded shadow-xl px-4 py-2">
+        <div className="bg-gradient-to-br from-emerald-700 to-emerald-900 rounded shadow-xl px-4 py-2 hover:scale-[1.01] transform transition duration-300 w-full">
            <div className='border-b border-emerald-700 py-1 mb-1'>
                 <Link href={`/profile/${comment.author_id}`} className='font-semibold text-lg text-emerald-300 cursor-pointer hover:underline'>
                 {owner?.username || comment.author_id}
@@ -71,16 +71,16 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
                         <p>{comment.likes?.length || 0}</p>
                         <button 
                         onClick={(e) => handleOnLike(e)}
-                        className='bg-emerald-600 text-white px-1 py-1 cursor-pointer rounded-full hover:bg-emerald-700 transition duration-300'>
-                            {comment.is_liked ? "❤️" : "🤍"}
+                        className='hover:scale-[1.1] cursor-pointer transition duration-300 transform'>
+                            {comment.is_liked ? <Heart color="red" /> : <Heart />}
                         </button>
                     </div>
                     <div className="flex items-center gap-x-2">
                         <p>{comment.child_commets?.length || 0}</p>
                         <button 
                         onClick={() => setIsCommentAdding(prev => !prev)}
-                        className='bg-emerald-600 text-white px-1 py-1 cursor-pointer rounded-full hover:bg-emerald-700 transition duration-300'>
-                            ✍
+                        className='hover:scale-[1.1] cursor-pointer transition duration-300 transform'>
+                            <MessageSquarePlus size={24} />
                         </button>
                     </div>
                 </div>

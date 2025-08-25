@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { Comment } from './CommentCard';
 import { usePostContext } from '@/context/PostContext';
 import CommentCreator from './CommentCreator';
+import { MessageSquarePlus, Heart } from "lucide-react";
 
 export interface Post {
   id: string;
@@ -50,19 +51,23 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
       ))}
       </div>
       <div className='flex items-center justify-between px-2'>
-        <div className='flex space-x-4 items-center'> 
-          <p className='text-sm text-emerald-300 cursor-default'>{post.likes.length}</p>
-          <button
-          onClick={(e) => handleOnLike(e)} 
-          className='bg-emerald-600 text-white px-1 py-1 cursor-pointer rounded-full hover:bg-emerald-700 transition duration-300'>
-            {post.is_liked ? "❤️" : "🤍"}
-          </button>
-          <p className='text-sm text-emerald-300 cursor-default'>{post.comments.length}</p>
-          <button 
-          onClick={() => setIsCommentAdding((prev) => !prev)}
-          className='bg-emerald-600 text-white px-1 py-1 cursor-pointer rounded-full hover:bg-emerald-700 transition duration-300'>
-            ✍
+        <div className='flex space-x-4 items-center'>
+          <div className='flex items-center gap-x-2 bg-emerald-900 rounded-xl px-2 py-1'>
+            <p className='text-sm text-emerald-300 cursor-default'>{post.likes.length}</p>
+            <button
+            onClick={(e) => handleOnLike(e)} 
+            className='hover:scale-[1.1] cursor-pointer transition duration-300 transform'>
+              {post.is_liked ? <Heart color={"red"} /> : <Heart />}
             </button>
+            </div> 
+          <div className='flex items-center gap-x-2 bg-emerald-900 rounded-xl px-2 py-1'>
+              <p className='text-sm text-emerald-300 cursor-default'>{post.comments.length}</p>
+            <button 
+            onClick={() => setIsCommentAdding((prev) => !prev)}
+            className='hover:scale-[1.1] cursor-pointer transition duration-300 transform'>
+              <MessageSquarePlus size={24} />
+            </button>
+          </div> 
         </div>
         <div>
           <p className='text-sm text-emerald-300'>Posted on: {new Date(post.created_at).toLocaleDateString()}</p>

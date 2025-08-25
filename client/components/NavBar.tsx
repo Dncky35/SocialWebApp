@@ -2,6 +2,7 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import { Origami } from "lucide-react";
 
 const NavBar: React.FC = () => {
     const { account, logout} = useAuth();
@@ -15,9 +16,9 @@ const NavBar: React.FC = () => {
     return (
         <nav className="fixed w-full top-0 bg-emerald-950/50 py-2 px-8 flex items-center justify-between backdrop-blur-sm">
             <div></div>
-            <div className="bg-emerald-900 cursor-pointer rounded flex items-center justify-center rounded-full 
-            text-2xl w-12 h-12 hover:bg-emerald-800 hover:text-white transition duration-200">
-                <Link href={"/"}>🐤</Link>
+            <div className="bg-gradient-to-b from-emerald-800 to-emerald-700 cursor-pointer rounded flex items-center justify-center rounded-full 
+            text-2xl w-12 h-12 hover:bg-gradient-to-t hover:text-white hover:scale-[1.01] transition duration-300">
+                <Link href={"/"}><Origami color="yellow" size={24} /></Link>
             </div>
            <div>
             {account && (

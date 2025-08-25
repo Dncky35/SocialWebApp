@@ -22,6 +22,7 @@ interface PostContext{
     fetchCommentWithId: (commentID: string) => Promise<any> | null;
     followAccount: (accountID: string) => Promise<boolean>;
     fetchAccountWithId: (account_id: string) => Promise<void>;
+    getFeedPageData: () => Promise<void>;
 }
 
 interface LikeType{
@@ -52,9 +53,21 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
 
         if(result){
             setPosts(result);
+            localStorage.setItem("posts", JSON.stringify(result));
         }
         
     }, [getData, fetchWithAuth]);
+
+    const getFeedPageData = useCallback(async () => {
+        const localStoragedPosts = localStorage.getItem("posts");
+        if(localStoragedPosts){
+            setPosts(JSON.parse(localStoragedPosts));
+        }
+        else{
+            await fetchPosts();
+        }
+
+    }, [fetchPosts]);
 
     const fetchPostWithID = useCallback(async (postID:string) => {
         const result = await fetchWithAuth(async () => {
@@ -305,6 +318,7 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             fetchCommentWithId,
             followAccount,
             fetchAccountWithId,
+            getFeedPageData,
             }}>
             {children}
         </PostContext.Provider>
