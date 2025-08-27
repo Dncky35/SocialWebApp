@@ -1,5 +1,5 @@
 "use client";
-import React, { useContext, useState, useCallback } from "react";
+import React, { useContext, useState, useCallback, useEffect } from "react";
 import { BASEURL } from "./ContextProvider";
 import useGet from "@/hooks/useGet";
 import usePost from "@/hooks/usePost";
@@ -10,7 +10,7 @@ import { Comment } from "@/components/CommentCard";
 
 export const FeedOptions = ["Latest", "Following", "Trending"];
 
-export const tagList:string[] = ["Sport", "News", "Science", "Technology", "Politics", "Entertainment", "Health", "Travel", "Food", "Lifestyle"];
+export const tagList:string[] = ["", "Sport", "News", "Science", "Technology", "Politics", "Entertainment", "Health", "Travel", "Food", "Lifestyle"];
 
 interface PostContext{
     posts: Post[] | null;
@@ -26,6 +26,10 @@ interface PostContext{
     followAccount: (accountID: string) => Promise<boolean>;
     fetchAccountWithId: (account_id: string) => Promise<void>;
     getFeedPageData: () => Promise<void>;
+    feedValue: string;
+    tagValue: string;
+    setFeedValue: React.Dispatch<React.SetStateAction<string>>;
+    setTagValue: React.Dispatch<React.SetStateAction<string>>;
 }
 
 interface LikeType{
@@ -33,11 +37,6 @@ interface LikeType{
     likes_count: number;
     liked: boolean;
 }
-
-interface FetchPostOptions{
-    tag?:string;
-    feed?:string;
-};
 
 interface PostSearchOptions {
     id?:string;
@@ -50,6 +49,8 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
     const { isLoading:isLoadingGet, error:errorGet, getData, setError:setErrorGet } = useGet();
     const { fetchWithAuth } = useAuth();
     const [posts, setPosts] = useState<Post[] | null>(null);   
+    const [feedValue, setFeedValue] = useState<string>(FeedOptions[0]);
+    const [tagValue, setTagValue] = useState<string>(tagList[0]);
 
     const getLocalStoragedPosts = () => {
         const result = localStorage.getItem("posts");
@@ -82,9 +83,9 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
         }
     };
 
-    const fetchPosts = useCallback(async (options?:FetchPostOptions) => {
+    const fetchPosts = useCallback(async () => {
         const result = await fetchWithAuth(async () => {
-            return await getData(`${BASEURL}posts`, {
+            return await getData(`${BASEURL}posts?feedValue=${feedValue}&tagValue=${tagValue}`, {
                 credentials:"include",
             });
         });
@@ -344,17 +345,19 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
 
         if(result){
             storeFetchedPosts(result);
-            // result.map((post) => {
-            //     setPosts((prev) => {
-            //         // Avoid duplicates
-            //         const postExists = prev?.find((p) => p.id === post.id) || null;
-            //         if(postExists) return prev;
-            //             return ([...(prev || []), post])
-            //     });
-            // });
         }
 
     }, [getData, fetchWithAuth]);
+
+    useEffect(() => {
+        if(!isLoadingGet && !isLoadingPost && !errorGet && !errorPost){
+            const fetchingPost = async () => {
+                localStorage.removeItem("posts");
+                await fetchPosts();
+            };
+            fetchingPost();
+        }
+    }, [feedValue]);
 
     return(
         <PostContext.Provider value={{
@@ -372,6 +375,10 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             followAccount,
             fetchAccountWithId,
             getFeedPageData,
+            feedValue,
+            tagValue,
+            setFeedValue,
+            setTagValue,
             }}>
             {children}
         </PostContext.Provider>

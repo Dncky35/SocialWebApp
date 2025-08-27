@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { usePostContext, FeedOptions, tagList } from "@/context/PostContext";
 import PostCard, { Post } from "@/components/PostCard";
 import PostCreator from "@/components/PostCreator";
@@ -8,16 +8,27 @@ import ErrorComponent from "@/components/Error";
 import { useAuth } from "@/context/AuthContext";
 import { Search } from 'lucide-react'
 
-
 type ListName = "Feed" | "Tags";
 
 const FeedPage:React.FC = () => {
-    const { posts, isLoading: isLoadingPost, error:errorPost, getFeedPageData, setError } = usePostContext();
+    const { posts, isLoading: isLoadingPost, 
+        setFeedValue, setTagValue, feedValue, tagValue, 
+        error:errorPost, getFeedPageData, setError } = usePostContext();
     const { pageState, isLoading: isLoadingAuth, error: errorAuth } = useAuth();
-    const [feedValue, setFeedValue] = React.useState<string>(FeedOptions[0]);
-    const [tagValue, setTagValue] = React.useState<string>(tagList[0]);
+    const [hydrated, setHydrated] = useState(false); // ✅ track client hydration,
 
     useEffect(() => {
+        const storedFeedValue = localStorage.getItem("feedValue");
+        if (storedFeedValue) {
+        setFeedValue(storedFeedValue);
+        }
+        setHydrated(true); // ✅ mark hydration done
+    }, []);
+
+    useEffect(() => {
+        if(!hydrated)
+            return;
+
        if(!posts && !isLoadingPost && !isLoadingAuth && !errorPost) {
             const fetchingposts = async () => {
                 await getFeedPageData();
@@ -26,7 +37,7 @@ const FeedPage:React.FC = () => {
             fetchingposts();
         }
 
-    }, [posts, errorPost]);
+    }, [posts, errorPost, hydrated]);
 
     if(errorPost)
         return (<ErrorComponent status={errorPost.status} detail={errorPost.detail} setError={setError} />);
@@ -41,10 +52,12 @@ const FeedPage:React.FC = () => {
     const handleOnValueChange = ( listName:ListName, value:string) => {
         if(listName === "Tags"){
             setTagValue(value);
+            localStorage.setItem("tagValue", value);
         }
         
         if(listName === "Feed"){
             setFeedValue(value);
+            localStorage.setItem("feedValue", value);
         }
     };
 
@@ -73,9 +86,13 @@ const FeedPage:React.FC = () => {
                         value={tagValue} 
                         onChange={(e) => handleOnValueChange("Tags", e.target.value)}
                         className="bg-emerald-100 rounded p-2 w-full shadow-inner text-emerald-950">
-                            {tagList.map((tag, index) => (
-                                <option key={index}>{tag}</option>
-                            ))}
+                            {tagList.map((tag, index) => {
+                                if(tag === "")
+                                    return (<option key={index} value="">Select Tag</option>);
+                                return (
+                                    <option key={index}>{tag}</option>
+                                );
+                            })}
                         </select>
                     </div>
                 </div>

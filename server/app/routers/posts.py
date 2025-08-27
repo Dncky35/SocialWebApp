@@ -10,6 +10,7 @@ from app.schemas.account import PublicAccount
 from app.schemas.comment import CommentRequest, CommentResponse
 from app.core import oauth2
 from typing import List
+from beanie.odm.operators.find.comparison import In
 
 router = APIRouter(
     prefix="/posts",
@@ -83,7 +84,8 @@ async def create_post(post_data: PostCreate, current_user=Depends(oauth2.get_cur
 
 
 @router.get("", response_model=List[PostPublic])
-async def get_all_post(offset:int = Query(0, ge=0), limit:int = Query(20, ge=1, le=100), current_user=Depends(oauth2.get_current_user)):
+async def get_all_post(feedValue:str, tagValue:str, offset:int = Query(0, ge=0), limit:int = Query(20, ge=1, le=100), current_user=Depends(oauth2.get_current_user)):
+    print(f"feedValue: {feedValue}, tagValue: {tagValue}, offset: {offset}, limit: {limit}")
     # Fetch all posts with pagination and no get deleted posts
     if offset < 0 or limit < 1 or limit > 100:
         raise HTTPException(status_code=400, detail="Invalid offset or limit")
@@ -94,11 +96,28 @@ async def get_all_post(offset:int = Query(0, ge=0), limit:int = Query(20, ge=1, 
     else:
         offset = 0 
     
-    # Fetch posts from the database
-    # Note: Beanie's find_all() method does not support filtering by is_deleted directly    
-    # so we use find() with a filter
-    posts = await Post.find_all().sort(-Post.created_at).skip(offset).limit(limit).to_list()
-    posts = [post for post in posts if not post.is_deleted]
+    if feedValue == "Latest":
+        posts = await Post.find(Post.is_deleted == False).sort(-Post.created_at).skip(offset).limit(limit).to_list()
+    if feedValue == "Following":
+        account = await Account.get(PydanticObjectId(current_user.account_id))
+        if not account:
+            return []
+
+        following_ids = [str(id) for id in account.following]
+        if not following_ids:
+            return []
+
+        posts = await Post.find(
+            {
+                "$and": [
+                    {"is_deleted": False},
+                    {"author_id": {"$in": following_ids}}
+                ]
+            }
+        ).sort(-Post.created_at).skip(offset).limit(limit).to_list()
+    if feedValue == "Trending":
+        posts = await Post.find(Post.is_deleted == False).sort(-Post.likes.length).skip(offset).limit(limit).to_list()
+    
 
     post_list = []
     for post in posts:
