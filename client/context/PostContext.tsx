@@ -8,17 +8,20 @@ import { useAuth } from "./AuthContext";
 import { Post } from "@/components/PostCard";
 import { Comment } from "@/components/CommentCard";
 
+export const FeedOptions = ["Latest", "Following", "Trending"];
+
+export const tagList:string[] = ["Sport", "News", "Science", "Technology", "Politics", "Entertainment", "Health", "Travel", "Food", "Lifestyle"];
+
 interface PostContext{
     posts: Post[] | null;
     isLoading: boolean;
     error: ApiError | null;
-    fetchPosts: () => Promise<void>;
     createPost: (content: string, tags?: string[] | undefined, image_url?: string | undefined) => Promise<void>;
     likePost: (postId: string) => Promise<any>;
     addComment: (postId: string, content: string, parent_comment_id?: string | undefined) => Promise<void>;
     setError: React.Dispatch<React.SetStateAction<ApiError | null>>;
     likeComment: (commentID: string) => Promise<void>;
-    fetchPostWithID: (postID: string) => Promise<any> | null;
+    searchPosts: (options: PostSearchOptions) => Promise<void>;
     fetchCommentWithId: (commentID: string) => Promise<any> | null;
     followAccount: (accountID: string) => Promise<boolean>;
     fetchAccountWithId: (account_id: string) => Promise<void>;
@@ -36,6 +39,10 @@ interface FetchPostOptions{
     feed?:string;
 };
 
+interface PostSearchOptions {
+    id?:string;
+}
+
 const PostContext = React.createContext<PostContext | undefined>(undefined);
 
 export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) => {
@@ -43,6 +50,37 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
     const { isLoading:isLoadingGet, error:errorGet, getData, setError:setErrorGet } = useGet();
     const { fetchWithAuth } = useAuth();
     const [posts, setPosts] = useState<Post[] | null>(null);   
+
+    const getLocalStoragedPosts = () => {
+        const result = localStorage.getItem("posts");
+        if(result){
+            setPosts(JSON.parse(result));
+            return JSON.parse(result) as Post[];
+        }
+        else
+            return null;
+    };
+
+    const storeFetchedPosts = (posts:Post[]) => {
+        const storedPosts = getLocalStoragedPosts();
+        let newPosts:Post[] = [];
+
+        if(!storedPosts){
+            setPosts(posts);
+            localStorage.setItem("posts", JSON.stringify(posts));
+        }
+        else{
+            newPosts = posts;
+            posts.map((post) => {
+                const postExists = storedPosts?.find((p) => p.id === post.id) || null;
+                if(!postExists){
+                    newPosts.push(post);
+                }
+            });
+            setPosts(newPosts);
+            localStorage.setItem("posts", JSON.stringify(newPosts));  
+        }
+    };
 
     const fetchPosts = useCallback(async (options?:FetchPostOptions) => {
         const result = await fetchWithAuth(async () => {
@@ -52,18 +90,26 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
         });
 
         if(result){
-            setPosts(result);
-            localStorage.setItem("posts", JSON.stringify(result));
+            localStorage.setItem("lastFetchDate", new Date().toISOString());
+            storeFetchedPosts(result);
+            return result;
+        }
+        else{
+            return null;
         }
         
     }, [getData, fetchWithAuth]);
 
     const getFeedPageData = useCallback(async () => {
-        const localStoragedPosts = localStorage.getItem("posts");
-        if(localStoragedPosts){
-            setPosts(JSON.parse(localStoragedPosts));
+        const lastFetchDate = localStorage.getItem("lastFetchDate");
+        // IF 10 minutes passed, fetch again
+        if(!lastFetchDate || new Date().getTime() - new Date(lastFetchDate).getTime() > 10 * 60 * 1000){
+            await fetchPosts();
+            return;
         }
-        else{
+        
+        const storedPosts = getLocalStoragedPosts();
+        if(!storedPosts){
             await fetchPosts();
         }
 
@@ -77,19 +123,25 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
         });
 
         if(result){
-            setPosts((prev) => {
-                const postExists = prev?.find((p) => p.id === postID) || null;
-                if(!postExists){
-                    return [...(prev || []), result];
-                }
-                return prev;
-            });
+            storeFetchedPosts([result]);
             return result;
         }
         else
             return null;
 
     }, [getData, fetchWithAuth]);
+
+    const searchPosts = async (options:PostSearchOptions) => {
+        // Check if post stored locally.
+        const storedPosts = getLocalStoragedPosts(); 
+        if(!storedPosts){
+            if(options.id){
+                await fetchPostWithID(options.id);
+            }
+        }
+        else{
+        }
+    };
     
     const fetchCommentWithId = useCallback((commentID:string) => {
         const result = fetchWithAuth(async () => {
@@ -291,14 +343,15 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
         });
 
         if(result){
-            result.map((post) => {
-                setPosts((prev) => {
-                    // Avoid duplicates
-                    const postExists = prev?.find((p) => p.id === post.id) || null;
-                    if(postExists) return prev;
-                        return ([...(prev || []), post])
-                });
-            });
+            storeFetchedPosts(result);
+            // result.map((post) => {
+            //     setPosts((prev) => {
+            //         // Avoid duplicates
+            //         const postExists = prev?.find((p) => p.id === post.id) || null;
+            //         if(postExists) return prev;
+            //             return ([...(prev || []), post])
+            //     });
+            // });
         }
 
     }, [getData, fetchWithAuth]);
@@ -308,13 +361,13 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             posts, 
             isLoading: isLoadingPost || isLoadingGet, 
             error: errorPost || errorGet,
-            fetchPosts,
+            // fetchPosts,
             createPost,
             likePost,
             addComment,
             setError: setErrorPost,
             likeComment,
-            fetchPostWithID,
+            searchPosts,
             fetchCommentWithId,
             followAccount,
             fetchAccountWithId,

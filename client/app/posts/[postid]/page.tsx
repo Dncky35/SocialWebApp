@@ -10,14 +10,14 @@ import { useAuth } from "@/context/AuthContext";
 
 const PostPage:React.FC = () => {
     const params = useParams(); // postid
-    const { posts, isLoading, fetchPostWithID, error, setError } = usePostContext();
+    const { posts, isLoading, searchPosts, error, setError } = usePostContext();
     const post = posts?.find((p) => p.id === params.postid) || null;
     const { pageState } = useAuth();
 
     useEffect(() => {
         if (!post && !isLoading && !error) {
             const fetchPost = async () => {
-                await fetchPostWithID(params.postid as string);
+                await searchPosts({id: params.postid as string});
             };
 
             fetchPost();

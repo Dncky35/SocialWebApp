@@ -27,7 +27,6 @@ interface CommentProps {
 
 const CommentCard:React.FC<CommentProps> = ({ comment }) => {
 
-    // console.log(JSON.stringify(comment));
     const { error:errorAuth, isLoading:isLoadingAUTH } = useAuth();
     const { fetchAccountWithId, posts, likeComment, error:errorPost, isLoading:isLoadingPOST } = usePostContext();
     const owner = posts?.find((post) => post.owner.id === comment.author_id)?.owner || null;

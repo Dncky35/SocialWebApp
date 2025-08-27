@@ -1,18 +1,18 @@
 "use client";
 import React, { useEffect } from "react";
-import { usePostContext } from "@/context/PostContext";
+import { usePostContext, FeedOptions, tagList } from "@/context/PostContext";
 import PostCard, { Post } from "@/components/PostCard";
-import PostCreator, { tagList } from "@/components/PostCreator";
+import PostCreator from "@/components/PostCreator";
 import LoadingComponent from "@/components/Loading";
 import ErrorComponent from "@/components/Error";
 import { useAuth } from "@/context/AuthContext";
 import { Search } from 'lucide-react'
 
-const FeedOptions = ["Latest", "Following", "Trending"];
+
 type ListName = "Feed" | "Tags";
 
 const FeedPage:React.FC = () => {
-    const { posts, isLoading: isLoadingPost, error:errorPost, fetchPosts, getFeedPageData, setError } = usePostContext();
+    const { posts, isLoading: isLoadingPost, error:errorPost, getFeedPageData, setError } = usePostContext();
     const { pageState, isLoading: isLoadingAuth, error: errorAuth } = useAuth();
     const [feedValue, setFeedValue] = React.useState<string>(FeedOptions[0]);
     const [tagValue, setTagValue] = React.useState<string>(tagList[0]);

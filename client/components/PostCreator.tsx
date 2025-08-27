@@ -1,5 +1,5 @@
 import React, { useState} from "react";
-import { usePostContext } from "@/context/PostContext";
+import { usePostContext, tagList } from "@/context/PostContext";
 import LoadingComponent from "./Loading";
 
 export interface PostCreationForm {
@@ -7,8 +7,6 @@ export interface PostCreationForm {
     image_url?: string,
     tags?: string[],
 };
-
-export const tagList:string[] = ["Sport", "News", "Science", "Technology", "Politics", "Entertainment", "Health", "Travel", "Food", "Lifestyle"];
 
 const PostCreator:React.FC = () => {
     const [ isExtended, setIsExtended ] = useState(false);

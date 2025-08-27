@@ -36,6 +36,7 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             setAccount(JSON.parse(account));
             setPageState("Completed")
         }
+        
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
