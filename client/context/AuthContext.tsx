@@ -75,6 +75,8 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
 
         if(result){
             localStorage.removeItem("account");
+            localStorage.removeItem("lastFetchDate");
+            localStorage.removeItem("posts");
             setAccount(null);
             window.location.href = "/";
         }

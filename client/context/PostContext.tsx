@@ -47,7 +47,7 @@ const PostContext = React.createContext<PostContext | undefined>(undefined);
 export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) => {
     const { isLoading:isLoadingPost, error:errorPost, postData, setError:setErrorPost } = usePost();
     const { isLoading:isLoadingGet, error:errorGet, getData, setError:setErrorGet } = useGet();
-    const { fetchWithAuth } = useAuth();
+    const { account, fetchWithAuth } = useAuth();
     const [posts, setPosts] = useState<Post[] | null>(null);   
     const [feedValue, setFeedValue] = useState<string>(FeedOptions[0]);
     const [tagValue, setTagValue] = useState<string>(tagList[0]);
@@ -350,6 +350,9 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
     }, [getData, fetchWithAuth]);
 
     useEffect(() => {
+        if(!account)
+            return;
+        
         if(!isLoadingGet && !isLoadingPost && !errorGet && !errorPost){
             const fetchingPost = async () => {
                 localStorage.removeItem("posts");
@@ -357,7 +360,7 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             };
             fetchingPost();
         }
-    }, [feedValue]);
+    }, [feedValue, account]);
 
     return(
         <PostContext.Provider value={{
