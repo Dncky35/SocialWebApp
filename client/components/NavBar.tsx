@@ -18,7 +18,7 @@ const NavBar: React.FC = () => {
             <div></div>
             <div className="bg-gradient-to-b from-emerald-800 to-emerald-700 cursor-pointer rounded flex items-center justify-center rounded-full 
             text-2xl w-12 h-12 hover:bg-gradient-to-t hover:text-white hover:scale-[1.01] transition duration-300">
-                <Link href={"/"}><Origami color="yellow" size={24} /></Link>
+                <Link href={"/"}>🐤</Link>
             </div>
            <div>
             {account && (

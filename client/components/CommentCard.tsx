@@ -27,10 +27,11 @@ interface CommentProps {
 
 const CommentCard:React.FC<CommentProps> = ({ comment }) => {
 
-    const { error:errorAuth, isLoading:isLoadingAUTH } = useAuth();
+    const { error:errorAuth, isLoading:isLoadingAUTH, account } = useAuth();
     const { fetchAccountWithId, posts, likeComment, error:errorPost, isLoading:isLoadingPOST } = usePostContext();
     const owner = posts?.find((post) => post.owner.id === comment.author_id)?.owner || null;
     const [isCommentAdding, setIsCommentAdding] = useState(false);
+    const isOwnComment = account && account.id === comment.author_id;
 
     useEffect(() => {
         if(!owner && !isLoadingPOST && !isLoadingAUTH && !errorAuth && !errorPost){
@@ -55,11 +56,14 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
     }
 
     return (
-        <div className="bg-gradient-to-br from-emerald-700 to-emerald-900 rounded shadow-xl px-4 py-2 hover:scale-[1.01] transform transition duration-300 w-full">
-           <div className='border-b border-emerald-700 py-1 mb-1'>
+        <div className={`bg-gradient-to-br ${isOwnComment ? "from-emerald-600 to-emerald-800" :"from-emerald-700 to-emerald-900"} rounded shadow-xl px-4 py-2 hover:scale-[1.01] transform transition duration-300 w-full`}>
+           <div className='border-b border-emerald-700 py-1 mb-1 flex items-center justify-between'>
                 <Link href={`/profile/${comment.author_id}`} className='font-semibold text-lg text-emerald-300 cursor-pointer hover:underline'>
                 {owner?.username || comment.author_id}
                 </Link>
+                    {isOwnComment && (
+                        <button className='cursor-pointer hover:underline'>Edit</button>
+                    )}
             </div>
             <Link href={`/posts/${comment.post_id}/comments/${comment.id}`} className='cursor-pointer text-xl font-semibold whitespace-pre-wrap break-words mb-2'>
                 {comment.content}

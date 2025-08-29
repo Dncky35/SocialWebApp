@@ -8,21 +8,14 @@ import PrivateAccountCard from "@/components/Profile/PrivateAccountCard";
 import CommentCard, { Comment } from "@/components/CommentCard";
 
 type Options = "Posts" |"Comments" | "Liked";
-const options:Options[] = ["Posts", "Comments", "Liked"];
+const options:Options[] = ["Posts", "Liked", "Comments"];
 
 const ProfilePage:React.FC = () => {
     const { account, pageState, isLoading:isLoadingAuth } = useAuth();
     const { posts, isLoading:isLoadingPost } = usePostContext();
     const userPosts = posts?.filter((post) => post.owner.id === account?.id) || null;
-    const userComments:Comment[] = posts?.filter((post) => {
-        
-        return post.comments.map((comment) => {
-            if(comment.author_id === account?.id)
-                return comment;
-            else
-                return null;
-        });
-    }).map((post) => post.comments).flat().filter((comment) => comment.author_id === account?.id) || [];
+    const likedPosts = posts?.filter((post) => post.likes.includes(account?.id || "")) || null;
+    const userComments:Comment[] = posts?.map((post) => post.comments).flat().filter((comment) => comment.author_id === account?.id) || [];
 
     const [selectedOption, setSelectedOption] = useState<Options>(options[0]);
 
@@ -49,6 +42,9 @@ const ProfilePage:React.FC = () => {
                     ))}
                 </div>
                 {selectedOption === "Posts" && userPosts?.map((post, index) => (
+                    <PostCard key={index} post={post} />
+                ))}
+                {selectedOption === "Liked" && likedPosts?.map((post, index) => (
                     <PostCard key={index} post={post} />
                 ))}
                 {selectedOption === "Comments" && userComments?.map((comment, index) => (

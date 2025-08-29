@@ -4,6 +4,7 @@ import { PublicAccount } from '@/schemas/account';
 import Link from 'next/link';
 import { Comment } from './CommentCard';
 import { usePostContext } from '@/context/PostContext';
+import { useAuth } from '@/context/AuthContext';
 import CommentCreator from './CommentCreator';
 import { MessageSquarePlus, Heart } from "lucide-react";
 
@@ -27,7 +28,9 @@ interface PostProps {
 
 const PostCard: React.FC<PostProps> = ({ post }) => {
   const { likePost } = usePostContext();
+  const { account } = useAuth();
   const [ isCommentAdding, setIsCommentAdding ] = useState(false);
+  const isOwnPost = account && account.id === post.owner.id;
   
   const handleOnLike = async( e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
@@ -36,9 +39,12 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
   };
   
   return (
-    <div className='bg-gradient-to-br from-emerald-700 to-emerald-900 rounded shadow-xl px-4 py-2 hover:scale-[1.01] transform transition duration-300 w-full'>
-      <div className='border-b border-emerald-700 py-1 mb-1'>
+    <div className={`${isOwnPost ? "bg-gradient-to-br from-emerald-600 to-emerald-800" :"bg-gradient-to-br from-emerald-700 to-emerald-900"} rounded shadow-xl px-4 py-2 hover:scale-[1.01] transform transition duration-300 w-full`}>
+      <div className='border-b border-emerald-700 py-1 mb-1 flex justify-between items-center'>
         <Link href={`/profile/${post.owner.id}`} className='font-semibold text-lg text-emerald-300 cursor-pointer hover:underline'>{post.owner.username}</Link>
+        {isOwnPost && (
+          <button className='cursor-pointer hover:underline'>Edit</button>
+        )}
       </div>
       <Link href={`/posts/${post.id}`} className='text-xl font-semibold whitespace-pre-wrap break-words mb-2'>
         {post.content}
