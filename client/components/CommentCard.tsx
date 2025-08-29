@@ -56,7 +56,8 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
     }
 
     return (
-        <div className={`bg-gradient-to-br ${isOwnComment ? "from-emerald-600 to-emerald-800" :"from-emerald-700 to-emerald-900"} rounded shadow-xl px-4 py-2 hover:scale-[1.01] transform transition duration-300 w-full`}>
+        <div className={`bg-gradient-to-br ${isOwnComment ? "from-emerald-600 to-emerald-800" :"from-emerald-700 to-emerald-900"} 
+        rounded shadow-xl px-4 py-2 hover:scale-[1.01] transform transition duration-300 w-full`}>
            <div className='border-b border-emerald-700 py-1 mb-1 flex items-center justify-between'>
                 <Link href={`/profile/${comment.author_id}`} className='font-semibold text-lg text-emerald-300 cursor-pointer hover:underline'>
                 {owner?.username || comment.author_id}
@@ -70,7 +71,7 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
             </Link>
             <div className="flex items-center justify-between border-t border-emerald-700 py-2">
                 <div className="flex items-center gap-x-4">
-                    <div className="flex items-center gap-x-2">
+                    <div className='flex items-center gap-x-2 bg-emerald-900 rounded-xl px-2 py-1'>
                         <p>{comment.likes?.length || 0}</p>
                         <button 
                         onClick={(e) => handleOnLike(e)}
@@ -78,7 +79,7 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
                             {comment.is_liked ? <Heart color="red" /> : <Heart />}
                         </button>
                     </div>
-                    <div className="flex items-center gap-x-2">
+                    <div className='flex items-center gap-x-2 bg-emerald-900 rounded-xl px-2 py-1'>
                         <p>{comment.child_commets?.length || 0}</p>
                         <button 
                         onClick={() => setIsCommentAdding(prev => !prev)}

@@ -9,22 +9,22 @@ import { useAuth } from "@/context/AuthContext";
 
 const CommentsPage:React.FC = () => {
     const params = useParams();
-    const { pageState } = useAuth();
-    const { posts, fetchPostWithID, fetchCommentWithId, isLoading, error, setError } = usePostContext();
+    const { pageState, isLoading:isLoadingAuth } = useAuth();
+    const { posts, fetchCommentWithId, isLoading:isLoadingPost, error, setError } = usePostContext();
     const post = posts?.find((p) => p.id === params.postid) || null;
     const comment = post?.comments.find((c) => c.id === params.commentId) || null;
     const childComments = post?.comments.filter((c) => c.parent_comment_id === params.commentId) || [];
 
     useEffect(() => {
-        if(!post && !isLoading && !error) {
+        if(!post && !isLoadingPost && !isLoadingAuth && !error) {
             const fetchPost = async () => {
-                await fetchPostWithID(params.postid as string);
+                // await fetchPostWithID(params.postid as string);
             };
 
             fetchPost();
         }
 
-        if(!comment && !isLoading && !error){
+        if(!comment && !isLoadingAuth && !isLoadingPost && !error){
             const fetchComment = async () => {
                 await fetchCommentWithId(params.commentId as string);
             };
@@ -32,10 +32,9 @@ const CommentsPage:React.FC = () => {
             fetchComment();
         }
 
-
     }, [post, comment, error]);
 
-    if(isLoading || pageState === "Initializing")
+    if(isLoadingAuth || isLoadingPost || pageState === "Initializing")
         return ( <LoadingComponent />);
 
     if(error)
@@ -48,10 +47,7 @@ const CommentsPage:React.FC = () => {
             </div>
         );
     }
-
-
-
-
+    
     return(
         <div className="flex-grow w-full max-w-2xl mx-auto rounded-2xl shadow-2xl p-6">
             {/* <button className="bg-emerald-500 rounded py-1 px-4 cursor-pointer hover:bg-emerald-600 text-white font-semibold transition duration-300">
