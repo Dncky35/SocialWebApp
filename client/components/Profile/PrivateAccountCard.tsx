@@ -1,8 +1,10 @@
+"use client";
 import React from 'react';
 import { PrivateAccount } from '@/schemas/account';
 
 interface Props {
     account: PrivateAccount;
+    setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
 };
 
 const formatDate = (date: string) =>
@@ -14,14 +16,14 @@ const formatDate = (date: string) =>
         minute: '2-digit',
 });
 
-const PrivateAccountCard:React.FC<Props> = ({account}) => {
+const PrivateAccountCard:React.FC<Props> = ({account, setIsEditing}) => {
 
     if(!account)
         return null;
 
     return (
         <div className="bg-gradient-to-t from-emerald-50 to-emerald-200 shadow-lg rounded-lg p-8">
-            <div className="flex flex-col sm:flex-row items-center gap-6">
+            <div className="flex flex-col sm:flex-row gap-6">
                 <div className="w-32 h-32 rounded-full bg-emerald-300 overflow-hidden">
                     <img
                         src={
@@ -33,18 +35,21 @@ const PrivateAccountCard:React.FC<Props> = ({account}) => {
                     />
                 </div>
                 <div className="flex-1">
-                    <h1 className="text-3xl font-bold text-emerald-800 flex items-center gap-2">
-                        {account.username}
-                        {account.is_verified && (
-                            <span className="text-emerald-500 text-sm font-medium bg-blue-100 px-2 py-1 rounded">
-                                Verified
-                            </span>
-                        )}
-                    </h1>
-                    <p className="text-emerald-600 text-sm mt-1">{account.email}</p>
+                    <h1 className='text-3xl font-bold text-emerald-800'>{account.username}</h1>
+                    <p className='text-emerald-600 text-sm mt-1'>{account.email}</p>
+                    <div className='flex items-center justify-start mt-1'>
+                        <p className='bg-emerald-600 rounded py-1 px-3'>{account.is_verified ? 'Verified' : 'Unverified'}</p>
+                    </div>
                     {account.full_name && (
-                        <p className="text-emerald-500 mt-1">Full name: {account.full_name}</p>
-                    )}
+		                <p className='text-emerald-500 mt-1'>Full name: {account.full_name}</p>
+	                )}
+                </div>
+                <div className='flex justify-end items-start'>
+                    <button 
+                    onClick={() => setIsEditing(true)}
+                    className='bg-emerald-900 rounded py-2 px-6 text-white hover:bg-emerald-800 cursor-pointer hover:scale-[1.1] transition-all duration-300'>
+                        Edit
+                    </button>
                 </div>
             </div>
 

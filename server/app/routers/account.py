@@ -115,8 +115,9 @@ async def get_profile_posts(account_id: str, current_user=Depends(oauth2.get_cur
 
     
 # Fix: endpoint as profile/me
-@router.patch("/me/profile", status_code=status.HTTP_200_OK)
+@router.patch("/profile/me", status_code=status.HTTP_200_OK)
 async def update_my_profile(profile_data: UpdateProfile, current_user=Depends(oauth2.get_current_user)):
+
     try:
         account = await Account.get(PydanticObjectId(current_user.account_id))
     except (InvalidId, Exception):

@@ -3,6 +3,7 @@ import React, { useContext, useState, useCallback, useEffect } from "react";
 import { BASEURL } from "./ContextProvider";
 import useGet from "@/hooks/useGet";
 import usePost from "@/hooks/usePost";
+import usePatch from "@/hooks/usePatch";
 import { ApiError } from "@/hooks/useFetch";
 import { useAuth } from "./AuthContext";
 import { Post } from "@/components/PostCard";
@@ -30,6 +31,7 @@ interface PostContext{
     tagValue: string;
     setFeedValue: React.Dispatch<React.SetStateAction<string>>;
     setTagValue: React.Dispatch<React.SetStateAction<string>>;
+    updateProfile: (full_name: string, bio: string, avatar_url: string) => Promise<boolean>;
 }
 
 interface LikeType{
@@ -47,6 +49,10 @@ const PostContext = React.createContext<PostContext | undefined>(undefined);
 export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) => {
     const { isLoading:isLoadingPost, error:errorPost, postData, setError:setErrorPost } = usePost();
     const { isLoading:isLoadingGet, error:errorGet, getData, setError:setErrorGet } = useGet();
+    const { isLoading:isLoadingPatch, error:errorPatch, patchData, setError:setErrorPatch } = usePatch({ bodyFormat: "JSON", headers:{ 
+        "Content-Type": "application/json",
+        credentials:"include",
+    }});
     const { account, fetchWithAuth } = useAuth();
     const [posts, setPosts] = useState<Post[] | null>(null);   
     const [feedValue, setFeedValue] = useState<string>(FeedOptions[0]);
@@ -349,6 +355,23 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
 
     }, [getData, fetchWithAuth]);
 
+    const updateProfile = useCallback(async (full_name?:string, bio?:string, avatar_url?:string) => {
+        const result = await fetchWithAuth(async () => {
+            return await patchData(`${BASEURL}accounts/profile/me`, {
+                full_name,
+                bio,
+                avatar_url,
+            });
+        });
+
+        if(result){
+            console.log(`result: ${JSON.stringify(result)} `);
+            // TO DO: update current account without fetch data again
+            return true;
+        }
+        return false;
+    }, [patchData, fetchWithAuth]);
+
     useEffect(() => {
         if(!account)
             return;
@@ -365,8 +388,8 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
     return(
         <PostContext.Provider value={{
             posts, 
-            isLoading: isLoadingPost || isLoadingGet, 
-            error: errorPost || errorGet,
+            isLoading: isLoadingPost || isLoadingGet || isLoadingPatch, 
+            error: errorPost || errorGet || errorPatch,
             // fetchPosts,
             createPost,
             likePost,
@@ -382,6 +405,7 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             tagValue,
             setFeedValue,
             setTagValue,
+            updateProfile,
             }}>
             {children}
         </PostContext.Provider>

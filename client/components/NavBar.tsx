@@ -2,7 +2,6 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
-import { Origami } from "lucide-react";
 
 const NavBar: React.FC = () => {
     const { account, logout} = useAuth();
