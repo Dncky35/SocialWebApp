@@ -5,7 +5,6 @@ import { usePostContext } from "@/context/PostContext";
 import PostCard from "@/components/PostCard";
 import { useAuth } from "@/context/AuthContext";
 import LoadingComponent from "@/components/Loading";
-import ErrorComponent from "@/components/Error";
 
 const ProfilePage:React.FC = () => {
     const params = useParams();
@@ -25,14 +24,6 @@ const ProfilePage:React.FC = () => {
         }
 
     }, [account, errorPost, errorAuth]);
-
-    if(errorPost){
-        return(
-            <div>
-                <ErrorComponent status={errorPost.status} detail={errorPost.detail} setError={setError} />
-            </div>
-        )
-    }
 
     if(isLoading || isLoadingPost || pageState === "Initializing" || !posts || !account)
         return(

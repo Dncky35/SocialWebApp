@@ -3,12 +3,11 @@ import { ApiError } from '@/hooks/useFetch';
 import React, { useState } from 'react';
 
 interface ErrorInterface {
-    setError: React.Dispatch<React.SetStateAction<ApiError | null>>;
     status: number;
     detail: string;
 }
 
-const ErrorComponent:React.FC<ErrorInterface> = ({ status, detail, setError }) => {
+const ErrorComponent:React.FC<ErrorInterface> = ({ status, detail }) => {
     const [isClosed, setIsClosed] = useState<boolean>(false);
 
     if(isClosed){
@@ -17,7 +16,6 @@ const ErrorComponent:React.FC<ErrorInterface> = ({ status, detail, setError }) =
 
     const handleOnClicked = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
-        setError(null);
         setIsClosed(true);
     };
 

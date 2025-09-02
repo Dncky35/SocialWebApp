@@ -27,9 +27,6 @@ const PostPage:React.FC = () => {
     if(isLoading || pageState === "Initializing")
         return ( <LoadingComponent />);
 
-    if(error)
-        return (<ErrorComponent status={error.status} detail={error.detail} setError={setError} />);
-
     if(post === null){
         return (
             <div>

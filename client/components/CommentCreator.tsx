@@ -2,7 +2,6 @@
 import { useState } from "react";
 import { usePostContext } from "@/context/PostContext";
 import LoadingComponent from "@/components/Loading";
-import ErrorComponent from "@/components/Error";
 
 interface CommentRequest {
     content: string;
@@ -40,9 +39,6 @@ const CommentCreator:React.FC<CommentCreatorProps> = ({postID, commentID = ""}:C
         <div className="space-y-4">
             {isLoading && (
                 <LoadingComponent />
-            )}
-            {error && (
-                <ErrorComponent status={error.status} detail={error.detail} setError={setError} />
             )}
 
             <label htmlFor="post" className="text-white font-semibold text-lg">

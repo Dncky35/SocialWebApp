@@ -4,7 +4,6 @@ import { usePostContext } from "@/context/PostContext";
 import CommentCard from "@/components/CommentCard";
 import { useParams } from "next/navigation";
 import LoadingComponent from "@/components/Loading";
-import ErrorComponent from "@/components/Error";
 import { useAuth } from "@/context/AuthContext";
 
 const CommentsPage:React.FC = () => {
@@ -36,10 +35,7 @@ const CommentsPage:React.FC = () => {
 
     if(isLoadingAuth || isLoadingPost || pageState === "Initializing")
         return ( <LoadingComponent />);
-
-    if(error)
-        return (<ErrorComponent status={error.status} detail={error.detail} setError={setError} />);
-
+    
     if(comment === null){
         return (
             <div>

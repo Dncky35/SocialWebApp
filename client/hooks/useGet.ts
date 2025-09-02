@@ -6,11 +6,10 @@ interface UseGetReturn{
     error: ApiError | null;
     isLoading: boolean;
     getData: (url: string, options: RequestInit) => Promise<any>;
-    setError: Dispatch<SetStateAction<ApiError | null>>;
 }
 
 const useGet = (): UseGetReturn => {
-    const { isLoading, error, fetchData, setError } = useFetch();
+    const { isLoading, error, fetchData } = useFetch();
     
     const getData = async (url:string, options?: RequestInit ) =>{
         return await fetchData(url, {
@@ -19,7 +18,7 @@ const useGet = (): UseGetReturn => {
         });
     };
 
-    return { error, isLoading, getData, setError } 
+    return { error, isLoading, getData } 
 
 };
 

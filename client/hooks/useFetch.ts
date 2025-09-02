@@ -35,7 +35,7 @@ const useFetch = () => {
         }
     };
     
-    return { isLoading, error, fetchData, setError }
+    return { isLoading, error, fetchData }
 };
 
 export default useFetch;

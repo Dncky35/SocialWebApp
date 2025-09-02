@@ -4,7 +4,6 @@ import { usePostContext, FeedOptions, tagList } from "@/context/PostContext";
 import PostCard, { Post } from "@/components/PostCard";
 import PostCreator from "@/components/PostCreator";
 import LoadingComponent from "@/components/Loading";
-import ErrorComponent from "@/components/Error";
 import { useAuth } from "@/context/AuthContext";
 import { Search } from 'lucide-react'
 
@@ -38,9 +37,6 @@ const FeedPage:React.FC = () => {
         }
 
     }, [posts, errorPost, hydrated]);
-
-    if(errorPost)
-        return (<ErrorComponent status={errorPost.status} detail={errorPost.detail} setError={setError} />);
 
     if(isLoadingPost || isLoadingAuth)
         return (<LoadingComponent />);

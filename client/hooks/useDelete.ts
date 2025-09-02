@@ -6,11 +6,10 @@ interface useDeleteReturn{
     error: ApiError | null;
     isLoading: boolean;
     deleteData: (url: string, options: RequestInit) => Promise<any>;
-    setError: Dispatch<SetStateAction<ApiError | null>>;
 }
 
 const useDelete = ():useDeleteReturn => {
-    const { isLoading, error, fetchData, setError } = useFetch();
+    const { isLoading, error, fetchData } = useFetch();
 
     const deleteData = async (url:string, options?: RequestInit)=> {
         const result = await fetchData(url, {
@@ -21,7 +20,7 @@ const useDelete = ():useDeleteReturn => {
         return result;
     };
 
-    return { isLoading, error, deleteData, setError };
+    return { isLoading, error, deleteData };
 
 }
 
