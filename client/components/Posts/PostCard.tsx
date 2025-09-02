@@ -6,7 +6,7 @@ import { Comment } from './CommentCard';
 import { usePostContext } from '@/context/PostContext';
 import { useAuth } from '@/context/AuthContext';
 import CommentCreator from './CommentCreator';
-import { MessageSquarePlus, Heart } from "lucide-react";
+import { MessageSquarePlus, Heart  } from "lucide-react";
 
 export interface Post {
   id: string;
@@ -27,8 +27,8 @@ interface PostProps {
 };
 
 const PostCard: React.FC<PostProps> = ({ post }) => {
-  const { likePost } = usePostContext();
-  const { account } = useAuth();
+  const { likePost, error:errorPost } = usePostContext();
+  const { account, error:errorAuth } = useAuth();
   const [ isCommentAdding, setIsCommentAdding ] = useState(false);
   const isOwnPost = account && account.id === post.owner.id;
   

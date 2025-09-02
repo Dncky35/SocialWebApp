@@ -6,8 +6,8 @@ import usePost from "@/hooks/usePost";
 import usePatch from "@/hooks/usePatch";
 import { ApiError } from "@/hooks/useFetch";
 import { useAuth } from "./AuthContext";
-import { Post } from "@/components/PostCard";
-import { Comment } from "@/components/CommentCard";
+import { Post } from "@/components/Posts/PostCard";
+import { Comment } from "@/components/Posts/CommentCard";
 
 export const FeedOptions = ["Latest", "Following", "Trending"];
 
@@ -20,7 +20,6 @@ interface PostContext{
     createPost: (content: string, tags?: string[] | undefined, image_url?: string | undefined) => Promise<void>;
     likePost: (postId: string) => Promise<any>;
     addComment: (postId: string, content: string, parent_comment_id?: string | undefined) => Promise<void>;
-    setError: React.Dispatch<React.SetStateAction<ApiError | null>>;
     likeComment: (commentID: string) => Promise<void>;
     searchPosts: (options: PostSearchOptions) => Promise<void>;
     fetchCommentWithId: (commentID: string) => Promise<any> | null;
@@ -47,9 +46,9 @@ interface PostSearchOptions {
 const PostContext = React.createContext<PostContext | undefined>(undefined);
 
 export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) => {
-    const { isLoading:isLoadingPost, error:errorPost, postData, setError:setErrorPost } = usePost();
-    const { isLoading:isLoadingGet, error:errorGet, getData, setError:setErrorGet } = useGet();
-    const { isLoading:isLoadingPatch, error:errorPatch, patchData, setError:setErrorPatch } = usePatch({ bodyFormat: "JSON", headers:{ 
+    const { isLoading:isLoadingPost, error:errorPost, postData } = usePost();
+    const { isLoading:isLoadingGet, error:errorGet, getData } = useGet();
+    const { isLoading:isLoadingPatch, error:errorPatch, patchData } = usePatch({ bodyFormat: "JSON", headers:{ 
         "Content-Type": "application/json",
         credentials:"include",
     }});
@@ -394,7 +393,6 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             createPost,
             likePost,
             addComment,
-            setError: setErrorPost,
             likeComment,
             searchPosts,
             fetchCommentWithId,

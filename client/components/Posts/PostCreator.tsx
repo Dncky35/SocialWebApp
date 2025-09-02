@@ -1,6 +1,6 @@
 import React, { useState} from "react";
 import { usePostContext, tagList } from "@/context/PostContext";
-import LoadingComponent from "./Loading";
+import LoadingComponent from "../Loading";
 
 export interface PostCreationForm {
     content: string,

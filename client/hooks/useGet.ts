@@ -1,15 +1,15 @@
 "use client";
-import { Dispatch, SetStateAction } from 'react';
 import useFetch, { ApiError } from "./useFetch";
 
 interface UseGetReturn{
     error: ApiError | null;
     isLoading: boolean;
     getData: (url: string, options: RequestInit) => Promise<any>;
+    setError: React.Dispatch<React.SetStateAction<ApiError | null>>
 }
 
 const useGet = (): UseGetReturn => {
-    const { isLoading, error, fetchData } = useFetch();
+    const { isLoading, error, fetchData, setError } = useFetch();
     
     const getData = async (url:string, options?: RequestInit ) =>{
         return await fetchData(url, {
@@ -18,7 +18,7 @@ const useGet = (): UseGetReturn => {
         });
     };
 
-    return { error, isLoading, getData } 
+    return { error, isLoading, getData, setError } 
 
 };
 

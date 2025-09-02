@@ -1,15 +1,16 @@
 "use client";
-import { Dispatch, SetStateAction, use } from 'react';
+import React from "react";
 import useFetch, { ApiError } from "./useFetch";
 
 interface useDeleteReturn{
     error: ApiError | null;
     isLoading: boolean;
     deleteData: (url: string, options: RequestInit) => Promise<any>;
+    setError: React.Dispatch<React.SetStateAction<ApiError | null>>
 }
 
 const useDelete = ():useDeleteReturn => {
-    const { isLoading, error, fetchData } = useFetch();
+    const { isLoading, error, fetchData, setError } = useFetch();
 
     const deleteData = async (url:string, options?: RequestInit)=> {
         const result = await fetchData(url, {
@@ -20,7 +21,7 @@ const useDelete = ():useDeleteReturn => {
         return result;
     };
 
-    return { isLoading, error, deleteData };
+    return { isLoading, error, deleteData, setError };
 
 }
 

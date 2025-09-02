@@ -24,8 +24,8 @@ export type PageState = "Completed" | "Initializing";
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
 export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) => {
-    const { isLoading:isLoadingPost, error:errorPost, postData, setError:setErrorPost } = usePost("URLSearchParams");
-    const { isLoading:isLoadingGet, error:errorGet, getData, setError:setErrorGet } = useGet();
+    const { isLoading:isLoadingPost, error:errorPost, postData} = usePost("URLSearchParams");
+    const { isLoading:isLoadingGet, error:errorGet, getData } = useGet();
     const [account, setAccount] = useState(null);
     const [pageState, setPageState] = useState<PageState>("Initializing");
 

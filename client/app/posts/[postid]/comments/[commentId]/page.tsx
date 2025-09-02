@@ -1,7 +1,7 @@
 "use client";
 import React, { useEffect } from "react";
 import { usePostContext } from "@/context/PostContext";
-import CommentCard from "@/components/CommentCard";
+import CommentCard from "@/components/Posts/CommentCard";
 import { useParams } from "next/navigation";
 import LoadingComponent from "@/components/Loading";
 import { useAuth } from "@/context/AuthContext";

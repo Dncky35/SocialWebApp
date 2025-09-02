@@ -3,8 +3,8 @@ import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { usePostContext } from "@/context/PostContext";
 import { useAuth } from "@/context/AuthContext";
-import CommentCreator from "@/components/CommentCreator";
-import LoadingComponent from "./Loading";
+import CommentCreator from "@/components/Posts/CommentCreator";
+import LoadingComponent from "../Loading";
 import { MessageSquarePlus, Heart } from "lucide-react";
 
 export interface Comment {

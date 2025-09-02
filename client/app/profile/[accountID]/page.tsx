@@ -2,14 +2,14 @@
 import React, { useEffect } from "react";
 import { useParams } from "next/navigation";
 import { usePostContext } from "@/context/PostContext";
-import PostCard from "@/components/PostCard";
+import PostCard from "@/components/Posts/PostCard";
 import { useAuth } from "@/context/AuthContext";
 import LoadingComponent from "@/components/Loading";
 
 const ProfilePage:React.FC = () => {
     const params = useParams();
     const { isLoading, pageState, error:errorAuth} = useAuth();
-    const { isLoading:isLoadingPost, fetchAccountWithId, posts, followAccount, error:errorPost, setError } = usePostContext();
+    const { isLoading:isLoadingPost, fetchAccountWithId, posts, followAccount, error:errorPost } = usePostContext();
     
     const account = posts?.find((post) => post.owner.id === params.accountID)?.owner || null;
     const postsOfUser = posts?.filter((post) => post.owner.id === params.accountID) || null;

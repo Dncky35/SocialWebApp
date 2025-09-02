@@ -1,5 +1,4 @@
 "use client";
-import { Dispatch, SetStateAction } from 'react';
 import useFetch, { ApiError } from "./useFetch";
 
 type BodyFormat = "JSON" | "URLSearchParams";
@@ -13,10 +12,11 @@ interface usePutReturn<T>{
     isLoading: boolean;
     error: ApiError | null;
     patchData: (url:string, body: {}) => Promise<any>;
+    setError: React.Dispatch<React.SetStateAction<ApiError | null>>;
 };
 
 const usePatch = <T=any>(options?:usePutOptions): usePutReturn<T> => {
-    const { fetchData, isLoading, error } = useFetch();
+    const { fetchData, isLoading, error, setError } = useFetch();
     const patchData = async (url:string, body: {}) => {
         const serializeBody = options?.bodyFormat === "URLSearchParams" ? new URLSearchParams(body).toString() : JSON.stringify(body);
 
@@ -31,7 +31,7 @@ const usePatch = <T=any>(options?:usePutOptions): usePutReturn<T> => {
         });
     };
 
-    return { isLoading, error, patchData };
+    return { isLoading, error, patchData, setError };
 };
 
 export default usePatch;

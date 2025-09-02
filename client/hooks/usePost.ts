@@ -1,5 +1,4 @@
 "use client";
-import { Dispatch, SetStateAction } from 'react';
 import useFetch, { ApiError } from "./useFetch";
 
 type BodyFormat = "JSON" | "URLSearchParams";
@@ -8,10 +7,11 @@ interface UsePostReturn{
     error: ApiError | null;
     isLoading: boolean;
     postData: (url: string, body: {}, options: RequestInit) => Promise<any>;
+    setError: React.Dispatch<React.SetStateAction<ApiError | null>>;
 };
 
 const usePost = (bodyFormat: BodyFormat = "JSON"): UsePostReturn => {
-    const { isLoading, error, fetchData } = useFetch();
+    const { isLoading, error, fetchData, setError } = useFetch();
     const postData = async (url: string, body: {}, options?: RequestInit) => {
         const serializeBody = bodyFormat === "URLSearchParams" ? new URLSearchParams(body).toString() : JSON.stringify(body);
 
@@ -25,7 +25,7 @@ const usePost = (bodyFormat: BodyFormat = "JSON"): UsePostReturn => {
             ...options
         });    
     };
-    return { isLoading, error, postData };
+    return { isLoading, error, postData, setError };
 }
 
 export default usePost;

@@ -2,8 +2,8 @@
 import { useParams } from "next/navigation";
 import React, { useEffect } from 'react';
 import { usePostContext } from "@/context/PostContext";
-import PostCard from "@/components/PostCard";
-import CommentCard from "@/components/CommentCard";
+import PostCard from "@/components/Posts/PostCard";
+import CommentCard from "@/components/Posts/CommentCard";
 import LoadingComponent from "@/components/Loading";
 import ErrorComponent from "@/components/Error";
 import { useAuth } from "@/context/AuthContext";
