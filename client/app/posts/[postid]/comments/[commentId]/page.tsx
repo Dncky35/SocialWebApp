@@ -5,14 +5,18 @@ import CommentCard from "@/components/Posts/CommentCard";
 import { useParams } from "next/navigation";
 import LoadingComponent from "@/components/Loading";
 import { useAuth } from "@/context/AuthContext";
+import ErrorDisplay from "@/components/ErrorDisplay";
+import PostCard from "@/components/Posts/PostCard";
 
 const CommentsPage:React.FC = () => {
     const params = useParams();
     const { pageState, isLoading:isLoadingAuth } = useAuth();
-    const { posts, fetchCommentWithId, isLoading:isLoadingPost, error, setError } = usePostContext();
+    const { posts, fetchCommentWithId, isLoading:isLoadingPost, error } = usePostContext();
     const post = posts?.find((p) => p.id === params.postid) || null;
     const comment = post?.comments.find((c) => c.id === params.commentId) || null;
     const childComments = post?.comments.filter((c) => c.parent_comment_id === params.commentId) || [];
+    const parentComment = post?.comments.find((c) => c.id === comment?.parent_comment_id) || null;
+
 
     useEffect(() => {
         if(!post && !isLoadingPost && !isLoadingAuth && !error) {
@@ -49,7 +53,20 @@ const CommentsPage:React.FC = () => {
             {/* <button className="bg-emerald-500 rounded py-1 px-4 cursor-pointer hover:bg-emerald-600 text-white font-semibold transition duration-300">
             ≪ Back
             </button> */}
-            <CommentCard comment={comment} />                
+            {error && (
+                <ErrorDisplay error={error || undefined} />
+            )}
+            <div>
+                {!comment.parent_comment_id && post && (
+                   <PostCard post={post} />
+                )}
+                {parentComment && (
+                    <CommentCard comment={parentComment} />
+                )}
+            </div>
+            <div className="w-[calc(100%-10px)]  ml-auto mt-4">
+                <CommentCard comment={comment} /> 
+            </div>
             <div className="w-[calc(100%-30px)] ml-auto mt-4 space-y-4">
                 {childComments.map((comment, index) => (
                     <div key={index} className="">

@@ -1,11 +1,15 @@
 'use client';
-import React, { useEffect } from "react";
+import React, { useEffect , useState} from "react";
 import { useParams } from "next/navigation";
 import { usePostContext } from "@/context/PostContext";
 import PostCard from "@/components/Posts/PostCard";
 import { useAuth } from "@/context/AuthContext";
 import LoadingComponent from "@/components/Loading";
 import ErrorDisplay from "@/components/ErrorDisplay";
+import CommentCard, { Comment } from "@/components/Posts/CommentCard";
+
+type Options = "Shared" |"Comments" | "Liked";
+const options:Options[] = ["Shared", "Liked", "Comments"];
 
 const ProfilePage:React.FC = () => {
     const params = useParams();
@@ -14,6 +18,9 @@ const ProfilePage:React.FC = () => {
     
     const account = posts?.find((post) => post.owner.id === params.accountID)?.owner || null;
     const postsOfUser = posts?.filter((post) => post.owner.id === params.accountID) || null;
+    const likedPosts = posts?.filter((post) => post.likes.includes(account?.id || "")) || null;
+    const userComments:Comment[] = posts?.map((post) => post.comments).flat().filter((comment) => comment.author_id === account?.id) || [];
+    const [selectedOption, setSelectedOption] = useState<Options>(options[0]);
 
     useEffect(() => {
         if(isLoading || errorAuth || errorPost || isLoadingPost)
@@ -99,8 +106,24 @@ const ProfilePage:React.FC = () => {
                 <div className="text-sm text-emerald-300 hover:underline cursor-pointer">Following</div>
                 </div>
             </div>
-            {postsOfUser?.map((post) => (
-                <PostCard key={post.id} post={post} />
+            <div className="grid grid-cols-3 p-2 space-x-4">
+                {options.map((option, index) => (
+                    <button key={index} 
+                    onClick={() => setSelectedOption(option)}
+                    className={`${ selectedOption !== option ? "bg-gradient-to-b from-emerald-600 to-emerald-900" : "bg-gradient-to-b from-emerald-900 to-emerald-600" } cursor-pointer py-2
+                    rounded hover:scale-[1.1] transform transition duration-300 text-white text-lg`}>
+                        {option}
+                    </button>
+                ))}
+            </div>
+            {selectedOption === "Shared" && postsOfUser?.map((post, index) => (
+                <PostCard key={index} post={post} />
+            ))}
+            {selectedOption === "Liked" && likedPosts?.map((post, index) => (
+                <PostCard key={index} post={post} />
+            ))}
+            {selectedOption === "Comments" && userComments?.map((comment, index) => (
+                <CommentCard key={index} comment={comment} />
             ))}
         </div>
     );
