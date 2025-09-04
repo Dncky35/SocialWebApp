@@ -9,13 +9,12 @@ import CommentCard, { Comment } from "@/components/Posts/CommentCard";
 import AccountEditor from "@/components/Profile/AccountEditor";
 import ErrorDisplay from "@/components/ErrorDisplay";
 
-
 type Options = "Shared" |"Comments" | "Liked";
 const options:Options[] = ["Shared", "Liked", "Comments"];
 
 const ProfilePage:React.FC = () => {
     const { account, pageState, isLoading:isLoadingAuth, error:errorAuth} = useAuth();
-    const { posts, isLoading:isLoadingPost, error:errorPost } = usePostContext();
+    const { posts, isLoading:isLoadingPost, error:errorPost} = usePostContext();
     const userPosts = posts?.filter((post) => post.owner.id === account?.id) || null;
     const likedPosts = posts?.filter((post) => post.likes.includes(account?.id || "")) || null;
     const userComments:Comment[] = posts?.map((post) => post.comments).flat().filter((comment) => comment.author_id === account?.id) || [];

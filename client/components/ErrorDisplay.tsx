@@ -2,16 +2,22 @@
 import React, { useState } from 'react';
 import { ApiError } from '@/hooks/useFetch';
 import { AlertCircle, X } from 'lucide-react';
+import { usePostContext } from '@/context/PostContext';
+import { useAuth } from '@/context/AuthContext';
 
 interface Props {
     error?: ApiError;
 }
 
 const ErrorDisplay:React.FC<Props> = ({ error }) => {
+    const { setNullEachError: setNullEachErrorPost } = usePostContext();
+    const { setNullEachError: setNullEachErrorAuth } = useAuth();
     const [isClosed, setIsClosed] = useState<boolean>(false);
 
     const handleOnClose = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();
+        setNullEachErrorPost();
+        setNullEachErrorAuth();
         setIsClosed(true);
     };
 

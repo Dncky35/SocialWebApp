@@ -17,6 +17,7 @@ interface AuthState{
     error: ApiError | null;
     pageState: PageState;
     setPageState: React.Dispatch<React.SetStateAction<PageState>>;
+    setNullEachError: () => void;
 }
 
 export type PageState = "Completed" | "Initializing";
@@ -24,8 +25,8 @@ export type PageState = "Completed" | "Initializing";
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
 export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) => {
-    const { isLoading:isLoadingPost, error:errorPost, postData} = usePost("URLSearchParams");
-    const { isLoading:isLoadingGet, error:errorGet, getData } = useGet();
+    const { isLoading:isLoadingPost, error:errorPost, postData, setError:setErrorPost } = usePost("URLSearchParams");
+    const { isLoading:isLoadingGet, error:errorGet, getData, setError:setErrorAuth} = useGet();
     const [account, setAccount] = useState(null);
     const [pageState, setPageState] = useState<PageState>("Initializing");
 
@@ -39,6 +40,11 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
         
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
+
+    const setNullEachError = () => {
+        setErrorPost(null);
+        setErrorAuth(null);
+    }
 
     const signUp = useCallback(async (email:string, username:string, password:string) => {
         const result = await postData(`${BASEURL}auth/signup`, {email, username, password}, {
@@ -124,7 +130,8 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
                 signUp, 
                 login, 
                 logout, 
-                fetchWithAuth
+                fetchWithAuth,
+                setNullEachError,
             }}>
             {children}
         </AuthContext.Provider>

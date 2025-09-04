@@ -5,6 +5,7 @@ import { usePostContext } from "@/context/PostContext";
 import PostCard from "@/components/Posts/PostCard";
 import { useAuth } from "@/context/AuthContext";
 import LoadingComponent from "@/components/Loading";
+import ErrorDisplay from "@/components/ErrorDisplay";
 
 const ProfilePage:React.FC = () => {
     const params = useParams();
@@ -30,7 +31,9 @@ const ProfilePage:React.FC = () => {
             <div>
                 <LoadingComponent />
             </div>
-        );
+    );
+
+    
 
     if(!account){
         return(
@@ -45,6 +48,9 @@ const ProfilePage:React.FC = () => {
 
     return (
         <div className="flex-grow p-6 w-full max-w-2xl mx-auto rounded-2xl shadow-2xl space-y-6">
+            {errorPost && (
+                    <ErrorDisplay error={errorAuth || errorPost || undefined} />
+            )}
             <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                     <div className="w-16 h-16 rounded-full bg-emerald-300 overflow-hidden hover:cursor-pointer">
@@ -67,7 +73,7 @@ const ProfilePage:React.FC = () => {
                 <div>
                     <button 
                     onClick={(e) => handleOnFollow(e)}
-                    className="bg-emerald-600 text-white px-4 py-2 cursor-pointer rounded-full hover:bg-emerald-700 transition duration-300">
+                    className="bg-emerald-600 text-white px-4 py-2 cursor-pointer rounded-full hover:scale-[1.05] hover:bg-emerald-500 transition duration-300">
                         {account.is_following !== null && account.is_following ? (
                             <span>Following</span>
                         ) : (
@@ -86,11 +92,11 @@ const ProfilePage:React.FC = () => {
             <div className="flex justify-evenly text-center border-t border-b border-emerald-700 py-2">
                 <div>
                 <div className="text-lg font-bold">{account.followers_count}</div>
-                <div className="text-sm text-emerald-300">Followers</div>
+                <div className="text-sm text-emerald-300 hover:underline cursor-pointer">Followers</div>
                 </div>
                 <div>
                 <div className="text-lg font-bold">{account.following_count}</div>
-                <div className="text-sm text-emerald-300">Following</div>
+                <div className="text-sm text-emerald-300 hover:underline cursor-pointer">Following</div>
                 </div>
             </div>
             {postsOfUser?.map((post) => (

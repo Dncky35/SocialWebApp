@@ -11,9 +11,7 @@ import ErrorDisplay from "@/components/ErrorDisplay";
 type ListName = "Feed" | "Tags";
 
 const FeedPage:React.FC = () => {
-    const { posts, isLoading: isLoadingPost, 
-        setFeedValue, setTagValue, feedValue, tagValue, 
-        error:errorPost, getFeedPageData } = usePostContext();
+    const { posts, isLoading: isLoadingPost, setFeedValue, setTagValue, feedValue, tagValue,  error:errorPost, getFeedPageData } = usePostContext();
     const { pageState, isLoading: isLoadingAuth, error: errorAuth } = useAuth();
     const [hydrated, setHydrated] = useState(false); // ✅ track client hydration,
 

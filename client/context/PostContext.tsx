@@ -31,6 +31,7 @@ interface PostContext{
     setFeedValue: React.Dispatch<React.SetStateAction<string>>;
     setTagValue: React.Dispatch<React.SetStateAction<string>>;
     updateProfile: (full_name: string, bio: string, avatar_url: string) => Promise<boolean>;
+    setNullEachError: () => void;
 }
 
 interface LikeType{
@@ -46,13 +47,13 @@ interface PostSearchOptions {
 const PostContext = React.createContext<PostContext | undefined>(undefined);
 
 export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) => {
-    const { isLoading:isLoadingPost, error:errorPost, postData } = usePost();
-    const { isLoading:isLoadingGet, error:errorGet, getData } = useGet();
-    const { isLoading:isLoadingPatch, error:errorPatch, patchData } = usePatch({ bodyFormat: "JSON", headers:{ 
+    const { isLoading:isLoadingPost, error:errorPost, postData, setError:setErrorPost } = usePost();
+    const { isLoading:isLoadingGet, error:errorGet, getData, setError:setErrorAuth } = useGet();
+    const { isLoading:isLoadingPatch, error:errorPatch, patchData, setError:setErrorPatch } = usePatch({ bodyFormat: "JSON", headers:{ 
         "Content-Type": "application/json",
         credentials:"include",
     }});
-    const { account, fetchWithAuth } = useAuth();
+    const { account, fetchWithAuth, setNullEachError: setNullEachErrorAuth } = useAuth();
     const [posts, setPosts] = useState<Post[] | null>(null);   
     const [feedValue, setFeedValue] = useState<string>(FeedOptions[0]);
     const [tagValue, setTagValue] = useState<string>(tagList[0]);
@@ -371,6 +372,13 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
         return false;
     }, [patchData, fetchWithAuth]);
 
+    const setNullEachError = () => {
+        setErrorPost(null);
+        setErrorAuth(null);
+        setErrorPatch(null);
+        setNullEachErrorAuth();
+    }
+
     useEffect(() => {
         if(!account)
             return;
@@ -389,7 +397,6 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             posts, 
             isLoading: isLoadingPost || isLoadingGet || isLoadingPatch, 
             error: errorPost || errorGet || errorPatch,
-            // fetchPosts,
             createPost,
             likePost,
             addComment,
@@ -404,6 +411,7 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             setFeedValue,
             setTagValue,
             updateProfile,
+            setNullEachError,
             }}>
             {children}
         </PostContext.Provider>
