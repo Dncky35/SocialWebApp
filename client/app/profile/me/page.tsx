@@ -35,7 +35,7 @@ const ProfilePage:React.FC = () => {
             {isEditing && <AccountEditor account={account} setIsEditing={setIsEditing} />}
             <div className="flex-grow flex flex-col gap-y-4 p-4 w-full max-w-2xl mx-auto rounded-xl shadow-xl bg-emerald-800/20 backdrop-blur-sm my-2">
                 {errorPost && (
-                    <ErrorDisplay error={errorAuth || errorPost || undefined} />
+                    <ErrorDisplay error={errorPost || undefined} />
                 )}
                 <PrivateAccountCard account={account} setIsEditing={setIsEditing} />          
                 <div className="space-y-4">
@@ -43,7 +43,7 @@ const ProfilePage:React.FC = () => {
                         {options.map((option, index) => (
                             <button key={index} 
                             onClick={() => setSelectedOption(option)}
-                            className={`${ selectedOption === option ? "bg-gradient-to-b from-emerald-600 to-emerald-900" : "bg-gradient-to-b from-emerald-900 to-emerald-600" } cursor-pointer py-2
+                            className={`${ selectedOption !== option ? "bg-gradient-to-b from-emerald-600 to-emerald-900" : "bg-gradient-to-b from-emerald-900 to-emerald-600" } cursor-pointer py-2
                             rounded hover:scale-[1.1] transform transition duration-300 text-white text-lg`}>
                                 {option}
                             </button>

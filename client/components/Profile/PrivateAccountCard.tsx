@@ -37,8 +37,11 @@ const PrivateAccountCard:React.FC<Props> = ({account, setIsEditing}) => {
                 <div className="flex-1">
                     <h1 className='text-3xl font-bold text-emerald-800'>{account.username}</h1>
                     <p className='text-emerald-600 text-sm mt-1'>{account.email}</p>
-                    <div className='flex items-center justify-start mt-1'>
-                        <p className='bg-emerald-600 rounded py-1 px-3'>{account.is_verified ? 'Verified' : 'Unverified'}</p>
+                    <div className='flex items-center justify-start mt-1 space-x-2'>
+                        <p className='bg-emerald-600 rounded py-1 px-3 cursor-default'>{account.is_verified ? 'Verified' : 'Unverified'}</p>
+                        {/* {!account.is_verified && (
+                            <p className='text-emerald-950 cursor-pointer underline hover:text-emerald-800 font-semibold italic transform transition-all duration-300 hover:scale-[1.1]'>Lets Verify</p>
+                        )} */}
                     </div>
                     {account.full_name && (
 		                <p className='text-emerald-500 mt-1'>Full name: {account.full_name}</p>

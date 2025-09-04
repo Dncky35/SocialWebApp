@@ -2,6 +2,8 @@
 import { PrivateAccount } from '@/schemas/account';
 import React, { useState } from 'react';
 import { usePostContext } from '@/context/PostContext';
+import ErrorDisplay from '@/components/ErrorDisplay';
+
 
 /* <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
 <div className="rounded-lg shadow-lg p-6 max-w-xl text-center text-2xl font-semibold text-emerald-900 flex items-center space-x-4"></div> */
@@ -112,11 +114,7 @@ const AccountEditor:React.FC<Props> = ({ account, setIsEditing }) => {
                     className='block px-4 py-2 w-full bg-emerald-50 rounded border hover:scale-[1.01] transition-all duration-300'
                     value={accountForm.bio} onChange={(e) => handleOnValueChange("bio", e.target.value)} />
                 </div>
-                {error && (
-                    <div>
-                        <p className='text-emerald-50 text-center font-semibold text-xl'>{error.detail || "Unknown error occured!"}</p>
-                    </div>
-                )}
+                {error && (<ErrorDisplay error={error} />)}
                 <div className='grid grid-cols-2 gap-4 py-4 text-white text-xl font-semibold'>
                     <button 
                     type={"button"}
