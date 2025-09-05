@@ -29,7 +29,7 @@ const NavBar: React.FC = () => {
                         <img
                             src={
                                 account.avatar_url ??
-                                `https://ui-avatars.com/api/?name=${account.username}&background=50C878`
+                                `https://ui-avatars.com/api/?name=${account.username}&background=00bba7`
                             }
                             alt="Avatar"
                             className="w-full h-full object-cover"
