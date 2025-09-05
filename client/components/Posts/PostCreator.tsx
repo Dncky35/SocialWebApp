@@ -87,7 +87,7 @@ const PostCreator:React.FC = () => {
     };
 
     return(
-        <div className="bg-gradient-to-b from-emerald-700 to-emerald-900 px-6 py-2 rounded-xl shadow-xl w-full max-w-xl mx-auto">
+        <div className="bg-gradient-to-b from-teal-700 to-teal-900 px-6 py-2 rounded-xl shadow-xl w-full max-w-xl mx-auto">
             {isLoading && (
                <LoadingComponent />
             )}
@@ -110,11 +110,11 @@ const PostCreator:React.FC = () => {
 
             {isExtended && (
                 <div className="space-y-4">
-                    <div className="bg-emerald-800 p-2 rounded-lg shadow-inner">
+                    <div className="bg-teal-800 p-2 rounded-lg shadow-inner">
                         <textarea  id="post"
                             name="post"
                             className="w-full h-32 p-4 rounded-lg 
-                            bg-emerald-100 text-emerald-950 shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500"
+                            bg-teal-100 text-teal-950 shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-teal-500"
                             placeholder="What's on your mind?"
                             maxLength={500}
                             value={postForm.content}
@@ -123,23 +123,23 @@ const PostCreator:React.FC = () => {
                         <div className="flex flex-col gap-y-2">
                             <ul className="flex items-center flex-wrap gap-2 text-sm">
                                 {postForm.tags?.map((tag, index) => (
-                                <li key={index} className="bg-emerald-500 flex items-center justify-between p-2 rounded-lg text-white">
+                                <li key={index} className="bg-teal-500 flex items-center justify-between p-2 rounded-lg text-white">
                                     <p>{tag}</p>
                                     <button 
                                     value={tag}
-                                    className="bg-emerald-800 text-white hover:bg-emerald-700 cursor-pointer rounded ml-2 px-1 text-emerald-200" 
+                                    className="bg-teal-800 text-white hover:bg-teal-700 cursor-pointer rounded ml-2 px-1 text-teal-200" 
                                     onClick={(e) => handleTagRemove(e)}>X</button>
                                 </li>
                                 ))}
                             </ul>
                             <div className="flex gap-x-2 text-sm">
                                 <button onClick={() => {setIsAddTag((prev) => !prev); setIsAddImage(false);}}
-                                className="bg-gradient-to-b from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 
+                                className="bg-gradient-to-b from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-500 
                                 text-white cursor-pointer rounded py-2 px-2 hover:shadow-lg transition duration-300 hover:scale-105"  >
                                     Add Tag(s)
                                 </button>
                                 <button onClick={() => {setIsAddImage((prev) => !prev); setIsAddTag(false);}} 
-                                className="bg-emerald-900 rounded py-2 hover:bg-emerald-900 px-2" disabled={true} >
+                                className="bg-teal-900 rounded py-2 hover:bg-teal-900 px-2" disabled={true} >
                                     Add Image
                                 </button>
                             </div>
@@ -149,14 +149,14 @@ const PostCreator:React.FC = () => {
                         {isAddTag && (
                             <div>
                                 <input
-                                    className="text-sm bg-emerald-50 text-emerald-950 w-full rounded px-2 py-2"
+                                    className="text-sm bg-teal-50 text-teal-950 w-full rounded px-2 py-2"
                                     type="text"
                                     value={tag}
                                     onChange={handleOnTagChange}
                                 />
                                 {tagSuggestion && (
                                     <div
-                                    className="bg-emerald-600 p-2 mt-1 cursor-pointer rounded hover:bg-emerald-700"
+                                    className="bg-teal-600 p-2 mt-1 cursor-pointer rounded hover:bg-teal-700"
                                     onClick={handleSuggestionClick}
                                     >
                                     <p><strong>{tagSuggestion}</strong></p>
@@ -169,14 +169,14 @@ const PostCreator:React.FC = () => {
                             <input
                                 type="file"
                                 accept="image/*"
-                                className="block w-full text-sm text-emerald-900 bg-emerald-50 rounded-lg cursor-pointer 
-                                file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-emerald-700 file:text-white hover:file:bg-emerald-600 file:cursor-pointer"
+                                className="block w-full text-sm text-teal-900 bg-teal-50 rounded-lg cursor-pointer 
+                                file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-teal-700 file:text-white hover:file:bg-teal-600 file:cursor-pointer"
                                 onChange={(e) => handleOnImageChange(e)}
                             />
                         )}      
                     </div>
                     <button onClick={handleOnPublish} 
-                    className="w-full bg-gradient-to-b from-emerald-500 to-emerald-600 hover:from-emerald-600 hover:to-emerald-500 
+                    className="w-full bg-gradient-to-b from-teal-500 to-teal-600 hover:from-teal-600 hover:to-teal-500 
                     text-white cursor-pointer rounded py-2 hover:shadow-lg transition duration-300 hover:scale-105" >
                         Publish
                     </button>

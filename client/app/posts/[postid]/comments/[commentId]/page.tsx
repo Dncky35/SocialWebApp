@@ -50,7 +50,7 @@ const CommentsPage:React.FC = () => {
     
     return(
         <div className="flex-grow w-full max-w-2xl mx-auto rounded-2xl shadow-2xl p-6">
-            {/* <button className="bg-emerald-500 rounded py-1 px-4 cursor-pointer hover:bg-emerald-600 text-white font-semibold transition duration-300">
+            {/* <button className="bg-teal-500 rounded py-1 px-4 cursor-pointer hover:bg-teal-600 text-white font-semibold transition duration-300">
             ≪ Back
             </button> */}
             {error && (

@@ -52,7 +52,7 @@ const Signup:React.FC = () => {
 					<LoadingComponent />
 				)}
 				<form
-					className="bg-emerald-900 py-6 px-8 rounded shadow-md"
+					className="bg-teal-900 py-6 px-8 rounded shadow-md"
 					onSubmit={(e) => handleSubmit(e)}
 					>
 					<h2 className="text-2xl font-bold text-center mb-4">
@@ -83,7 +83,7 @@ const Signup:React.FC = () => {
 					))}
 					<button
 						type="submit"
-						className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 cursor-pointer rounded transition duration-200"
+						className="w-full bg-teal-600 hover:bg-teal-700 text-white cursor-pointer font-semibold py-2 rounded transition duration-300 hover:-translate-y-1 hover:scale-110"
 						>
 						Sign Up
 					</button>

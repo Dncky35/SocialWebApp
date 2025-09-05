@@ -6,7 +6,7 @@ import ErrorDisplay from '@/components/ErrorDisplay';
 
 
 /* <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
-<div className="rounded-lg shadow-lg p-6 max-w-xl text-center text-2xl font-semibold text-emerald-900 flex items-center space-x-4"></div> */
+<div className="rounded-lg shadow-lg p-6 max-w-xl text-center text-2xl font-semibold text-teal-900 flex items-center space-x-4"></div> */
 
 interface Props{
     account:PrivateAccount;
@@ -20,7 +20,7 @@ interface AccountEditForm{
     avatar_url: string;
 }
 
-// shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-emerald-500
+// shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-teal-500
 
 const AccountEditor:React.FC<Props> = ({ account, setIsEditing }) => {
     const { updateProfile, isLoading, error } = usePostContext();
@@ -62,18 +62,18 @@ const AccountEditor:React.FC<Props> = ({ account, setIsEditing }) => {
 
     return (
         <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50 w-full">
-            <div className="rounded-lg shadow-lg bg-gradient-to-t from-emerald-500 to-emerald-700 text-emerald-950 p-4 max-w-2xl w-full mx-auto flex flex-col space-y-2">
-                <h1 className='text-2xl font-semibold text-center text-white border-b-4 pb-2 border-emerald-900 cursor-default'>Edit Your Account</h1>
+            <div className="rounded-lg shadow-lg bg-gradient-to-t from-teal-500 to-teal-700 text-teal-950 p-4 max-w-2xl w-full mx-auto flex flex-col space-y-2">
+                <h1 className='text-2xl font-semibold text-center text-white border-b-4 pb-2 border-teal-900 cursor-default'>Edit Your Account</h1>
                 {/* <div className='rounded-xl shadow-xl p-2'>
                     <label htmlFor="username" className="ml-1 font-semibold block text-md py-1" >Username</label>
                     <input
                     id='username' 
                     type="text"
-                    className='block px-4 py-2 w-full bg-emerald-50 rounded hover:scale-[1.01] transition-all duration-300'
+                    className='block px-4 py-2 w-full bg-teal-50 rounded hover:scale-[1.01] transition-all duration-300'
                     defaultValue={accountForm.username} onChange={(e) => handleOnValueChange("username", e.target.value)} />
                 </div> */}
                 <div className='rounded-xl shadow-xl p-2'>
-                    <label htmlFor="avatar_url" className="ml-1 font-semibold block text-md py-1 text-emerald-50" >
+                    <label htmlFor="avatar_url" className="ml-1 font-semibold block text-md py-1 text-teal-50" >
                         Profile Avatar
                     </label>
                     <div className='flex space-x-4 items-center justify-center'>
@@ -89,29 +89,29 @@ const AccountEditor:React.FC<Props> = ({ account, setIsEditing }) => {
                     id='avatar_url' 
                     type={"file"}
                     accept="image/*"
-                    className="block w-full text-sm text-emerald-900 bg-emerald-50 rounded-lg cursor-pointer 
-                    file:m-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-emerald-700 file:text-white hover:file:bg-emerald-600 file:cursor-pointer"
+                    className="block w-full text-sm text-teal-900 bg-teal-50 rounded-lg cursor-pointer 
+                    file:m-2 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-teal-700 file:text-white hover:file:bg-teal-600 file:cursor-pointer"
                     value={accountForm.avatar_url} onChange={(e) => onImageSelected(e)} />
 
                     </div>
                     
                 </div>
                 <div className='rounded-xl shadow-xl p-2'>
-                    <label htmlFor="full_name" className="ml-1 font-semibold block text-md py-1 text-emerald-50" >Full Name</label>
+                    <label htmlFor="full_name" className="ml-1 font-semibold block text-md py-1 text-teal-50" >Full Name</label>
                     <input
                     id='full_name' 
                     type="text"
-                    className='block px-4 py-2 w-full bg-emerald-50 rounded hover:scale-[1.01] transition-all duration-300'
+                    className='block px-4 py-2 w-full bg-teal-50 rounded hover:scale-[1.01] transition-all duration-300'
                     value={accountForm.full_name} onChange={(e) => handleOnValueChange("full_name", e.target.value)} />
                 </div>
                 <div className='rounded-xl shadow-xl p-2'>
-                    <label htmlFor="bio" className="ml-1 font-semibold block text-md py-1 text-emerald-50" >
+                    <label htmlFor="bio" className="ml-1 font-semibold block text-md py-1 text-teal-50" >
                         Biography<span className='italic text-sm'>(max 500 characters)</span>
                     </label>
                     <textarea
                     id='bio' 
                     maxLength={500}
-                    className='block px-4 py-2 w-full bg-emerald-50 rounded border hover:scale-[1.01] transition-all duration-300'
+                    className='block px-4 py-2 w-full bg-teal-50 rounded border hover:scale-[1.01] transition-all duration-300'
                     value={accountForm.bio} onChange={(e) => handleOnValueChange("bio", e.target.value)} />
                 </div>
                 {error && (<ErrorDisplay error={error} />)}

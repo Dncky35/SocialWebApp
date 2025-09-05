@@ -56,10 +56,10 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
     }
 
     return (
-        <div className={`bg-gradient-to-br ${isOwnComment ? "from-emerald-600 to-emerald-800" :"from-emerald-700 to-emerald-900"} 
+        <div className={`bg-gradient-to-br ${isOwnComment ? "from-teal-600 to-teal-800" :"from-teal-700 to-teal-900"} 
         rounded shadow-xl px-4 py-2 hover:scale-[1.01] transform transition duration-300 w-full`}>
-           <div className='border-b border-emerald-700 py-1 mb-1 flex items-center justify-between'>
-                <Link href={`/profile/${comment.author_id}`} className='font-semibold text-lg text-emerald-300 cursor-pointer hover:underline'>
+           <div className='border-b border-teal-700 py-1 mb-1 flex items-center justify-between'>
+                <Link href={`/profile/${comment.author_id}`} className='font-semibold text-lg text-teal-300 cursor-pointer hover:underline'>
                 {owner?.username || comment.author_id}
                 </Link>
                     {isOwnComment && (
@@ -69,9 +69,9 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
             <Link href={`/posts/${comment.post_id}/comments/${comment.id}`} className='cursor-pointer text-xl font-semibold whitespace-pre-wrap break-words mb-2'>
                 {comment.content}
             </Link>
-            <div className="flex items-center justify-between border-t border-emerald-700 py-2">
+            <div className="flex items-center justify-between border-t border-teal-700 py-2">
                 <div className="flex items-center gap-x-4">
-                    <div className='flex items-center gap-x-2 bg-emerald-900 rounded-xl px-2 py-1'>
+                    <div className='flex items-center gap-x-2 bg-teal-900 rounded-xl px-2 py-1'>
                         <p>{comment.likes?.length || 0}</p>
                         <button 
                         onClick={(e) => handleOnLike(e)}
@@ -79,7 +79,7 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
                             {comment.is_liked ? <Heart color="red" /> : <Heart />}
                         </button>
                     </div>
-                    <div className='flex items-center gap-x-2 bg-emerald-900 rounded-xl px-2 py-1'>
+                    <div className='flex items-center gap-x-2 bg-teal-900 rounded-xl px-2 py-1'>
                         <p>{comment.child_commets?.length || 0}</p>
                         <button 
                         onClick={() => setIsCommentAdding(prev => !prev)}
@@ -88,9 +88,9 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
                         </button>
                     </div>
                 </div>
-                <p className='text-sm text-emerald-300'>Posted On: {new Date(comment.created_at).toLocaleDateString()}</p>
+                <p className='text-sm text-teal-300'>Posted On: {new Date(comment.created_at).toLocaleDateString()}</p>
             </div>
-            <div className='mt-2 py-2 px-4 border-t border-emerald-700'>
+            <div className='mt-2 py-2 px-4 border-t border-teal-700'>
             {isCommentAdding  && (
                 <CommentCreator commentID={comment.id} postID={comment.post_id} />
             )}

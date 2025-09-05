@@ -44,7 +44,7 @@ const Login:React.FC = () => {
 				{isLoading && (
 					<LoadingComponent />
 				)}
-				<form className="py-6 px-8 rounded shadow-md bg-emerald-900"
+				<form className="py-6 px-8 rounded shadow-md bg-teal-900"
 					onSubmit={(e) => handleSubmit(e)}>
 					<h2 className="text-2xl font-bold text-center mb-4">
 						Log In
@@ -64,7 +64,7 @@ const Login:React.FC = () => {
 								required
 								value={field.value}
 								onChange={(e) => handleOnValueChange(field.name, e.target.value)}
-								className="w-full bg-white text-emerald-900 border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+								className="w-full bg-white text-teal-900 border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
 								/>
 							{field.error && (
 								<p className="text-red-500 text-sm mt-1">{field.error}</p>
@@ -73,7 +73,7 @@ const Login:React.FC = () => {
 					))}
 					<button
 						type="submit"
-						className="w-full bg-emerald-600 hover:bg-emerald-700 text-white font-semibold py-2 rounded transition duration-200"
+						className="w-full bg-teal-600 hover:bg-teal-700 text-white cursor-pointer font-semibold py-2 rounded transition duration-300 hover:-translate-y-1 hover:scale-110"
 						>
 						Log In
 					</button>
