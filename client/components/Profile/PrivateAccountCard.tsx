@@ -14,11 +14,11 @@ const formatDate = (date: string) =>
         day: 'numeric',
         hour: '2-digit',
         minute: '2-digit',
-});
+    });
 
-const PrivateAccountCard:React.FC<Props> = ({account, setIsEditing}) => {
+const PrivateAccountCard: React.FC<Props> = ({ account, setIsEditing }) => {
 
-    if(!account)
+    if (!account)
         return null;
 
     return (
@@ -44,13 +44,13 @@ const PrivateAccountCard:React.FC<Props> = ({account, setIsEditing}) => {
                         )} */}
                     </div>
                     {account.full_name && (
-		                <p className='text-teal-500 mt-1'>Full name: {account.full_name}</p>
-	                )}
+                        <p className='text-teal-500 mt-1'>Full name: {account.full_name}</p>
+                    )}
                 </div>
                 <div className='flex justify-end items-start'>
-                    <button 
-                    onClick={() => setIsEditing(true)}
-                    className='bg-teal-900 rounded py-2 px-6 text-white hover:bg-teal-800 cursor-pointer hover:scale-[1.1] transition-all duration-300'>
+                    <button
+                        onClick={() => setIsEditing(true)}
+                        className='bg-teal-900 rounded py-2 px-6 text-white hover:bg-teal-800 cursor-pointer hover:scale-[1.1] transition-all duration-300'>
                         Edit
                     </button>
                 </div>

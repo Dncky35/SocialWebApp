@@ -18,7 +18,7 @@ const FeedPage:React.FC = () => {
     useEffect(() => {
         const storedFeedValue = localStorage.getItem("feedValue");
         if (storedFeedValue) {
-        setFeedValue(storedFeedValue);
+            setFeedValue(storedFeedValue);
         }
         setHydrated(true); // ✅ mark hydration done
     }, []);

@@ -9,6 +9,7 @@ export interface PostCreationForm {
 };
 
 const PostCreator:React.FC = () => {
+    const { isLoading, createPost } = usePostContext();
     const [ isExtended, setIsExtended ] = useState(false);
     const [ isAddTag, setIsAddTag ] = useState(false);
     const [ isAddImage, setIsAddImage ] = useState(false);
@@ -18,8 +19,7 @@ const PostCreator:React.FC = () => {
         tags: [],
     });
     const [tag, setTag] = useState("");
-    const [tagSuggestion, setTagSuggestion] = useState<string | null>(null);
-    const { isLoading, createPost } = usePostContext();
+    // const [tagSuggestion, setTagSuggestion] = useState<string | null>(null);
 
     const handleOnContentChange = (value:string) => {
         setPostForm((prev) => {
@@ -37,39 +37,57 @@ const PostCreator:React.FC = () => {
             return;
     }
 
-    const handleOnTagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-        const value = e.target.value;
-        setTag(value);
+    // const handleOnTagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    //     const value = e.target.value;
+    //     setTag(value);
 
-        // Suggest closest tag (simple filter)
-        if(value.length > 0){
-            const suggestion = tagList.find((tag) => tag.toLowerCase().startsWith(value.toLowerCase()));
-            setTagSuggestion(suggestion || null);
-        } else {
-            setTagSuggestion(null)
-        }
-    };
+    //     // Suggest closest tag (simple filter)
+    //     if(value.length > 0){
+    //         const suggestion = tagList.find((tag) => tag.toLowerCase().startsWith(value.toLowerCase()));
+    //         setTagSuggestion(suggestion || null);
+    //     } else {
+    //         setTagSuggestion(null)
+    //     }
+    // };
 
-    const handleSuggestionClick = () => {
-        if(!tagSuggestion)
+    // const handleSuggestionClick = () => {
+    //     if(!tagSuggestion)
+    //         return;
+
+    //     if(postForm.tags?.includes(tagSuggestion)){
+    //         setTag("");
+    //         setTagSuggestion(null);
+    //         return;
+    //     }
+
+    //     setPostForm((prev) => ({
+    //         ...prev,
+    //         tags: [...(prev.tags || []), tagSuggestion],
+    //     }));
+    //     setTag("");
+    //     setTagSuggestion(null);
+    // };
+
+    const handleOnTagSelected = ( e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+        e.preventDefault();
+        if(postForm.tags && postForm.tags.length > 2)
             return;
+        const value = (e.target as HTMLInputElement).value;
 
-        if(postForm.tags?.includes(tagSuggestion)){
-            setTag("");
-            setTagSuggestion(null);
-            return;
+        if(postForm.tags?.includes(value)){
+            return
         }
 
         setPostForm((prev) => ({
             ...prev,
-            tags: [...(prev.tags || []), tagSuggestion],
+            tags: [...(prev.tags || []), value],
         }));
         setTag("");
-        setTagSuggestion(null);
     };
 
     const handleTagRemove = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         const value = (e.target as HTMLButtonElement).value;
+
         setPostForm((prev) => {
             const updatedTags = prev.tags?.filter((tag) => tag !== value);
             return {
@@ -148,21 +166,20 @@ const PostCreator:React.FC = () => {
                     <div>
                         {isAddTag && (
                             <div>
-                                <input
-                                    className="text-sm bg-teal-50 text-teal-950 w-full rounded px-2 py-2"
-                                    type="text"
-                                    value={tag}
-                                    onChange={handleOnTagChange}
-                                />
-                                {tagSuggestion && (
-                                    <div
-                                    className="bg-teal-600 p-2 mt-1 cursor-pointer rounded hover:bg-teal-700"
-                                    onClick={handleSuggestionClick}
-                                    >
-                                    <p><strong>{tagSuggestion}</strong></p>
-                                    </div>
-                                )}
-                                
+                                <div className="grid grid-cols-4 gap-3 ">
+                                    {tagList.map((tag, index) => {
+
+                                        if(tag !== "")
+                                            return(
+                                                <button value={tag} 
+                                                onClick={(e) => handleOnTagSelected(e)}
+                                                className="bg-gradient-to-b from-teal-500 to-teal-700 p-2 rounded shadow-xl text-sm hover:bg-gradient-to-t hover:scale-110 
+                                                hover:-translate-y-1 transition duration-300" key={index}>
+                                                    {tag}
+                                                </button>
+                                            )
+                                    })}
+                                </div>
                             </div>
                         )}      
                         {isAddImage && (
