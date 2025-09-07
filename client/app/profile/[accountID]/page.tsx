@@ -7,7 +7,6 @@ import { useAuth } from "@/context/AuthContext";
 import LoadingComponent from "@/components/Loading";
 import ErrorDisplay from "@/components/ErrorDisplay";
 import CommentCard, { Comment } from "@/components/Posts/CommentCard";
-import Image from "next/image";
 
 type Options = "Shared" | "Comments" | "Liked";
 const options: Options[] = ["Shared", "Liked", "Comments"];
@@ -62,7 +61,7 @@ const ProfilePage: React.FC = () => {
             <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
                     <div className="w-16 h-16 rounded-full bg-teal-300 overflow-hidden hover:cursor-pointer">
-                        <Image
+                        <img
                             src={
                                 account.avatar_url ??
                                 `https://ui-avatars.com/api/?name=${account.username}&background=00bba7`

@@ -34,8 +34,7 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
   
   const handleOnLike = async( e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    // const result = await likePost(post.id);
-
+    await likePost(post.id);
   };
   
   return (
