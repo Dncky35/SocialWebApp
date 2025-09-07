@@ -15,7 +15,7 @@ interface CommentCreatorProps {
 
 
 const CommentCreator:React.FC<CommentCreatorProps> = ({postID, commentID = ""}:CommentCreatorProps) => {
-    const { addComment, error, isLoading } = usePostContext();
+    const { addComment, isLoading } = usePostContext();
     const [commentForm, setCommentForm] = useState<CommentRequest>({
         content: "",
         parent_comment_id: commentID,

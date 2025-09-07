@@ -21,7 +21,8 @@ const FeedPage:React.FC = () => {
             setFeedValue(storedFeedValue);
         }
         setHydrated(true); // ✅ mark hydration done
-    }, []);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [setFeedValue]);
 
     useEffect(() => {
         if(!hydrated)
@@ -34,7 +35,7 @@ const FeedPage:React.FC = () => {
 
             fetchingposts();
         }
-
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [posts, errorPost, hydrated]);
 
     if(isLoadingPost || isLoadingAuth || pageState === "Initializing")

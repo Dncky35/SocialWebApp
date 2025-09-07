@@ -34,7 +34,7 @@ const CommentsPage:React.FC = () => {
 
             fetchComment();
         }
-
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [post, comment, error]);
 
     if(isLoadingAuth || isLoadingPost || pageState === "Initializing")

@@ -22,6 +22,7 @@ const PostPage:React.FC = () => {
 
             fetchPost();
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [post, error]);
 
     if(isLoading || pageState === "Initializing")

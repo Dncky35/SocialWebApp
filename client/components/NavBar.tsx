@@ -2,6 +2,7 @@
 import Link from "next/link";
 import React, { useState } from "react";
 import { useAuth } from "@/context/AuthContext";
+import Image from "next/image";
 
 const NavBar: React.FC = () => {
     const { account, logout} = useAuth();
@@ -26,7 +27,7 @@ const NavBar: React.FC = () => {
                     onClick={() => setDropdownVisible((prev) => !prev)}
                     >
                     <div className="w-12 h-12 rounded-full bg-teal-300 overflow-hidden cursor-pointer">
-                        <img
+                        <Image
                             src={
                                 account.avatar_url ??
                                 `https://ui-avatars.com/api/?name=${account.username}&background=00bba7`

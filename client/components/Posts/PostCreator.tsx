@@ -18,6 +18,7 @@ const PostCreator:React.FC = () => {
         image_url: "",
         tags: [],
     });
+    // @typescript-eslint/no-unused-vars
     const [tag, setTag] = useState("");
     // const [tagSuggestion, setTagSuggestion] = useState<string | null>(null);
 
@@ -36,37 +37,6 @@ const PostCreator:React.FC = () => {
         if(!file)
             return;
     }
-
-    // const handleOnTagChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    //     const value = e.target.value;
-    //     setTag(value);
-
-    //     // Suggest closest tag (simple filter)
-    //     if(value.length > 0){
-    //         const suggestion = tagList.find((tag) => tag.toLowerCase().startsWith(value.toLowerCase()));
-    //         setTagSuggestion(suggestion || null);
-    //     } else {
-    //         setTagSuggestion(null)
-    //     }
-    // };
-
-    // const handleSuggestionClick = () => {
-    //     if(!tagSuggestion)
-    //         return;
-
-    //     if(postForm.tags?.includes(tagSuggestion)){
-    //         setTag("");
-    //         setTagSuggestion(null);
-    //         return;
-    //     }
-
-    //     setPostForm((prev) => ({
-    //         ...prev,
-    //         tags: [...(prev.tags || []), tagSuggestion],
-    //     }));
-    //     setTag("");
-    //     setTagSuggestion(null);
-    // };
 
     const handleOnTagSelected = ( e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
         e.preventDefault();

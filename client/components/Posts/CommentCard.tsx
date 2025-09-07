@@ -40,7 +40,7 @@ const CommentCard:React.FC<CommentProps> = ({ comment }) => {
             };
             getAccount();
         }
-
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [owner, fetchAccountWithId, errorAuth, errorPost]);
 
     const handleOnLike = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {

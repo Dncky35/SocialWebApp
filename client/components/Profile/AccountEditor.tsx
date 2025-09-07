@@ -26,16 +26,15 @@ const AccountEditor: React.FC<Props> = ({ account, setIsEditing }) => {
     const { updateProfile, isLoading, error } = usePostContext();
     const [preview, setPreview] = useState<string | null>(null);
     const [file, setFile] = useState<File | null>(null);
+    const [accountForm, setAccountForm] = useState<AccountEditForm>({
+        username: account?.username || "",
+        full_name: account?.full_name || "",
+        bio: account?.bio || "",
+        avatar_url: account?.avatar_url || "",
+    });
 
     if (!account)
         return null;
-
-    const [accountForm, setAccountForm] = useState<AccountEditForm>({
-        username: account.username,
-        full_name: account.full_name || "",
-        bio: account.bio || "",
-        avatar_url: account.avatar_url || "",
-    });
 
     const handleOnValueChange = (key: string, value: string) => {
         setAccountForm((prev) => {

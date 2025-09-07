@@ -27,14 +27,14 @@ interface PostProps {
 };
 
 const PostCard: React.FC<PostProps> = ({ post }) => {
-  const { likePost, error:errorPost } = usePostContext();
-  const { account, error:errorAuth } = useAuth();
+  const { likePost } = usePostContext();
+  const { account } = useAuth();
   const [ isCommentAdding, setIsCommentAdding ] = useState(false);
   const isOwnPost = account && account.id === post.owner.id;
   
   const handleOnLike = async( e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
-    const result = await likePost(post.id);
+    // const result = await likePost(post.id);
 
   };
   
