@@ -79,9 +79,10 @@ const AccountEditor: React.FC<Props> = ({ account, setIsEditing }) => {
                     <div className="relative">
                         <img
                             src={
-                                preview ??
-                                account.avatar_url ??
+                                preview ? 
+                                preview : account.avatar_url && account.avatar_url.trim() !== "" ? account.avatar_url :
                                 `https://ui-avatars.com/api/?name=${account.username}&background=50C878`
+
                             }
                             alt="Avatar"
                             className="w-28 h-28 rounded-full object-cover shadow-md border border-gray-200"

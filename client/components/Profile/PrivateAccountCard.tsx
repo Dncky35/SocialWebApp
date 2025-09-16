@@ -26,8 +26,8 @@ const PrivateAccountCard: React.FC<Props> = ({ account, setIsEditing }) => {
             <div className="flex flex-col sm:flex-row gap-6">
                 <div className="w-32 h-32 rounded-full bg-teal-300 overflow-hidden">
                     <img
-                        src={
-                            account.avatar_url ??
+                       src={
+                            (account.avatar_url && account.avatar_url.trim() !== "") ? account.avatar_url : 
                             `https://ui-avatars.com/api/?name=${account.username}&background=00bba7`
                         }
                         alt="Avatar"

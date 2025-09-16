@@ -28,7 +28,7 @@ const NavBar: React.FC = () => {
                     <div className="w-12 h-12 rounded-full bg-teal-300 overflow-hidden cursor-pointer">
                         <img
                             src={
-                                account.avatar_url ??
+                                (account.avatar_url && account.avatar_url.trim() !== "") ? account.avatar_url : 
                                 `https://ui-avatars.com/api/?name=${account.username}&background=00bba7`
                             }
                             alt="Avatar"
