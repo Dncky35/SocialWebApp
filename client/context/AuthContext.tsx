@@ -1,19 +1,21 @@
 "use client";
 import React, { useState, createContext, useContext, useCallback, useEffect } from "react";
-import { PrivateAccount, PublicAccount } from "@/schemas/account";
+import { PrivateAccount } from "@/schemas/account";
 import usePost from "@/hooks/usePost";
 import useGet from "@/hooks/useGet";
+import usePatch from "@/hooks/usePatch";
 import { ApiError } from "@/hooks/useFetch";
 import { BASEURL } from "./ContextProvider";
 
 interface AuthState{
     account: PrivateAccount | null;
     isLoading: boolean;
-    setAccount: React.Dispatch<React.SetStateAction<null>>;
+    setAccount: React.Dispatch<React.SetStateAction<PrivateAccount | null>>
     signUp: (email: string, username: string, password: string) => Promise<void>;
     login: (username: string, password: string) => Promise<void>;
     logout: () => Promise<void>;
     fetchWithAuth: (fetchFunc: () => Promise<any>) => Promise<any>;
+    updateProfile: (full_name?: string, bio?: string, avatar_url?: string) => Promise<boolean>;
     error: ApiError | null;
     pageState: PageState;
     setPageState: React.Dispatch<React.SetStateAction<PageState>>;
@@ -27,7 +29,11 @@ const AuthContext = createContext<AuthState | undefined>(undefined);
 export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) => {
     const { isLoading:isLoadingPost, error:errorPost, postData, setError:setErrorPost } = usePost("URLSearchParams");
     const { isLoading:isLoadingGet, error:errorGet, getData, setError:setErrorAuth} = useGet();
-    const [account, setAccount] = useState(null);
+    const { isLoading:isLoadingPatch, error:errorPatch, patchData, setError:setErrorPatch } = usePatch({ bodyFormat: "JSON", headers:{ 
+        "Content-Type": "application/json",
+        credentials:"include",
+    }});
+    const [account, setAccount] = useState<PrivateAccount | null>(null);
     const [pageState, setPageState] = useState<PageState>("Initializing");
 
     useEffect(() => {
@@ -44,6 +50,7 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
     const setNullEachError = () => {
         setErrorPost(null);
         setErrorAuth(null);
+        setErrorPatch(null);
     }
 
     const signUp = useCallback(async (email:string, username:string, password:string) => {
@@ -118,12 +125,41 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             return await fetchFunc();
     };
 
+    const updateProfile = useCallback(async (fullName?:string, bio?:string, avatarUrl?:string) => {
+        const result = await fetchWithAuth(async () => {
+            return await patchData(`${BASEURL}accounts/profile/me`, {
+                fullName,
+                bio,
+                avatarUrl,
+            });
+        });
+
+        if(result){
+            console.log(`result: ${JSON.stringify(result)} `);
+            // TO DO: update current account without fetch data again
+            setAccount(prevAccount => {
+                if (!prevAccount) return null;
+                const updatedAccount = {
+                    ...prevAccount,
+                    full_name: fullName ?? prevAccount.full_name,
+                    bio: bio ?? prevAccount.bio,
+                    avatar_url: avatarUrl ?? prevAccount.avatar_url,
+                };
+                localStorage.setItem("account", JSON.stringify(updatedAccount));
+                return updatedAccount;
+            });
+
+            return true;
+        }
+        return false;
+    }, [patchData, fetchWithAuth]);
+
     return (
         <AuthContext.Provider value={
             {
                 account, 
-                error: errorPost || errorGet, 
-                isLoading: isLoadingPost || isLoadingGet,
+                error: errorPost || errorGet || errorPatch, 
+                isLoading: isLoadingPost || isLoadingGet || isLoadingPatch,
                 pageState,
                 setPageState,
                 setAccount, 
@@ -132,6 +168,7 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
                 logout, 
                 fetchWithAuth,
                 setNullEachError,
+                updateProfile,
             }}>
             {children}
         </AuthContext.Provider>

@@ -1,9 +1,9 @@
 "use client";
 import { PrivateAccount } from '@/schemas/account';
 import React, { useState } from 'react';
-import { usePostContext } from '@/context/PostContext';
 import ErrorDisplay from '@/components/ErrorDisplay';
 import { Upload, X } from "lucide-react";
+import { useAuth } from '@/context/AuthContext';
 
 /* <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
 <div className="rounded-lg shadow-lg p-6 max-w-xl text-center text-2xl font-semibold text-teal-900 flex items-center space-x-4"></div> */
@@ -23,7 +23,7 @@ interface AccountEditForm {
 // shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-teal-500
 
 const AccountEditor: React.FC<Props> = ({ account, setIsEditing }) => {
-    const { updateProfile, isLoading, error } = usePostContext();
+    const { updateProfile, isLoading, error } = useAuth();
     const [preview, setPreview] = useState<string | null>(null);
     const [file, setFile] = useState<File | null>(null);
     const [accountForm, setAccountForm] = useState<AccountEditForm>({

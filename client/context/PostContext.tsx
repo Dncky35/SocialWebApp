@@ -30,7 +30,6 @@ interface PostContext{
     tagValue: string;
     setFeedValue: React.Dispatch<React.SetStateAction<string>>;
     setTagValue: React.Dispatch<React.SetStateAction<string>>;
-    updateProfile: (full_name: string, bio: string, avatar_url: string) => Promise<boolean>;
     setNullEachError: () => void;
 }
 
@@ -49,10 +48,7 @@ const PostContext = React.createContext<PostContext | undefined>(undefined);
 export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) => {
     const { isLoading:isLoadingPost, error:errorPost, postData, setError:setErrorPost } = usePost();
     const { isLoading:isLoadingGet, error:errorGet, getData, setError:setErrorAuth } = useGet();
-    const { isLoading:isLoadingPatch, error:errorPatch, patchData, setError:setErrorPatch } = usePatch({ bodyFormat: "JSON", headers:{ 
-        "Content-Type": "application/json",
-        credentials:"include",
-    }});
+
     const { account, fetchWithAuth, setNullEachError: setNullEachErrorAuth } = useAuth();
     const [posts, setPosts] = useState<Post[] | null>(null);   
     const [feedValue, setFeedValue] = useState<string>(FeedOptions[0]);
@@ -355,27 +351,9 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
 
     }, [getData, fetchWithAuth]);
 
-    const updateProfile = useCallback(async (full_name?:string, bio?:string, avatar_url?:string) => {
-        const result = await fetchWithAuth(async () => {
-            return await patchData(`${BASEURL}accounts/profile/me`, {
-                full_name,
-                bio,
-                avatar_url,
-            });
-        });
-
-        if(result){
-            console.log(`result: ${JSON.stringify(result)} `);
-            // TO DO: update current account without fetch data again
-            return true;
-        }
-        return false;
-    }, [patchData, fetchWithAuth]);
-
     const setNullEachError = () => {
         setErrorPost(null);
         setErrorAuth(null);
-        setErrorPatch(null);
         setNullEachErrorAuth();
     }
 
@@ -395,8 +373,8 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
     return(
         <PostContext.Provider value={{
             posts, 
-            isLoading: isLoadingPost || isLoadingGet || isLoadingPatch, 
-            error: errorPost || errorGet || errorPatch,
+            isLoading: isLoadingPost || isLoadingGet, 
+            error: errorPost || errorGet,
             createPost,
             likePost,
             addComment,
@@ -410,7 +388,6 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             tagValue,
             setFeedValue,
             setTagValue,
-            updateProfile,
             setNullEachError,
             }}>
             {children}
