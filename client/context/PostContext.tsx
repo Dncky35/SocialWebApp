@@ -11,9 +11,9 @@ import { Comment } from "@/components/Posts/CommentCard";
 
 export const FeedOptions = ["Latest", "Following", "Trending"];
 
-export const tagList:string[] = ["", "Sport", "News", "Science", "Technology", "Politics", "Entertainment", "Health", "Travel", "Food", "Lifestyle"];
+export const tagList: string[] = ["", "Sport", "News", "Science", "Technology", "Politics", "Entertainment", "Health", "Travel", "Food", "Lifestyle"];
 
-interface PostContext{
+interface PostContext {
     posts: Post[] | null;
     isLoading: boolean;
     error: ApiError | null;
@@ -22,6 +22,10 @@ interface PostContext{
     addComment: (postId: string, content: string, parent_comment_id?: string | undefined) => Promise<void>;
     likeComment: (commentID: string) => Promise<void>;
     searchPosts: (options: PostSearchOptions) => Promise<void>;
+    editPost: (postID: string, postData: {
+        content: string;
+        image_url?: string;
+    }) => Promise<boolean>
     fetchCommentWithId: (commentID: string) => Promise<any> | null;
     followAccount: (accountID: string) => Promise<boolean>;
     fetchAccountWithId: (account_id: string) => Promise<void>;
@@ -33,30 +37,36 @@ interface PostContext{
     setNullEachError: () => void;
 }
 
-interface LikeType{
+interface LikeType {
     message: string;
     likes_count: number;
     liked: boolean;
 }
 
 interface PostSearchOptions {
-    id?:string;
+    id?: string;
 }
 
 const PostContext = React.createContext<PostContext | undefined>(undefined);
 
-export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) => {
-    const { isLoading:isLoadingPost, error:errorPost, postData, setError:setErrorPost } = usePost();
-    const { isLoading:isLoadingGet, error:errorGet, getData, setError:setErrorAuth } = useGet();
+export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const { isLoading: isLoadingPost, error: errorPost, postData, setError: setErrorPost } = usePost();
+    const { isLoading: isLoadingGet, error: errorGet, getData, setError: setErrorAuth } = useGet();
+    const { isLoading: isLoadingPatch, error: errorPatch, patchData, setError: setErrorPatch } = usePatch({
+        bodyFormat: "JSON", headers: {
+            "Content-Type": "application/json",
+            credentials: "include",
+        }
+    });
 
     const { account, fetchWithAuth, setNullEachError: setNullEachErrorAuth } = useAuth();
-    const [posts, setPosts] = useState<Post[] | null>(null);   
+    const [posts, setPosts] = useState<Post[] | null>(null);
     const [feedValue, setFeedValue] = useState<string>(FeedOptions[0]);
     const [tagValue, setTagValue] = useState<string>(tagList[0]);
 
     const getLocalStoragedPosts = () => {
         const result = localStorage.getItem("posts");
-        if(result){
+        if (result) {
             setPosts(JSON.parse(result));
             return JSON.parse(result) as Post[];
         }
@@ -64,68 +74,68 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             return null;
     };
 
-    const storeFetchedPosts = (posts:Post[]) => {
+    const storeFetchedPosts = (posts: Post[]) => {
         const storedPosts = getLocalStoragedPosts();
-        let newPosts:Post[] = [];
+        let newPosts: Post[] = [];
 
-        if(!storedPosts){
+        if (!storedPosts) {
             setPosts(posts);
             localStorage.setItem("posts", JSON.stringify(posts));
         }
-        else{
+        else {
             newPosts = posts;
             posts.map((post) => {
                 const postExists = storedPosts?.find((p) => p.id === post.id) || null;
-                if(!postExists){
+                if (!postExists) {
                     newPosts.push(post);
                 }
             });
             setPosts(newPosts);
-            localStorage.setItem("posts", JSON.stringify(newPosts));  
+            localStorage.setItem("posts", JSON.stringify(newPosts));
         }
     };
 
     const fetchPosts = useCallback(async () => {
         const result = await fetchWithAuth(async () => {
             return await getData(`${BASEURL}posts?feedValue=${feedValue}&tagValue=${tagValue}`, {
-                credentials:"include",
+                credentials: "include",
             });
         });
 
-        if(result){
+        if (result) {
             localStorage.setItem("lastFetchDate", new Date().toISOString());
             storeFetchedPosts(result);
             return result;
         }
-        else{
+        else {
             return null;
         }
-        
+
     }, [getData, fetchWithAuth]);
 
     const getFeedPageData = useCallback(async () => {
         const lastFetchDate = localStorage.getItem("lastFetchDate");
         // IF 10 minutes passed, fetch again
-        if(!lastFetchDate || new Date().getTime() - new Date(lastFetchDate).getTime() > 10 * 60 * 1000){
+        if (!lastFetchDate || new Date().getTime() - new Date(lastFetchDate).getTime() > 10 * 60 * 1000) {
             await fetchPosts();
             return;
         }
-        
+
         const storedPosts = getLocalStoragedPosts();
-        if(!storedPosts){
+        if (!storedPosts) {
             await fetchPosts();
         }
 
     }, [fetchPosts]);
 
-    const fetchPostWithID = useCallback(async (postID:string) => {
+    const fetchPostWithID = useCallback(async (postID: string) => {
         const result = await fetchWithAuth(async () => {
             return await getData(`${BASEURL}posts/${postID}`, {
-                credentials:"include",
+                credentials: "include",
             });
         });
 
-        if(result){
+        if (result) {
             storeFetchedPosts([result]);
             return result;
         }
@@ -134,43 +144,43 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
 
     }, [getData, fetchWithAuth]);
 
-    const searchPosts = async (options:PostSearchOptions) => {
+    const searchPosts = async (options: PostSearchOptions) => {
         // Check if post stored locally.
-        const storedPosts = getLocalStoragedPosts(); 
-        if(!storedPosts){
-            if(options.id){
+        const storedPosts = getLocalStoragedPosts();
+        if (!storedPosts) {
+            if (options.id) {
                 await fetchPostWithID(options.id);
             }
         }
-        else{
+        else {
         }
     };
-    
-    const fetchCommentWithId = useCallback((commentID:string) => {
+
+    const fetchCommentWithId = useCallback((commentID: string) => {
         const result = fetchWithAuth(async () => {
             return await getData(`${BASEURL}comments/${commentID}`, {
-                credentials:"include",
+                credentials: "include",
             });
         });
 
-        if(result)
+        if (result)
             return result;
         else
             return null;
     }, [getData, fetchWithAuth])
 
     const createPost = useCallback(async (content: string, tags?: string[], image_url?: string,) => {
-        const result:Post = await fetchWithAuth(async ()=> {
+        const result: Post = await fetchWithAuth(async () => {
             return await postData(`${BASEURL}posts`, {
                 content,
                 image_url,
                 tags,
             }, {
-                credentials:"include",
+                credentials: "include",
             });
         });
 
-        if(result){
+        if (result) {
             const postTemp = posts || [];
             // set as first element
 
@@ -179,26 +189,26 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
         }
     }, [postData, fetchWithAuth]);
 
-    const likeComment = useCallback(async(commentID:string) => {
-        const result = await fetchWithAuth(async() => {
+    const likeComment = useCallback(async (commentID: string) => {
+        const result = await fetchWithAuth(async () => {
             return await postData(`${BASEURL}comments/${commentID}/like`, {}, {
-                credentials:"include",
+                credentials: "include",
             });
         });
 
-        if(result){
-            const likeResult:LikeType = result;
+        if (result) {
+            const likeResult: LikeType = result;
 
             setPosts((prevPosts) => {
-                if(!prevPosts) return prevPosts;
+                if (!prevPosts) return prevPosts;
                 return prevPosts.map((post) => {
                     post.comments.forEach((comment) => {
-                        if(comment.id === commentID){
+                        if (comment.id === commentID) {
                             comment.is_liked = likeResult.liked;
                             // Somehow it is increasing the likes count x2
                             // comment.likes = likeResult.liked ? [...comment.likes, comment.author_id] : comment.likes.filter((id) => id !== comment.author_id);
-                            if(likeResult.liked){
-                                if(!comment.likes.includes(comment.author_id))
+                            if (likeResult.liked) {
+                                if (!comment.likes.includes(comment.author_id))
                                     comment.likes.push(comment.author_id);
                             }
                             else
@@ -217,7 +227,7 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
     }, [postData])
 
     const likePost = useCallback(async (postId: string) => {
-        const result = await fetchWithAuth(async() =>
+        const result = await fetchWithAuth(async () =>
             await postData(`${BASEURL}posts/${postId}/like`, {}, {
                 credentials: "include",
             })
@@ -250,13 +260,13 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
     }, [postData, fetchWithAuth]);
 
     const followAccount = useCallback(async (accountID: string) => {
-        const result = await fetchWithAuth(async() => {
+        const result = await fetchWithAuth(async () => {
             return await postData(`${BASEURL}accounts/follow/${accountID}`, {}, {
                 credentials: "include",
             });
         });
 
-        if(result){
+        if (result) {
             // Update the posts state to reflect the new follow status
             setPosts((prevPosts) => {
                 if (!prevPosts) return prevPosts;
@@ -276,47 +286,48 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             });
             return true;
         }
-        else{
+        else {
             return false;
         }
 
     }, [postData, fetchWithAuth])
 
-    const addComment = useCallback(async (content:string, postId?:string, parent_comment_id?:string) => {
-       //  console.log(`content: ${content}, postId: ${postId}, parent_comment_id: ${parent_comment_id}`);
+    const addComment = useCallback(async (content: string, postId?: string, parent_comment_id?: string) => {
+        //  console.log(`content: ${content}, postId: ${postId}, parent_comment_id: ${parent_comment_id}`);
         const isChildComment = parent_comment_id?.trim() !== "";
         // TO DO: check if adding sub comment or main comment to post
-        const URL =  isChildComment ? `${BASEURL}comments/${parent_comment_id}/comment` : `${BASEURL}posts/${postId}/comment`;
+        const URL = isChildComment ? `${BASEURL}comments/${parent_comment_id}/comment` : `${BASEURL}posts/${postId}/comment`;
 
         const result: Comment = await fetchWithAuth(async () => {
             const result = await postData(URL, {
                 content,
                 parent_comment_id,
             }, {
-                credentials:"include",
+                credentials: "include",
             });
 
             return result;
         });
 
-        if(result){
+        if (result) {
             // console.log(JSON.stringify(result));
             setPosts((prevPosts) => {
-                if(!prevPosts) return prevPosts;
+                if (!prevPosts) return prevPosts;
 
                 return prevPosts.map((post) => {
                     if (post.id !== postId) return post;
                     // If it's a child comment, find the parent comment to add the new comment
                     const updatedComments = [...post.comments, result];
-                    if(isChildComment){
+                    if (isChildComment) {
                         const parentComment = updatedComments.find(c => c.id === parent_comment_id);
-                        if(parentComment){
+                        if (parentComment) {
                             const updatedChildComments = [...(parentComment.child_commets || []), result.id];
-                            
-                            return{
+
+                            return {
                                 ...post,
-                                comments: post.comments.map(comment => 
-                                    comment.id === parent_comment_id ? {...comment,
+                                comments: post.comments.map(comment =>
+                                    comment.id === parent_comment_id ? {
+                                        ...comment,
                                         child_commets: updatedChildComments,
                                     } : comment
                                 )
@@ -335,33 +346,65 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
 
     // profile/{account_id}/posts
     // fethcing posts instead of account, the account will get from posts
-    const fetchAccountWithId = useCallback(async (account_id:string) => {
-        const result:Post[] = await fetchWithAuth(async () => {
+    const fetchAccountWithId = useCallback(async (account_id: string) => {
+        const result: Post[] = await fetchWithAuth(async () => {
             // return await getData(`${BASEURL}/accounts/profile/${account_id}`, {
             //     credentials:"include",
             // });
             return await getData(`${BASEURL}/accounts/profile/${account_id}/posts`, {
-                credentials:"include",
+                credentials: "include",
             });
         });
 
-        if(result){
+        if (result) {
             storeFetchedPosts(result);
         }
 
     }, [getData, fetchWithAuth]);
 
+    const editPost = useCallback(async (postID: string, postData: { content: string, image_url?: string }) => {
+        const result = await fetchWithAuth(async () => {
+            return await patchData(`${BASEURL}/posts/${postID}`, { postData });
+        });
+
+        if (result) {
+            let updatedPost = posts?.find((post) => post.id === postID);
+            if (updatedPost) {
+                updatedPost = {
+                    ...updatedPost,
+                    content: postData.content,
+                    image_url: postData.image_url || updatedPost.image_url,
+                };
+
+                setPosts((prev) => {
+                    if (!prev) return prev;
+                    return prev.map((post) => {
+                        if (post.id === postID) {
+                            return updatedPost || post;
+                        }
+                        else
+                            return post;
+                    });
+                });
+            }
+            return true;
+        }
+
+        return false;
+    }, [fetchWithAuth, patchData])
+
     const setNullEachError = () => {
         setErrorPost(null);
         setErrorAuth(null);
+        setErrorPatch(null);
         setNullEachErrorAuth();
     }
 
     useEffect(() => {
-        if(!account)
+        if (!account)
             return;
-        
-        if(!isLoadingGet && !isLoadingPost && !errorGet && !errorPost){
+
+        if (!isLoadingGet && !isLoadingPost && !errorGet && !errorPost) {
             const fetchingPost = async () => {
                 localStorage.removeItem("posts");
                 await fetchPosts();
@@ -370,16 +413,17 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
         }
     }, [feedValue, account]);
 
-    return(
+    return (
         <PostContext.Provider value={{
-            posts, 
-            isLoading: isLoadingPost || isLoadingGet, 
-            error: errorPost || errorGet,
+            posts,
+            isLoading: isLoadingPost || isLoadingGet || isLoadingPatch,
+            error: errorPost || errorGet || errorPatch,
             createPost,
             likePost,
             addComment,
             likeComment,
             searchPosts,
+            editPost,
             fetchCommentWithId,
             followAccount,
             fetchAccountWithId,
@@ -389,7 +433,7 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             setFeedValue,
             setTagValue,
             setNullEachError,
-            }}>
+        }}>
             {children}
         </PostContext.Provider>
     );
@@ -397,7 +441,7 @@ export const PostProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
 
 export const usePostContext = () => {
     const context = useContext(PostContext);
-    if(!context){
+    if (!context) {
         throw new Error("usePostContext must be used within a PostProvider");
     }
 

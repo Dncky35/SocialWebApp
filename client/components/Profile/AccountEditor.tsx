@@ -23,7 +23,7 @@ interface AccountEditForm {
 // shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-teal-500
 
 const AccountEditor: React.FC<Props> = ({ account, setIsEditing }) => {
-    const { updateProfile, isLoading, error } = useAuth();
+    const { updateProfile, error } = useAuth();
     const [preview, setPreview] = useState<string | null>(null);
     const [file, setFile] = useState<File | null>(null);
     const [accountForm, setAccountForm] = useState<AccountEditForm>({
@@ -61,9 +61,7 @@ const AccountEditor: React.FC<Props> = ({ account, setIsEditing }) => {
         e.preventDefault();
         // TO DO: add validation
         const result = await updateProfile(accountForm.full_name, accountForm.bio, accountForm.avatar_url);
-
-        if (result)
-            setIsEditing(false);
+        setIsEditing(!result);
     };
 
     return (
