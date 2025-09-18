@@ -73,7 +73,7 @@ app.include_router(admin_toggle.router)
 
 @app.get("/")
 async def root():
-    return {"message": "Welcome to the Social Web App API which updated with CI/CD pipeline 🚀"}
+    return {"message": "Welcome to the Social Web App API which updated with CI/CD pipeline 🤘"}
 
 @app.middleware("http")
 async def log_request(request:Request, call_next):
