@@ -70,9 +70,10 @@ const AccountEditor: React.FC<Props> = ({ account, setIsEditing }) => {
                 <h1 className="text-2xl font-bold text-center text-white border-b-4 pb-2 border-teal-900 select-none">
                     Edit Your Account
                 </h1>
-
+                <p className='text-center text-teal-300 text-sm'>Upload profile avatar currently unavailable</p>
                 {/* Avatar Upload */}
                 <div className="rounded-xl shadow-xl p-4 bg-white flex flex-col items-center space-y-3">
+                    
                     <label className="font-semibold text-gray-700">Profile Avatar</label>
                     <div className="relative">
                         <img

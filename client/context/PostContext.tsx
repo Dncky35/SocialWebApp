@@ -22,10 +22,10 @@ interface PostContext {
     addComment: (postId: string, content: string, parent_comment_id?: string | undefined) => Promise<void>;
     likeComment: (commentID: string) => Promise<void>;
     searchPosts: (options: PostSearchOptions) => Promise<void>;
-    editPost: (postID: string, postData: {
-        content: string;
-        image_url?: string;
-    }) => Promise<boolean>
+    // editPost: (postID: string, postData: {
+    //     content: string;
+    //     image_url?: string;
+    // }) => Promise<boolean>
     fetchCommentWithId: (commentID: string) => Promise<any> | null;
     followAccount: (accountID: string) => Promise<boolean>;
     fetchAccountWithId: (account_id: string) => Promise<void>;
@@ -362,37 +362,6 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     }, [getData, fetchWithAuth]);
 
-    const editPost = useCallback(async (postID: string, postData: { content: string, image_url?: string }) => {
-        const result = await fetchWithAuth(async () => {
-            return await patchData(`${BASEURL}/posts/${postID}`, { postData });
-        });
-
-        if (result) {
-            let updatedPost = posts?.find((post) => post.id === postID);
-            if (updatedPost) {
-                updatedPost = {
-                    ...updatedPost,
-                    content: postData.content,
-                    image_url: postData.image_url || updatedPost.image_url,
-                };
-
-                setPosts((prev) => {
-                    if (!prev) return prev;
-                    return prev.map((post) => {
-                        if (post.id === postID) {
-                            return updatedPost || post;
-                        }
-                        else
-                            return post;
-                    });
-                });
-            }
-            return true;
-        }
-
-        return false;
-    }, [fetchWithAuth, patchData])
-
     const setNullEachError = () => {
         setErrorPost(null);
         setErrorAuth(null);
@@ -423,7 +392,7 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
             addComment,
             likeComment,
             searchPosts,
-            editPost,
+            // editPost,
             fetchCommentWithId,
             followAccount,
             fetchAccountWithId,

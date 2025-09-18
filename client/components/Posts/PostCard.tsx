@@ -6,7 +6,7 @@ import { Comment } from './CommentCard';
 import { usePostContext } from '@/context/PostContext';
 import { useAuth } from '@/context/AuthContext';
 import CommentCreator from './CommentCreator';
-import { MessageSquarePlus, Heart } from "lucide-react";
+import { MessageSquarePlus, Heart} from "lucide-react";
 
 export interface Post {
   id: string;
@@ -27,7 +27,7 @@ interface PostProps {
 };
 
 const PostCard: React.FC<PostProps> = ({ post }) => {
-  const { likePost, editPost } = usePostContext();
+  const { likePost } = usePostContext();
   const { account } = useAuth();
   const [isCommentAdding, setIsCommentAdding] = useState(false);
   const isOwnPost = account && account.id === post.owner.id;
@@ -40,15 +40,15 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
     await likePost(post.id);
   };
 
-  const handleOnSaveEdit = async(e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-    e.preventDefault();
-    const postForm = {
-      content: postContent,
-      image_url: post.image_url || undefined,
-    };
-    const result = await editPost(post.id, postForm);
-    setIsEditing(!result);
-  };
+  // const handleOnSaveEdit = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  //   e.preventDefault();
+  //   const postForm = {
+  //     content: postContent,
+  //     image_url: post.image_url || undefined,
+  //   };
+  //   const result = await editPost(post.id, postForm);
+  //   setIsEditing(!result);
+  // };
 
   return (
     <div className={`${isOwnPost ? "bg-gradient-to-br from-teal-600 to-teal-800" : "bg-gradient-to-br from-teal-700 to-teal-900"} rounded shadow-xl px-4 py-2 hover:scale-[1.01] transform transition duration-300 w-full`}>
@@ -61,25 +61,19 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
             {isEditing ? "Cancel" : "Edit"}
           </button>
         )}
+
       </div>
-      {isEditing ? (
-        <div>
-          <textarea 
-          className='w-full h-32 p-4 rounded-lg bg-teal-50 text-teal-950 shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-teal-500'
-          value={postContent}
-          onChange={(e) => setPostContent(e.target.value)}
-          />
-          <button 
-          onClick={(e) => handleOnSaveEdit(e)}
-          className='w-full bg-teal-600 hover:bg-teal-500 cursor-pointer text-white font-semibold py-2 rounded transition duration-200'>
-            Save
-          </button>
-        </div>
-      ) : (
+      <div className='flex flex-col'>
         <Link href={`/posts/${post.id}`} className='text-xl font-semibold whitespace-pre-wrap break-words mb-2'>
           {post.content}
         </Link>
-      )}
+        {isEditing && (
+          <div>
+            <p className='text-sm text-teal-300'>Delete button will be here soon</p>
+          </div>
+        )}
+
+      </div>
       <div className='flex gap-x-2 border-b border-teal-700 py-1 mb-1'>
         {post.tags.map((tag, index) => (
           <div key={index} className="text-sm cursor-pointer hover:underline">
@@ -106,7 +100,12 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
             </button>
           </div>
         </div>
-        <div>
+        <div className='flex items-center justify-between gap-x-4'>
+          {/* {post.updated_at && post.created_at !== post.updated_at && (
+            <div>
+              <p className='text-xs font-semibold text-teal-300'>Edited</p>
+            </div>
+          )} */}
           <p className='text-sm text-teal-300'>Posted on: {new Date(post.created_at).toLocaleDateString()}</p>
         </div>
       </div>
