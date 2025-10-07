@@ -46,7 +46,7 @@ const CommentCreator:React.FC<CommentCreatorProps> = ({postID, commentID = ""}:C
             </label>
             <textarea  id="post"
                 name="post"
-                className="w-full h-32 p-4 rounded-lg bg-teal-50 text-teal-950 shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-teal-500"
+                className="w-full h-32 p-4 rounded-lg bg-slate-50 text-slate-950 shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-slate-500"
                 placeholder="What's on your mind?"
                 maxLength={500}
                 value={commentForm.content}
@@ -54,7 +54,7 @@ const CommentCreator:React.FC<CommentCreatorProps> = ({postID, commentID = ""}:C
             />
             <button
             onClick={(e) => handleOnPublish(e)} 
-            className="w-full bg-teal-600 hover:bg-teal-700 cursor-pointer text-white font-semibold py-2 rounded transition duration-200">
+            className="w-full bg-slate-600 hover:bg-slate-700 cursor-pointer text-white font-semibold py-2 rounded transition duration-200">
                 Share
             </button>
         </div>

@@ -54,33 +54,33 @@ const FeedPage:React.FC = () => {
     };
 
     return (
-        <div className="flex-grow flex flex-col gap-y-4 p-4 w-full max-w-2xl mx-auto rounded-xl shadow-xl bg-teal-800/50 backdrop-blur-sm mt-2 mb-2">
+        <div className="flex-grow flex flex-col gap-y-4 p-4 w-full max-w-2xl mx-auto rounded-xl shadow-xl bg-slate-800/50 backdrop-blur-sm mt-2 mb-2">
             {errorPost && (
                 <ErrorDisplay error={errorAuth || errorPost || undefined} />
             )}
-            <div className="bg-gradient-to-b from-teal-600 to-teal-700 grid grid-cols-4 gap-4 p-2 rounded-xl shadow-inner">
-                    <div className="pb-2 px-2 bg-teal-800 rounded-xl">
-                        <label className="text-teal-300 text-sm font-semibold italic">Feed:</label>
+            <div className="bg-gradient-to-b from-slate-600 to-slate-700 grid grid-cols-4 gap-4 p-2 rounded-xl shadow-inner">
+                    <div className="pb-2 px-2 bg-slate-800 rounded-xl">
+                        <label className="text-slate-300 text-sm font-semibold italic">Feed:</label>
                         <select
                         value={feedValue} 
                         onChange={(e) => handleOnValueChange("Feed", e.target.value)}
-                        className="bg-teal-100 rounded p-2 w-full shadow-inner text-teal-950">
+                        className="bg-slate-100 rounded p-2 w-full shadow-inner text-slate-950">
                             {FeedOptions.map((option, index) => (
                                 <option key={index}>{option}</option>
                             ))}
                         </select>
                     </div>
-                    <div className="col-span-2 flex items-center gap-x-2 bg-teal-800 rounded-xl py-2 px-2 shadow-inner">
-                        <input className="w-full text-teal-950 bg-teal-100 rounded py-2 px-4 shadow-inner " type="text" placeholder="Search" />
+                    <div className="col-span-2 flex items-center gap-x-2 bg-slate-800 rounded-xl py-2 px-2 shadow-inner">
+                        <input className="w-full text-slate-950 bg-slate-100 rounded py-2 px-4 shadow-inner " type="text" placeholder="Search" />
                         <button className="cursor-pointer rounded-full bg-gradient-to-b 
-                        from-teal-500 to-teal-600 p-2 shadow-inner text-white hover:opacity-80 hover:shadow-none hover:scale-105"><Search /></button>
+                        from-slate-500 to-slate-600 p-2 shadow-inner text-white hover:opacity-80 hover:shadow-none hover:scale-105"><Search /></button>
                     </div>
-                    <div className="pb-2 px-2 bg-teal-800 rounded-xl">
-                        <label className="text-teal-300 text-sm font-semibold italic">Tag:</label>
+                    <div className="pb-2 px-2 bg-slate-800 rounded-xl">
+                        <label className="text-slate-300 text-sm font-semibold italic">Tag:</label>
                         <select 
                         value={tagValue} 
                         onChange={(e) => handleOnValueChange("Tags", e.target.value)}
-                        className="bg-teal-100 rounded p-2 w-full shadow-inner text-teal-950">
+                        className="bg-slate-100 rounded p-2 w-full shadow-inner text-slate-950">
                             {tagList.map((tag, index) => {
                                 if(tag === "")
                                     return (<option key={index} value="">Select Tag</option>);

@@ -8,6 +8,7 @@ import PrivateAccountCard from "@/components/Profile/PrivateAccountCard";
 import CommentCard, { Comment } from "@/components/Posts/CommentCard";
 import AccountEditor from "@/components/Profile/AccountEditor";
 import ErrorDisplay from "@/components/ErrorDisplay";
+import { motion } from "motion/react";
 
 type Options = "Shared" |"Comments" | "Liked";
 const options:Options[] = ["Shared", "Liked", "Comments"];
@@ -33,7 +34,7 @@ const ProfilePage:React.FC = () => {
     return (
         <div className="flex-grow w-full">
             {isEditing && <AccountEditor account={account} setIsEditing={setIsEditing} />}
-            <div className="flex-grow flex flex-col gap-y-4 p-4 w-full max-w-2xl mx-auto rounded-xl shadow-xl bg-teal-800/20 backdrop-blur-sm my-2">
+            <div className="flex-grow flex flex-col gap-y-4 p-4 w-full max-w-2xl mx-auto rounded-xl shadow-xl bg-slate-800/20 backdrop-blur-sm my-2">
                 {errorPost && (
                     <ErrorDisplay error={errorPost || undefined} />
                 )}
@@ -41,12 +42,12 @@ const ProfilePage:React.FC = () => {
                 <div className="space-y-4">
                     <div className="grid grid-cols-3 p-2 space-x-4">
                         {options.map((option, index) => (
-                            <button key={index} 
+                            <motion.button key={index} 
                             onClick={() => setSelectedOption(option)}
-                            className={`${ selectedOption !== option ? "bg-gradient-to-b from-teal-600 to-teal-900" : "bg-gradient-to-b from-teal-900 to-teal-600" } cursor-pointer py-2
+                            className={`bg-gradient-to-b ${ selectedOption !== option ? "" : "border-b-4 border-blue-500" } cursor-pointer py-2
                             rounded hover:scale-[1.1] transform transition duration-300 text-white text-lg`}>
                                 {option}
-                            </button>
+                            </motion.button>
                         ))}
                     </div>
                     {selectedOption === "Shared" && userPosts?.map((post, index) => (

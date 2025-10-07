@@ -6,7 +6,7 @@ import { Upload, X } from "lucide-react";
 import { useAuth } from '@/context/AuthContext';
 
 /* <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
-<div className="rounded-lg shadow-lg p-6 max-w-xl text-center text-2xl font-semibold text-teal-900 flex items-center space-x-4"></div> */
+<div className="rounded-lg shadow-lg p-6 max-w-xl text-center text-2xl font-semibold text-slate-900 flex items-center space-x-4"></div> */
 
 interface Props {
     account: PrivateAccount;
@@ -20,7 +20,7 @@ interface AccountEditForm {
     avatar_url: string;
 }
 
-// shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-teal-500
+// shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-slate-500
 
 const AccountEditor: React.FC<Props> = ({ account, setIsEditing }) => {
     const { updateProfile, error } = useAuth();
@@ -66,11 +66,11 @@ const AccountEditor: React.FC<Props> = ({ account, setIsEditing }) => {
 
     return (
         <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50 w-full p-4">
-            <div className="rounded-xl shadow-2xl bg-gradient-to-t from-teal-500 to-teal-700 text-teal-950 max-w-2xl w-full mx-auto flex flex-col space-y-4 p-6">
-                <h1 className="text-2xl font-bold text-center text-white border-b-4 pb-2 border-teal-900 select-none">
+            <div className="rounded-xl shadow-2xl bg-gradient-to-t from-slate-500 to-slate-700 text-slate-950 max-w-2xl w-full mx-auto flex flex-col space-y-4 p-6">
+                <h1 className="text-2xl font-bold text-center text-white border-b-4 pb-2 border-slate-900 select-none">
                     Edit Your Account
                 </h1>
-                <p className='text-center text-teal-300 text-sm'>Upload profile avatar currently unavailable</p>
+                <p className='text-center text-slate-300 text-sm'>Upload profile avatar currently unavailable</p>
                 {/* Avatar Upload */}
                 <div className="rounded-xl shadow-xl p-4 bg-white flex flex-col items-center space-y-3">
                     
@@ -121,7 +121,7 @@ const AccountEditor: React.FC<Props> = ({ account, setIsEditing }) => {
                             <button
                                 // onClick={uploadToServer}
                                 // disabled={loading}
-                                className="rounded-lg bg-teal-500 px-4 py-2 text-white shadow hover:bg-teal-600 disabled:opacity-50"
+                                className="rounded-lg bg-slate-500 px-4 py-2 text-white shadow hover:bg-slate-600 disabled:opacity-50"
                             >
                                 {"Upload"}
                             </button>
@@ -134,7 +134,7 @@ const AccountEditor: React.FC<Props> = ({ account, setIsEditing }) => {
                     <label className="font-semibold text-gray-700 block mb-1">Full Name</label>
                     <input
                         type="text"
-                        className="block w-full px-4 py-2 bg-teal-50 rounded shadow-inner focus:outline-none focus:ring-2 focus:ring-teal-500 hover:scale-[1.01] transition-all duration-300"
+                        className="block w-full px-4 py-2 bg-slate-50 rounded shadow-inner focus:outline-none focus:ring-2 focus:ring-slate-500 hover:scale-[1.01] transition-all duration-300"
                         value={accountForm.full_name}
                         onChange={(e) => handleOnValueChange("full_name", e.target.value)}
                     />
@@ -147,7 +147,7 @@ const AccountEditor: React.FC<Props> = ({ account, setIsEditing }) => {
                     </label>
                     <textarea
                         maxLength={500}
-                        className="block w-full h-32 px-4 py-2 bg-teal-50 rounded shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-teal-500 hover:scale-[1.01] transition-all duration-300"
+                        className="block w-full h-32 px-4 py-2 bg-slate-50 rounded shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-slate-500 hover:scale-[1.01] transition-all duration-300"
                         value={accountForm.bio}
                         onChange={(e) => handleOnValueChange("bio", e.target.value)}
                     />

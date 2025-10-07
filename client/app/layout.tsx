@@ -12,7 +12,7 @@ export const metadata: Metadata = {
 export default function RootLayout({children,}: Readonly<{ children: React.ReactNode; }>) {
   return (
     <html lang="en">
-      <body className="bg-gradient-to-br from-teal-700 to-teal-900 text-white min-h-screen " >
+      <body className="bg-gradient-to-br from-slate-700 to-slate-900 text-white min-h-screen " >
         <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/food.png')] opacity-25"></div>
         <div className="relative z-10 flex flex-col min-h-screen">
             <AppProviders>

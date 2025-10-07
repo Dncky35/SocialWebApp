@@ -13,9 +13,9 @@ const NavBar: React.FC = () => {
     }
 
     return (
-        <nav className="z-50 fixed w-full top-0 bg-teal-950/50 py-2 px-8 flex items-center justify-between backdrop-blur-sm">
+        <nav className="z-50 fixed w-full top-0 bg-slate-950/50 py-2 px-8 flex items-center justify-between backdrop-blur-sm">
             <div></div>
-            <div className="bg-gradient-to-b from-teal-800 to-teal-700 cursor-pointer rounded flex items-center justify-center rounded-full 
+            <div className="bg-gradient-to-b from-slate-800 to-slate-700 cursor-pointer rounded flex items-center justify-center rounded-full 
             text-2xl w-12 h-12 hover:bg-gradient-to-t hover:text-white hover:scale-[1.01] transition duration-300">
                 <Link href={"/"}>🐤</Link>
             </div>
@@ -25,11 +25,11 @@ const NavBar: React.FC = () => {
                     className="relative"
                     onClick={() => setDropdownVisible((prev) => !prev)}
                     >
-                    <div className="w-12 h-12 rounded-full bg-teal-300 overflow-hidden cursor-pointer">
+                    <div className="w-12 h-12 rounded-full bg-slate-300 overflow-hidden cursor-pointer">
                         <img
                             src={
                                 (account.avatar_url && account.avatar_url.trim() !== "") ? account.avatar_url : 
-                                `https://ui-avatars.com/api/?name=${account.username}&background=00bba7`
+                                `https://ui-avatars.com/api/?name=${account.username}&background=cad5e2`
                             }
                             alt="Avatar"
                             className="w-full h-full object-cover"
@@ -41,13 +41,13 @@ const NavBar: React.FC = () => {
                         <div className="absolute right-0 mt-1 w-40 bg-white rounded shadow-lg z-50">
                             <Link
                                 href="/profile/me"
-                                className="block px-4 py-2 text-gray-800 hover:bg-teal-100"
+                                className="block px-4 py-2 text-gray-800 hover:bg-slate-100"
                             >
                                 Profile
                             </Link>
                             <button
                                 onClick={handleOnLogout}
-                                className="w-full text-left px-4 py-2 text-gray-800 hover:bg-teal-100"
+                                className="w-full text-left px-4 py-2 text-gray-800 hover:bg-slate-100"
                             >
                                 Logout
                             </button>

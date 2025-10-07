@@ -32,28 +32,16 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
   const [isCommentAdding, setIsCommentAdding] = useState(false);
   const isOwnPost = account && account.id === post.owner.id;
   const [isEditing, setIsEditing] = useState(false);
-  const [postContent, setPostContent] = useState<string>(post.content);
-
 
   const handleOnLike = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     e.preventDefault();
     await likePost(post.id);
   };
 
-  // const handleOnSaveEdit = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-  //   e.preventDefault();
-  //   const postForm = {
-  //     content: postContent,
-  //     image_url: post.image_url || undefined,
-  //   };
-  //   const result = await editPost(post.id, postForm);
-  //   setIsEditing(!result);
-  // };
-
   return (
-    <div className={`${isOwnPost ? "bg-gradient-to-br from-teal-600 to-teal-800" : "bg-gradient-to-br from-teal-700 to-teal-900"} rounded shadow-xl px-4 py-2 hover:scale-[1.01] transform transition duration-300 w-full`}>
-      <div className='border-b border-teal-700 py-1 mb-1 flex justify-between items-center'>
-        <Link href={`/profile/${post.owner.id}`} className='font-semibold text-lg text-teal-300 cursor-pointer hover:underline'>{post.owner.username}</Link>
+    <div className={`${isOwnPost ? "bg-gradient-to-br from-slate-600 to-slate-800" : "bg-gradient-to-br from-slate-700 to-slate-900"} rounded shadow-xl px-4 py-2 hover:scale-[1.01] transform transition duration-300 w-full`}>
+      <div className='border-b border-slate-700 py-1 mb-1 flex justify-between items-center'>
+        <Link href={`/profile/${post.owner.id}`} className='font-semibold text-lg text-slate-300 cursor-pointer hover:underline'>{post.owner.username}</Link>
         {isOwnPost && (
           <button
             onClick={() => setIsEditing((prev) => !prev)}
@@ -69,12 +57,12 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
         </Link>
         {isEditing && (
           <div>
-            <p className='text-sm text-teal-300'>Delete button will be here soon</p>
+            <p className='text-sm text-slate-300'>Delete button will be here soon</p>
           </div>
         )}
 
       </div>
-      <div className='flex gap-x-2 border-b border-teal-700 py-1 mb-1'>
+      <div className='flex gap-x-2 border-b border-slate-700 py-1 mb-1'>
         {post.tags.map((tag, index) => (
           <div key={index} className="text-sm cursor-pointer hover:underline">
             #{tag}
@@ -83,16 +71,16 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
       </div>
       <div className='flex items-center justify-between px-2'>
         <div className='flex space-x-4 items-center'>
-          <div className='flex items-center gap-x-2 bg-teal-900 rounded-xl px-2 py-1'>
-            <p className='text-sm text-teal-300 cursor-default'>{post.likes.length}</p>
+          <div className='flex items-center gap-x-2 bg-slate-900 rounded-xl px-2 py-1'>
+            <p className='text-sm text-slate-300 cursor-default'>{post.likes.length}</p>
             <button
               onClick={(e) => handleOnLike(e)}
               className='hover:scale-[1.1] cursor-pointer transition duration-300 transform'>
               {post.is_liked ? <Heart color={"red"} /> : <Heart />}
             </button>
           </div>
-          <div className='flex items-center gap-x-2 bg-teal-900 rounded-xl px-2 py-1'>
-            <p className='text-sm text-teal-300 cursor-default'>{post.comments.length}</p>
+          <div className='flex items-center gap-x-2 bg-slate-900 rounded-xl px-2 py-1'>
+            <p className='text-sm text-slate-300 cursor-default'>{post.comments.length}</p>
             <button
               onClick={() => setIsCommentAdding((prev) => !prev)}
               className='hover:scale-[1.1] cursor-pointer transition duration-300 transform'>
@@ -103,13 +91,13 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
         <div className='flex items-center justify-between gap-x-4'>
           {/* {post.updated_at && post.created_at !== post.updated_at && (
             <div>
-              <p className='text-xs font-semibold text-teal-300'>Edited</p>
+              <p className='text-xs font-semibold text-slate-300'>Edited</p>
             </div>
           )} */}
-          <p className='text-sm text-teal-300'>Posted on: {new Date(post.created_at).toLocaleDateString()}</p>
+          <p className='text-sm text-slate-300'>Posted on: {new Date(post.created_at).toLocaleDateString()}</p>
         </div>
       </div>
-      <div className='mt-2 py-2 px-4 border-t border-teal-700'>
+      <div className='mt-2 py-2 px-4 border-t border-slate-700'>
         {isCommentAdding && (
           <CommentCreator postID={post.id} />
         )}
