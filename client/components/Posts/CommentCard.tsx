@@ -89,7 +89,7 @@ const CommentCard: React.FC<CommentProps> = ({ comment }) => {
       </Link>
 
       {/* Likes & Replies */}
-      <div className="flex items-center justify-between border-t border-slate-700 py-2">
+      <div className="flex items-center justify-between py-2">
         <div className="flex items-center gap-x-4">
           <div className="flex items-center gap-x-2 bg-slate-900/70 rounded-xl px-2 py-1 shadow-inner">
             <p className="text-sm text-gray-300 cursor-default">{comment.likes?.length || 0}</p>
