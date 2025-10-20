@@ -40,15 +40,33 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
     await likePost(post.id);
   };
 
+  const handleOnDeleteClicked = async () => {
+    // TO DO: show warning message to inform user that the post about to deleting.
+
+  };
+
   return (
     <div
       className={`rounded-2xl shadow-xl px-4 py-3 w-full transform transition duration-300 hover:scale-[1.02] 
-      ${
-        isOwnPost
+      ${isOwnPost
           ? "bg-gradient-to-br from-sky-600 to-violet-800"
           : "bg-gradient-to-br from-sky-700 to-violet-900"
-      }`}
+        }`}
     >
+      {isEditing && (
+        <div className="w-full grid grid-cols-2 gap-4">
+          <button
+            onClick={handleOnDeleteClicked}
+            className="bg-rose-600 py-2 rounded-xl font-bold cursor-pointer hover:bg-rose-400 transition duration-300 hover:scale-101">
+            Delete
+          </button>
+          <button
+            onClick={(e) => setIsEditing(false)}
+            className="bg-green-600 py-2 rounded-xl font-bold cursor-pointer hover:bg-green-400 transition duration-300 hover:scale-101">
+            Cancel
+          </button>
+        </div>
+      )}
       {/* Header */}
       <div className="border-b border-slate-700 py-1 mb-2 flex justify-between items-center">
         <Link
@@ -57,13 +75,15 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
         >
           {post.owner.username}
         </Link>
-        {isOwnPost && (
-          <button
-            onClick={() => setIsEditing((prev) => !prev)}
-            className="cursor-pointer hover:underline text-gray-200"
-          >
-            {isEditing ? "Cancel" : "Edit"}
-          </button>
+        {isOwnPost && !isEditing && (
+          <div className="flex items-center justify-center space-x-4">
+            <button
+              onClick={() => setIsEditing(true)}
+              className="cursor-pointer hover:underline text-gray-200"
+            >
+              Edit
+            </button>
+          </div>
         )}
       </div>
 

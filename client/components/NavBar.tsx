@@ -29,8 +29,6 @@ const NavBar: React.FC = () => {
 
   return (
     <nav className="fixed top-0 w-full z-50 flex items-center justify-between px-8 py-2 bg-slate-950/50 backdrop-blur-sm">
-      <div></div>
-      
       {/* Logo */}
       <Link
         href="/"
@@ -63,6 +61,7 @@ const NavBar: React.FC = () => {
               <Link
                 href="/profile/me"
                 className="block px-4 py-2 text-gray-800 hover:bg-slate-100 transition"
+                onClick={(e) => setDropdownVisible(false)}
               >
                 Profile
               </Link>
