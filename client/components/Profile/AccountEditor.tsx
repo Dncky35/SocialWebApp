@@ -1,181 +1,154 @@
 "use client";
-import { PrivateAccount } from '@/schemas/account';
-import React, { useState } from 'react';
-import ErrorDisplay from '@/components/ErrorDisplay';
+import React, { useState } from "react";
+import { PrivateAccount } from "@/schemas/account";
+import { useAuth } from "@/context/AuthContext";
+import ErrorDisplay from "@/components/ErrorDisplay";
 import { Upload, X } from "lucide-react";
-import { useAuth } from '@/context/AuthContext';
-
-/* <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50">
-<div className="rounded-lg shadow-lg p-6 max-w-xl text-center text-2xl font-semibold text-slate-900 flex items-center space-x-4"></div> */
 
 interface Props {
-    account: PrivateAccount;
-    setIsEditing: React.Dispatch<React.SetStateAction<boolean>>
+  account: PrivateAccount;
+  setIsEditing: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 interface AccountEditForm {
-    username: string;
-    full_name: string;
-    bio: string;
-    avatar_url: string;
+  username: string;
+  full_name: string;
+  bio: string;
+  avatar_url: string;
 }
 
-// shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-slate-500
-
 const AccountEditor: React.FC<Props> = ({ account, setIsEditing }) => {
-    const { updateProfile, error } = useAuth();
-    const [preview, setPreview] = useState<string | null>(null);
-    const [file, setFile] = useState<File | null>(null);
-    const [accountForm, setAccountForm] = useState<AccountEditForm>({
-        username: account?.username || "",
-        full_name: account?.full_name || "",
-        bio: account?.bio || "",
-        avatar_url: account?.avatar_url || "",
-    });
+  const { updateProfile, error } = useAuth();
 
-    if (!account)
-        return null;
+  const [preview, setPreview] = useState<string | null>(null);
+  const [file, setFile] = useState<File | null>(null);
+  const [accountForm, setAccountForm] = useState<AccountEditForm>({
+    username: account.username || "",
+    full_name: account.full_name || "",
+    bio: account.bio || "",
+    avatar_url: account.avatar_url || "",
+  });
 
-    const handleOnValueChange = (key: string, value: string) => {
-        setAccountForm((prev) => {
-            return {
-                ...prev,
-                [key]: value,
-            };
-        });
-    };
+  if (!account) return null;
 
-    const onImageSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
-        e.preventDefault();
-        const selectedFile = e.target.files?.[0];
-        if (selectedFile) {
-            setFile(selectedFile);
+  const handleOnValueChange = (key: string, value: string) =>
+    setAccountForm((prev) => ({ ...prev, [key]: value }));
 
-            const reader = new FileReader();
-            reader.onloadend = () => setPreview(reader.result as string);
-            reader.readAsDataURL(selectedFile);
-        }
-    };
+  const onImageSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = e.target.files?.[0];
+    if (!selectedFile) return;
+    setFile(selectedFile);
 
-    const onSaveChanges = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
-        e.preventDefault();
-        // TO DO: add validation
-        const result = await updateProfile(accountForm.full_name, accountForm.bio, accountForm.avatar_url);
-        setIsEditing(!result);
-    };
+    const reader = new FileReader();
+    reader.onloadend = () => setPreview(reader.result as string);
+    reader.readAsDataURL(selectedFile);
+  };
 
-    return (
-        <div className="fixed inset-0 flex justify-center items-center bg-black/50 z-50 w-full p-4">
-            <div className="rounded-xl shadow-2xl bg-gradient-to-t from-slate-500 to-slate-700 text-slate-950 max-w-2xl w-full mx-auto flex flex-col space-y-4 p-6">
-                <h1 className="text-2xl font-bold text-center text-white border-b-4 pb-2 border-slate-900 select-none">
-                    Edit Your Account
-                </h1>
-                <p className='text-center text-slate-300 text-sm'>Upload profile avatar currently unavailable</p>
-                {/* Avatar Upload */}
-                <div className="rounded-xl shadow-xl p-4 bg-white flex flex-col items-center space-y-3">
-                    
-                    <label className="font-semibold text-gray-700">Profile Avatar</label>
-                    <div className="relative">
-                        <img
-                            src={
-                                preview ? 
-                                preview : account.avatar_url && account.avatar_url.trim() !== "" ? account.avatar_url :
-                                `https://ui-avatars.com/api/?name=${account.username}&background=00bcff`
+  const onSaveChanges = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    e.preventDefault();
+    const result = await updateProfile(accountForm.full_name, accountForm.bio, accountForm.avatar_url);
+    setIsEditing(!result);
+  };
 
-                            }
-                            alt="Avatar"
-                            className="w-28 h-28 rounded-full object-cover shadow-md border border-gray-200"
-                        />
-                        {preview && file && (
-                            <button
-                                onClick={() => {
-                                    setPreview(null);
-                                    setFile(null);
-                                }}
-                                className="absolute top-1 right-1 bg-red-500 text-white p-1 rounded-full shadow hover:bg-red-600"
-                            >
-                                <X className="w-4 h-4" />
-                            </button>
-                        )}
-                    </div>
+  return (
+    <div className="fixed inset-0 z-50 flex justify-center items-center bg-black/50 p-4">
+      <div className="w-full max-w-2xl bg-gradient-to-t from-slate-700 to-slate-900 rounded-2xl shadow-2xl p-6 flex flex-col space-y-6">
+        <h1 className="text-center text-2xl font-bold text-white border-b border-slate-800 pb-2 select-none">
+          Edit Your Account
+        </h1>
 
-                    {/* Hidden input */}
-                    <input
-                        type="file"
-                        accept="image/*"
-                        id="fileInput"
-                        className="hidden"
-                        onChange={onImageSelected}
-                    />
+        {/* Avatar */}
+        <div className="flex flex-col items-center bg-slate-800 rounded-xl p-4 space-y-3">
+          <label className="font-semibold text-slate-200">Profile Avatar</label>
+          <div className="relative">
+            <img
+              src={
+                preview
+                  ? preview
+                  : account.avatar_url?.trim()
+                  ? account.avatar_url
+                  : `https://ui-avatars.com/api/?name=${account.username}&background=00bcff&color=fff`
+              }
+              alt="Avatar"
+              className="w-28 h-28 rounded-full object-cover border border-slate-600 shadow-md"
+            />
+            {preview && file && (
+              <button
+                onClick={() => {
+                  setPreview(null);
+                  setFile(null);
+                }}
+                className="absolute top-0 right-0 bg-red-500 text-white p-1 rounded-full hover:bg-red-600"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            )}
+          </div>
 
-                    {/* Buttons */}
-                    <div className="flex space-x-2">
-                        <label
-                            htmlFor="fileInput"
-                            className="flex cursor-pointer items-center space-x-2 rounded-lg border border-dashed border-gray-400 px-4 py-2 text-gray-600 hover:bg-gray-100 transition"
-                        >
-                            <Upload className="h-4 w-4" />
-                            <span>Choose</span>
-                        </label>
-                        {file && (
-                            <button
-                                // onClick={uploadToServer}
-                                // disabled={loading}
-                                className="rounded-lg bg-slate-500 px-4 py-2 text-white shadow hover:bg-slate-600 disabled:opacity-50"
-                            >
-                                {"Upload"}
-                            </button>
-                        )}
-                    </div>
-                </div>
-
-                {/* Full Name */}
-                <div className="rounded-xl shadow-xl p-2 bg-white">
-                    <label className="font-semibold text-gray-700 block mb-1">Full Name</label>
-                    <input
-                        type="text"
-                        className="block w-full px-4 py-2 bg-slate-50 rounded shadow-inner focus:outline-none focus:ring-2 focus:ring-slate-500 hover:scale-[1.01] transition-all duration-300"
-                        value={accountForm.full_name}
-                        onChange={(e) => handleOnValueChange("full_name", e.target.value)}
-                    />
-                </div>
-
-                {/* Biography */}
-                <div className="rounded-xl shadow-xl p-2 bg-white">
-                    <label className="font-semibold text-gray-700 block mb-1">
-                        Biography <span className="italic text-sm">(max 500 characters)</span>
-                    </label>
-                    <textarea
-                        maxLength={500}
-                        className="block w-full h-32 px-4 py-2 bg-slate-50 rounded shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-slate-500 hover:scale-[1.01] transition-all duration-300"
-                        value={accountForm.bio}
-                        onChange={(e) => handleOnValueChange("bio", e.target.value)}
-                    />
-                </div>
-
-                {/* Error */}
-                {error && <ErrorDisplay error={error} />}
-
-                {/* Action Buttons */}
-                <div className="grid grid-cols-2 gap-4 py-4">
-                    <button
-                        type="button"
-                        onClick={() => setIsEditing(false)}
-                        className="cursor-pointer bg-gradient-to-b from-rose-500 to-rose-600 rounded py-2 text-white font-semibold hover:scale-[1.01] hover:-translate-y-0.5 transition-all duration-300"
-                    >
-                        Cancel
-                    </button>
-                    <button
-                        type="button"
-                        onClick={onSaveChanges}
-                        className="cursor-pointer bg-gradient-to-b from-cyan-500 to-sky-600 rounded py-2 text-white font-semibold hover:scale-[1.01] hover:-translate-y-0.5 transition-all duration-300"
-                    >
-                        Save
-                    </button>
-                </div>
-            </div>
+          <div className="flex space-x-2">
+            <label
+              htmlFor="fileInput"
+              className="flex items-center space-x-2 px-4 py-2 border border-dashed border-slate-400 rounded-lg cursor-pointer text-slate-200 hover:bg-slate-700 transition"
+            >
+              <Upload className="w-4 h-4" />
+              <span>Choose</span>
+            </label>
+            {file && (
+              <button className="bg-cyan-500 hover:bg-cyan-600 text-white px-4 py-2 rounded-lg shadow transition">
+                Upload
+              </button>
+            )}
+          </div>
+          <input id="fileInput" type="file" accept="image/*" className="hidden" onChange={onImageSelected} />
         </div>
-    );
+
+        {/* Full Name */}
+        <div className="flex flex-col bg-slate-800 rounded-xl p-3">
+          <label className="font-semibold text-slate-200 mb-1">Full Name</label>
+          <input
+            type="text"
+            value={accountForm.full_name}
+            onChange={(e) => handleOnValueChange("full_name", e.target.value)}
+            className="w-full px-4 py-2 rounded-lg bg-slate-700 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          />
+        </div>
+
+        {/* Bio */}
+        <div className="flex flex-col bg-slate-800 rounded-xl p-3">
+          <label className="font-semibold text-slate-200 mb-1">
+            Biography <span className="italic text-sm">(max 500 chars)</span>
+          </label>
+          <textarea
+            maxLength={500}
+            value={accountForm.bio}
+            onChange={(e) => handleOnValueChange("bio", e.target.value)}
+            className="w-full h-32 px-4 py-2 rounded-lg bg-slate-700 text-white resize-none focus:outline-none focus:ring-2 focus:ring-cyan-500"
+          />
+        </div>
+
+        {/* Error */}
+        {error && <ErrorDisplay error={error} />}
+
+        {/* Buttons */}
+        <div className="grid grid-cols-2 gap-4">
+          <button
+            type="button"
+            onClick={() => setIsEditing(false)}
+            className="bg-rose-500 hover:bg-rose-600 text-white py-2 rounded-lg font-semibold transition-transform hover:scale-105"
+          >
+            Cancel
+          </button>
+          <button
+            type="button"
+            onClick={onSaveChanges}
+            className="bg-cyan-500 hover:bg-cyan-600 text-white py-2 rounded-lg font-semibold transition-transform hover:scale-105"
+          >
+            Save
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default AccountEditor;

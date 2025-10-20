@@ -1,119 +1,104 @@
-"use client"
+"use client";
 import LoadingComponent from "@/components/Loading";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 import { FormEvent, useState } from "react";
 
-const Signup:React.FC = () => {
-	const { signUp, isLoading, error } = useAuth();
+const Signup: React.FC = () => {
+  const { signUp, isLoading, error } = useAuth();
 
-	const [formData, setFormData] = useState([
-		{name: "email", type: "email", error:"", value:""},
-		{name: "username", type: "text", error:"", value:""},
-		{name: "password", type: "password", error:"", value:""},
-		{name: "confirmPassword", type: "password", error:"", value:""},
-	]);
+  const [formData, setFormData] = useState([
+    { name: "email", type: "email", error: "", value: "" },
+    { name: "username", type: "text", error: "", value: "" },
+    { name: "password", type: "password", error: "", value: "" },
+    { name: "confirmPassword", type: "password", error: "", value: "" },
+  ]);
 
-	const handleOnValueChange = (key:string, value:string) => {
-		setFormData((prev) => {
-			const updated = [...prev];
+  const handleOnValueChange = (key: string, value: string) => {
+    setFormData((prev) =>
+      prev.map((field) =>
+        field.name === key ? { ...field, value } : field
+      )
+    );
+  };
 
-			updated.map((field) => {
-				if(field.name === key){
-					field.value = value;
-				}
-				return field;
-			});
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const payload = {
+      email: formData[0].value,
+      username: formData[1].value,
+      password: formData[2].value,
+    };
+    await signUp(payload.email, payload.username, payload.password);
+  };
 
-			return updated;
-		});
-	};
+  return (
+    <div className="flex items-center justify-center flex-grow flex container max-w-lg p-4 bg-gradient-to-br from-slate-900 via-cyan-950 to-violet-900">
+      <div className="w-full max-w-md">
+        {isLoading && <LoadingComponent />}
+        <form
+          className="py-6 px-8 rounded-2xl shadow-xl bg-slate-800/80 backdrop-blur-md border border-slate-700"
+          onSubmit={handleSubmit}
+        >
+          <h2 className="text-3xl font-extrabold text-center mb-6 text-white">
+            Create an Account
+          </h2>
 
-	const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
-		e.preventDefault();
-		const payload = {
-			email: formData[0].value,
-			username: formData[1].value,
-			password: formData[2].value,
-		};
+          {formData.map((field, index) => (
+            <div key={index} className="mb-4">
+              <label
+                htmlFor={field.name}
+                className="block text-sm font-medium mb-1 text-gray-200 capitalize"
+              >
+                {field.name}
+              </label>
+              <input
+                id={field.name}
+                name={field.name}
+                type={field.type}
+                required
+                value={field.value}
+                onChange={(e) =>
+                  handleOnValueChange(field.name, e.target.value)
+                }
+                className="w-full bg-slate-700 text-white border border-gray-600 px-4 py-2 rounded-lg focus:outline-none focus:ring-2 focus:ring-cyan-400 placeholder-gray-400 transition"
+                placeholder={field.name}
+              />
+              {field.error && (
+                <p className="text-red-500 text-sm mt-1">{field.error}</p>
+              )}
+            </div>
+          ))}
 
-		await signUp(payload.email, payload.username, payload.password);
+          <button
+            type="submit"
+            className="w-full bg-gradient-to-br from-cyan-500 to-violet-500 hover:scale-105 hover:shadow-lg text-white font-semibold py-2 rounded-xl transition duration-300"
+          >
+            Sign Up
+          </button>
 
-		// const result = await postData(`${BASE_URL}auth/signup`, payload);
+          {error && (
+            <div className="mt-4 text-red-400 text-center text-lg rounded py-2">
+              {error.detail}
+            </div>
+          )}
+        </form>
 
-		// if(result)
-		// 	setAccount(result);
-	};
-
-	return (
-		<div className="flex items-center justify-center p-4 rounded shadow-xl">
-			<div className="w-full max-w-md">
-				{isLoading && (
-					<LoadingComponent />
-				)}
-				<form
-					className="bg-sky-700 py-6 px-8 rounded-xl shadow-md"
-					onSubmit={(e) => handleSubmit(e)}
-					>
-					<h2 className="text-2xl font-bold text-center mb-4">
-						Create an Account
-					</h2>
-
-					{formData.map((field, index) => (
-						<div key={index} className="mb-4">
-							<label
-								htmlFor={field.name}
-								className="block text-sm font-medium mb-1 capitalize"
-								>
-								{field.name}
-							</label>
-							<input
-								id={field.name}
-								name={field.name}
-								type={field.type}
-								required
-								value={field.value}
-								onChange={(e) => handleOnValueChange(field.name, e.target.value)}
-								className="w-full bg-white text-cyan-900 border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-cyan-500"
-								/>
-							{field.error && (
-								<p className="text-red-500 text-sm mt-1">{field.error}</p>
-							)}
-						</div>
-					))}
-					<button
-						type="submit"
-						className="w-full bg-sky-500 hover:bg-sky-400 text-white cursor-pointer font-semibold py-2 rounded transition duration-300 hover:-translate-y-1 hover:scale-110"
-						>
-						Sign Up
-					</button>
-
-					{error && (
-						<div className="mt-4 text-red-400 text-center text-lg rounded py-2">
-							{error.detail}
-						</div>
-					)}
-
-					{/* {error && (
-						<div className="mt-4 text-red-600 text-center text-sm">
-							{JSON.stringify(error)}
-						</div>
-					)} */}
-				</form>
-
-				<div className="mt-4 text-center">
-					<p>
-						If you already have an account,{" "}
-						<Link href={"/auth/login"} className="font-semibold italic text-lg underline cursor-pointer">
-							Log In
-						</Link>{" "}
-						from here.
-					</p>
-				</div>
-			</div>
-		</div>
-
-	);
+        <div className="mt-6 text-center text-gray-200">
+          <p>
+            Already have an account?{" "}
+            <Link
+              href={"/auth/login"}
+              className="font-semibold italic text-cyan-400 hover:text-cyan-200 underline"
+            >
+              Log In
+            </Link>
+            .
+          </p>
+        </div>
+      </div>
+    </div>
+  );
 };
 
 export default Signup;

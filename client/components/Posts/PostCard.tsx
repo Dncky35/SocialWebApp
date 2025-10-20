@@ -1,12 +1,12 @@
 "use client";
-import React, { useState } from 'react';
-import { PublicAccount } from '@/schemas/account';
-import Link from 'next/link';
-import { Comment } from './CommentCard';
-import { usePostContext } from '@/context/PostContext';
-import { useAuth } from '@/context/AuthContext';
-import CommentCreator from './CommentCreator';
-import { MessageSquarePlus, Heart} from "lucide-react";
+import React, { useState } from "react";
+import { PublicAccount } from "@/schemas/account";
+import Link from "next/link";
+import { Comment } from "./CommentCard";
+import { usePostContext } from "@/context/PostContext";
+import { useAuth } from "@/context/AuthContext";
+import CommentCreator from "./CommentCreator";
+import { MessageSquarePlus, Heart } from "lucide-react";
 
 export interface Post {
   id: string;
@@ -15,16 +15,16 @@ export interface Post {
   tags: string[];
   likes: string[];
   is_liked?: boolean;
-  comments: Comment[]; // CREATE A SCHEMA FOR COMMENT AND USE HERE AS TYPE
+  comments: Comment[];
   is_deleted: boolean;
   created_at: string;
   updated_at: string;
   owner: PublicAccount;
-};
+}
 
 interface PostProps {
   post: Post;
-};
+}
 
 const PostCard: React.FC<PostProps> = ({ post }) => {
   const { likePost } = usePostContext();
@@ -33,75 +33,94 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
   const isOwnPost = account && account.id === post.owner.id;
   const [isEditing, setIsEditing] = useState(false);
 
-  const handleOnLike = async (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+  const handleOnLike = async (
+    e: React.MouseEvent<HTMLButtonElement, MouseEvent>
+  ) => {
     e.preventDefault();
     await likePost(post.id);
   };
 
   return (
-    <div className={`${isOwnPost ? "bg-gradient-to-br from-sky-700 to-sky-900" : "bg-gradient-to-br from-cyan-700  to-cyan-900"} rounded shadow-xl px-4 py-2 hover:scale-[1.01] transform transition duration-300 w-full`}>
-      <div className='border-b border-slate-700 py-1 mb-1 flex justify-between items-center'>
-        <Link href={`/profile/${post.owner.id}`} className='font-semibold text-lg text-slate-300 cursor-pointer hover:underline'>{post.owner.username}</Link>
+    <div
+      className={`rounded-2xl shadow-xl px-4 py-3 w-full transform transition duration-300 hover:scale-[1.02] 
+      ${
+        isOwnPost
+          ? "bg-gradient-to-br from-sky-600 to-violet-800"
+          : "bg-gradient-to-br from-sky-700 to-violet-900"
+      }`}
+    >
+      {/* Header */}
+      <div className="border-b border-slate-700 py-1 mb-2 flex justify-between items-center">
+        <Link
+          href={`/profile/${post.owner.id}`}
+          className="font-semibold text-lg text-gray-100 cursor-pointer hover:underline"
+        >
+          {post.owner.username}
+        </Link>
         {isOwnPost && (
           <button
             onClick={() => setIsEditing((prev) => !prev)}
-            className='cursor-pointer hover:underline'>
+            className="cursor-pointer hover:underline text-gray-200"
+          >
             {isEditing ? "Cancel" : "Edit"}
           </button>
         )}
-
       </div>
-      <div className='flex flex-col'>
-        <Link href={`/posts/${post.id}`} className='text-xl font-semibold whitespace-pre-wrap break-words mb-2'>
+
+      {/* Content */}
+      <div className="flex flex-col mb-2">
+        <Link
+          href={`/posts/${post.id}`}
+          className="text-lg sm:text-xl font-semibold whitespace-pre-wrap break-words text-gray-100 hover:text-cyan-300 transition"
+        >
           {post.content}
         </Link>
         {isEditing && (
-          <div>
-            <p className='text-sm text-slate-300'>Delete button will be here soon</p>
-          </div>
+          <p className="text-sm text-gray-400 mt-1">Delete button will be here soon</p>
         )}
-
       </div>
-      <div className='flex gap-x-2 border-b border-slate-700 py-1 mb-1'>
+
+      {/* Tags */}
+      <div className="flex flex-wrap gap-2 mb-2">
         {post.tags.map((tag, index) => (
-          <div key={index} className="text-sm cursor-pointer hover:underline">
+          <span
+            key={index}
+            className="text-sm cursor-pointer text-cyan-300 hover:text-violet-400 transition"
+          >
             #{tag}
-          </div>
+          </span>
         ))}
       </div>
-      <div className='flex items-center justify-between px-2'>
-        <div className='flex space-x-4 items-center'>
-          <div className='flex items-center gap-x-2 bg-slate-900 rounded-xl px-2 py-1'>
-            <p className='text-sm text-slate-300 cursor-default'>{post.likes.length}</p>
+
+      {/* Likes & Comments */}
+      <div className="flex items-center justify-between px-2 mb-2">
+        <div className="flex space-x-4 items-center">
+          <div className="flex items-center gap-x-2 bg-slate-900/70 px-2 py-1 rounded-xl shadow-inner">
+            <p className="text-sm text-gray-300 cursor-default">{post.likes.length}</p>
             <button
-              onClick={(e) => handleOnLike(e)}
-              className='hover:scale-[1.1] cursor-pointer transition duration-300 transform'>
-              {post.is_liked ? <Heart color={"red"} /> : <Heart />}
+              onClick={handleOnLike}
+              className="hover:scale-110 cursor-pointer transition transform"
+            >
+              {post.is_liked ? <Heart color="red" /> : <Heart color="white" />}
             </button>
           </div>
-          <div className='flex items-center gap-x-2 bg-slate-900 rounded-xl px-2 py-1'>
-            <p className='text-sm text-slate-300 cursor-default'>{post.comments.length}</p>
+          <div className="flex items-center gap-x-2 bg-slate-900/70 px-2 py-1 rounded-xl shadow-inner">
+            <p className="text-sm text-gray-300 cursor-default">{post.comments.length}</p>
             <button
               onClick={() => setIsCommentAdding((prev) => !prev)}
-              className='hover:scale-[1.1] cursor-pointer transition duration-300 transform'>
-              <MessageSquarePlus size={24} />
+              className="hover:scale-110 cursor-pointer transition transform"
+            >
+              <MessageSquarePlus color="white" size={20} />
             </button>
           </div>
         </div>
-        <div className='flex items-center justify-between gap-x-4'>
-          {/* {post.updated_at && post.created_at !== post.updated_at && (
-            <div>
-              <p className='text-xs font-semibold text-slate-300'>Edited</p>
-            </div>
-          )} */}
-          <p className='text-sm text-slate-300'>Posted on: {new Date(post.created_at).toLocaleDateString()}</p>
-        </div>
+        <p className="text-xs text-gray-400">
+          Posted on: {new Date(post.created_at).toLocaleDateString()}
+        </p>
       </div>
-      <div className='mt-2 py-2 px-4 border-t border-slate-700'>
-        {isCommentAdding && (
-          <CommentCreator postID={post.id} />
-        )}
-      </div>
+
+      {/* Comment Creator */}
+      {isCommentAdding && <CommentCreator postID={post.id} />}
     </div>
   );
 };
