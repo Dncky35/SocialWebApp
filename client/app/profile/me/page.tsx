@@ -62,7 +62,7 @@ const ProfilePage: React.FC = () => {
           {selectedOption === "Shared" && (
             <>
               {userPosts.length === 0 ? (
-                <p className="text-center text-slate-300 py-4">You haven't shared any posts yet.</p>
+                <p className="text-center text-slate-300 py-4">You haven&apos;t shared any posts yet.</p>
               ) : (
                 userPosts.map((post, idx) => <PostCard key={idx} post={post} />)
               )}
@@ -72,7 +72,7 @@ const ProfilePage: React.FC = () => {
           {selectedOption === "Liked" && (
             <>
               {likedPosts.length === 0 ? (
-                <p className="text-center text-slate-300 py-4">You haven't liked any posts yet.</p>
+                <p className="text-center text-slate-300 py-4">You haven&apos;t liked any posts yet.</p>
               ) : (
                 likedPosts.map((post, idx) => <PostCard key={idx} post={post} />)
               )}
@@ -82,7 +82,7 @@ const ProfilePage: React.FC = () => {
           {selectedOption === "Comments" && (
             <>
               {userComments.length === 0 ? (
-                <p className="text-center text-slate-300 py-4">You haven't commented yet.</p>
+                <p className="text-center text-slate-300 py-4">You haven&apos;t commented yet.</p>
               ) : (
                 userComments.map((comment, idx) => <CommentCard key={idx} comment={comment} />)
               )}

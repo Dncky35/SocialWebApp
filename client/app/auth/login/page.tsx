@@ -71,7 +71,7 @@ const Login: React.FC = () => {
         </form>
         <div className="mt-6 text-center text-gray-200">
           <p>
-            Don't have an account?{" "}
+            Don&apos;t have an account?{" "}
             <Link
               href={"/auth/signup"}
               className="font-semibold italic text-cyan-400 hover:text-cyan-200 underline"
