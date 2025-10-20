@@ -15,7 +15,7 @@ const NavBar: React.FC = () => {
     return (
         <nav className="z-50 fixed w-full top-0 bg-slate-950/50 py-2 px-8 flex items-center justify-between backdrop-blur-sm">
             <div></div>
-            <div className="bg-gradient-to-b from-slate-800 to-slate-700 cursor-pointer rounded flex items-center justify-center rounded-full 
+            <div className="bg-gradient-to-b from-cyan-500 to-sky-600 cursor-pointer rounded flex items-center justify-center rounded-full 
             text-2xl w-12 h-12 hover:bg-gradient-to-t hover:text-white hover:scale-[1.01] transition duration-300">
                 <Link href={"/"}>🐤</Link>
             </div>
@@ -29,7 +29,7 @@ const NavBar: React.FC = () => {
                         <img
                             src={
                                 (account.avatar_url && account.avatar_url.trim() !== "") ? account.avatar_url : 
-                                `https://ui-avatars.com/api/?name=${account.username}&background=cad5e2`
+                                `https://ui-avatars.com/api/?name=${account.username}&background=00bcff`
                             }
                             alt="Avatar"
                             className="w-full h-full object-cover"

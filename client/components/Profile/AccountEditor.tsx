@@ -80,7 +80,7 @@ const AccountEditor: React.FC<Props> = ({ account, setIsEditing }) => {
                             src={
                                 preview ? 
                                 preview : account.avatar_url && account.avatar_url.trim() !== "" ? account.avatar_url :
-                                `https://ui-avatars.com/api/?name=${account.username}&background=50C878`
+                                `https://ui-avatars.com/api/?name=${account.username}&background=00bcff`
 
                             }
                             alt="Avatar"
@@ -161,14 +161,14 @@ const AccountEditor: React.FC<Props> = ({ account, setIsEditing }) => {
                     <button
                         type="button"
                         onClick={() => setIsEditing(false)}
-                        className="bg-gradient-to-b from-amber-500 to-amber-600 rounded py-2 text-white font-semibold hover:scale-[1.05] hover:-translate-y-1 transition-all duration-300"
+                        className="cursor-pointer bg-gradient-to-b from-rose-500 to-rose-600 rounded py-2 text-white font-semibold hover:scale-[1.01] hover:-translate-y-0.5 transition-all duration-300"
                     >
                         Cancel
                     </button>
                     <button
                         type="button"
                         onClick={onSaveChanges}
-                        className="bg-gradient-to-b from-lime-500 to-lime-600 rounded py-2 text-white font-semibold hover:scale-[1.05] hover:-translate-y-1 transition-all duration-300"
+                        className="cursor-pointer bg-gradient-to-b from-cyan-500 to-sky-600 rounded py-2 text-white font-semibold hover:scale-[1.01] hover:-translate-y-0.5 transition-all duration-300"
                     >
                         Save
                     </button>

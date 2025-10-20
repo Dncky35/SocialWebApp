@@ -44,7 +44,7 @@ const ProfilePage:React.FC = () => {
                         {options.map((option, index) => (
                             <motion.button key={index} 
                             onClick={() => setSelectedOption(option)}
-                            className={`bg-gradient-to-b ${ selectedOption !== option ? "" : "border-b-4 border-blue-500" } cursor-pointer py-2
+                            className={`bg-gradient-to-b ${ selectedOption !== option ? "" : "border-b-4 border-sky-500" } cursor-pointer py-2
                             rounded hover:scale-[1.1] transform transition duration-300 text-white text-lg`}>
                                 {option}
                             </motion.button>

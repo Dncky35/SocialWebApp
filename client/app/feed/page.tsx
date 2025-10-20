@@ -54,12 +54,12 @@ const FeedPage:React.FC = () => {
     };
 
     return (
-        <div className="flex-grow flex flex-col gap-y-4 p-4 w-full max-w-2xl mx-auto rounded-xl shadow-xl bg-slate-800/50 backdrop-blur-sm mt-2 mb-2">
+        <div className="flex-grow flex flex-col gap-y-4 p-4 w-full max-w-2xl mx-auto rounded-xl shadow-xl bg-sky-900/30 backdrop-blur-sm mt-2 mb-2">
             {errorPost && (
                 <ErrorDisplay error={errorAuth || errorPost || undefined} />
             )}
-            <div className="bg-gradient-to-b from-slate-600 to-slate-700 grid grid-cols-4 gap-4 p-2 rounded-xl shadow-inner">
-                    <div className="pb-2 px-2 bg-slate-800 rounded-xl">
+            <div className="grid grid-cols-4 gap-4 p-2">
+                    <div className="pb-2 px-2 bg-slate-900 rounded-xl">
                         <label className="text-slate-300 text-sm font-semibold italic">Feed:</label>
                         <select
                         value={feedValue} 
@@ -70,12 +70,12 @@ const FeedPage:React.FC = () => {
                             ))}
                         </select>
                     </div>
-                    <div className="col-span-2 flex items-center gap-x-2 bg-slate-800 rounded-xl py-2 px-2 shadow-inner">
+                    <div className="col-span-2 flex items-center gap-x-2 bg-slate-900 rounded-xl py-2 px-2 shadow-inner">
                         <input className="w-full text-slate-950 bg-slate-100 rounded py-2 px-4 shadow-inner " type="text" placeholder="Search" />
                         <button className="cursor-pointer rounded-full bg-gradient-to-b 
                         from-slate-500 to-slate-600 p-2 shadow-inner text-white hover:opacity-80 hover:shadow-none hover:scale-105"><Search /></button>
                     </div>
-                    <div className="pb-2 px-2 bg-slate-800 rounded-xl">
+                    <div className="pb-2 px-2 bg-slate-900 rounded-xl">
                         <label className="text-slate-300 text-sm font-semibold italic">Tag:</label>
                         <select 
                         value={tagValue} 
@@ -90,10 +90,12 @@ const FeedPage:React.FC = () => {
                             })}
                         </select>
                     </div>
-                </div>
+            </div>
+            <hr className="border-b border-slate-200"></hr>
             <div className="space-y-4">
                 {/* TO DO: Add a header for filter, search and feed */}
                 <PostCreator />
+                <hr className="border-b border-slate-200"></hr>
                 <div className="w-full max-w-xl mx-auto space-y-4">
                     {posts && posts.map((post:Post, index) => (
                         <PostCard key={index} post={post} />

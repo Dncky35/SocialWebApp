@@ -44,6 +44,7 @@ const CommentCreator:React.FC<CommentCreatorProps> = ({postID, commentID = ""}:C
             <label htmlFor="post" className="text-white font-semibold text-lg">
                 Add your comment:
             </label>
+            <hr></hr>
             <textarea  id="post"
                 name="post"
                 className="w-full h-32 p-4 rounded-lg bg-slate-50 text-slate-950 shadow-inner resize-none focus:outline-none focus:ring-2 focus:ring-slate-500"
@@ -54,7 +55,7 @@ const CommentCreator:React.FC<CommentCreatorProps> = ({postID, commentID = ""}:C
             />
             <button
             onClick={(e) => handleOnPublish(e)} 
-            className="w-full bg-slate-600 hover:bg-slate-700 cursor-pointer text-white font-semibold py-2 rounded transition duration-200">
+            className="w-full bg-sky-500 hover:bg-cyan-400 cursor-pointer text-white font-semibold py-2 rounded transition duration-200">
                 Share
             </button>
         </div>

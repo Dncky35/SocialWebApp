@@ -60,11 +60,11 @@ const ProfilePage: React.FC = () => {
             )}
             <div className="flex items-center justify-between">
                 <div className="flex items-center space-x-4">
-                    <div className="w-16 h-16 rounded-full bg-teal-300 overflow-hidden hover:cursor-pointer">
+                    <div className="w-16 h-16 rounded-full bg-sky-300 overflow-hidden hover:cursor-pointer">
                         <img
                             src={
-                                (account.avatar_url && account.avatar_url.trim() !== "") ? account.avatar_url : 
-                                `https://ui-avatars.com/api/?name=${account.username}&background=00bba7`
+                                (account.avatar_url && account.avatar_url.trim() !== "") ? account.avatar_url :
+                                    `https://ui-avatars.com/api/?name=${account.username}&background=00bba7`
                             }
                             alt="Avatar"
                             className="w-full h-full object-cover"
@@ -72,7 +72,7 @@ const ProfilePage: React.FC = () => {
                     </div>
                     <div>
                         <h2 className="text-xl font-semibold">{account.username}</h2>
-                        <p className="text-sm text-teal-300">
+                        <p className="text-sm text-sky-300">
                             Joined on {new Date(account.created_at).toLocaleDateString()}
                         </p>
                     </div>
@@ -80,7 +80,7 @@ const ProfilePage: React.FC = () => {
                 <div>
                     <button
                         onClick={(e) => handleOnFollow(e)}
-                        className="bg-teal-600 text-white px-4 py-2 cursor-pointer rounded-full hover:scale-[1.05] hover:bg-teal-500 transition duration-300">
+                        className="bg-sky-600 text-white px-4 py-2 cursor-pointer rounded-full hover:scale-[1.05] hover:bg-sky-500 transition duration-300">
                         {account.is_following !== null && account.is_following ? (
                             <span>Following</span>
                         ) : (
@@ -91,27 +91,27 @@ const ProfilePage: React.FC = () => {
             </div>
 
             <div>
-                <p className="text-teal-100">
-                    {account.bio || <span className="italic text-teal-400">No bio provided.</span>}
+                <p className="text-sky-100">
+                    {account.bio || <span className="italic text-sky-300">No bio provided.</span>}
                 </p>
             </div>
 
-            <div className="flex justify-evenly text-center border-t border-b border-teal-700 py-2">
+            <div className="flex justify-evenly text-center border-t border-b border-cyan-500 py-2">
                 <div>
                     <div className="text-lg font-bold">{account.followers_count}</div>
-                    <div className="text-sm text-teal-300 hover:underline cursor-pointer">Followers</div>
+                    <div className="text-sm text-sky-300 hover:underline cursor-pointer">Followers</div>
                 </div>
                 <div>
                     <div className="text-lg font-bold">{account.following_count}</div>
-                    <div className="text-sm text-teal-300 hover:underline cursor-pointer">Following</div>
+                    <div className="text-sm text-sky-300 hover:underline cursor-pointer">Following</div>
                 </div>
             </div>
             <div className="grid grid-cols-3 p-2 space-x-4">
                 {options.map((option, index) => (
                     <button key={index}
                         onClick={() => setSelectedOption(option)}
-                        className={`${selectedOption !== option ? "bg-gradient-to-b from-teal-600 to-teal-900" : "bg-gradient-to-b from-teal-900 to-teal-600"} cursor-pointer py-2
-                    rounded hover:scale-[1.1] transform transition duration-300 text-white text-lg`}>
+                        className={`bg-gradient-to-b ${selectedOption !== option ? "" : "border-b-4 border-sky-500"} cursor-pointer py-2
+                            rounded hover:scale-[1.1] transform transition duration-300 text-white text-lg`}>
                         {option}
                     </button>
                 ))}

@@ -75,7 +75,7 @@ const PostCreator:React.FC = () => {
     };
 
     return(
-        <div className="bg-gradient-to-b from-slate-700 to-slate-900 px-6 py-2 rounded-xl shadow-xl w-full max-w-xl mx-auto">
+        <div className="bg-gradient-to-b from-sky-700 to-sky-900 px-6 py-2 rounded-xl shadow-xl w-full max-w-xl mx-auto">
             {isLoading && (
                <LoadingComponent />
             )}
@@ -111,7 +111,7 @@ const PostCreator:React.FC = () => {
                         <div className="flex flex-col gap-y-2">
                             <ul className="flex items-center flex-wrap gap-2 text-sm">
                                 {postForm.tags?.map((tag, index) => (
-                                <li key={index} className="bg-slate-500 flex items-center justify-between p-2 rounded-lg text-white">
+                                <li key={index} className="bg-sky-700 flex items-center justify-between p-2 rounded-lg text-white">
                                     <p>{tag}</p>
                                     <button 
                                     value={tag}
@@ -122,12 +122,12 @@ const PostCreator:React.FC = () => {
                             </ul>
                             <div className="flex gap-x-2 text-sm">
                                 <button onClick={() => {setIsAddTag((prev) => !prev); setIsAddImage(false);}}
-                                className="bg-gradient-to-b from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-500 
-                                text-white cursor-pointer rounded py-2 px-2 hover:shadow-lg transition duration-300 hover:scale-105"  >
+                                className="bg-gradient-to-br from-cyan-500 to-sky-700
+                                text-white cursor-pointer rounded py-2 px-2 hover:shadow-lg transition duration-300 hover:scale-101"  >
                                     Add Tag(s)
                                 </button>
                                 <button onClick={() => {setIsAddImage((prev) => !prev); setIsAddTag(false);}} 
-                                className="bg-slate-900 rounded py-2 hover:bg-slate-900 px-2" disabled={true} >
+                                className="bg-sky-900 rounded py-2 hover:bg-sky-900 px-2" disabled={true} >
                                     Add Image
                                 </button>
                             </div>
@@ -143,8 +143,9 @@ const PostCreator:React.FC = () => {
                                             return(
                                                 <button value={tag} 
                                                 onClick={(e) => handleOnTagSelected(e)}
-                                                className="bg-gradient-to-b from-slate-500 to-slate-700 p-2 rounded shadow-xl text-sm hover:bg-gradient-to-t hover:scale-110 
-                                                hover:-translate-y-1 transition duration-300" key={index}>
+                                                className="bg-gradient-to-br cursor-pointer from-slate-500 to-slate-700 p-2 rounded shadow-xl text-sm 
+                                                hover:scale-105
+                                                hover:-translate-y-0.5 transition duration-300" key={index}>
                                                     {tag}
                                                 </button>
                                             )
@@ -163,8 +164,8 @@ const PostCreator:React.FC = () => {
                         )}      
                     </div>
                     <button onClick={handleOnPublish} 
-                    className="w-full bg-gradient-to-b from-slate-500 to-slate-600 hover:from-slate-600 hover:to-slate-500 
-                    text-white cursor-pointer rounded py-2 hover:shadow-lg transition duration-300 hover:scale-105" >
+                    className="w-full bg-gradient-to-b from-cyan-500 to-sky-600
+                    text-white cursor-pointer rounded py-2 hover:shadow-lg transition duration-300 hover:scale-101" >
                         Publish
                     </button>
                 </div>

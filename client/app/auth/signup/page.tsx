@@ -52,7 +52,7 @@ const Signup:React.FC = () => {
 					<LoadingComponent />
 				)}
 				<form
-					className="bg-teal-900 py-6 px-8 rounded shadow-md"
+					className="bg-sky-700 py-6 px-8 rounded-xl shadow-md"
 					onSubmit={(e) => handleSubmit(e)}
 					>
 					<h2 className="text-2xl font-bold text-center mb-4">
@@ -74,7 +74,7 @@ const Signup:React.FC = () => {
 								required
 								value={field.value}
 								onChange={(e) => handleOnValueChange(field.name, e.target.value)}
-								className="w-full bg-white text-green-900 border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-green-500"
+								className="w-full bg-white text-cyan-900 border border-gray-300 px-4 py-2 rounded focus:outline-none focus:ring-2 focus:ring-cyan-500"
 								/>
 							{field.error && (
 								<p className="text-red-500 text-sm mt-1">{field.error}</p>
@@ -83,7 +83,7 @@ const Signup:React.FC = () => {
 					))}
 					<button
 						type="submit"
-						className="w-full bg-teal-600 hover:bg-teal-700 text-white cursor-pointer font-semibold py-2 rounded transition duration-300 hover:-translate-y-1 hover:scale-110"
+						className="w-full bg-sky-500 hover:bg-sky-400 text-white cursor-pointer font-semibold py-2 rounded transition duration-300 hover:-translate-y-1 hover:scale-110"
 						>
 						Sign Up
 					</button>

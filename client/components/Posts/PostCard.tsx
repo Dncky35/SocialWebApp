@@ -39,7 +39,7 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
   };
 
   return (
-    <div className={`${isOwnPost ? "bg-gradient-to-br from-slate-600 to-slate-800" : "bg-gradient-to-br from-slate-700 to-slate-900"} rounded shadow-xl px-4 py-2 hover:scale-[1.01] transform transition duration-300 w-full`}>
+    <div className={`${isOwnPost ? "bg-gradient-to-br from-sky-700 to-sky-900" : "bg-gradient-to-br from-cyan-700  to-cyan-900"} rounded shadow-xl px-4 py-2 hover:scale-[1.01] transform transition duration-300 w-full`}>
       <div className='border-b border-slate-700 py-1 mb-1 flex justify-between items-center'>
         <Link href={`/profile/${post.owner.id}`} className='font-semibold text-lg text-slate-300 cursor-pointer hover:underline'>{post.owner.username}</Link>
         {isOwnPost && (
