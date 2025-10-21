@@ -8,6 +8,7 @@ import { useAuth } from "@/context/AuthContext";
 import { Search } from 'lucide-react'
 import ErrorDisplay from "@/components/ErrorDisplay";
 import { Tags } from "lucide-react";
+import {  motion } from "motion/react";
 
 const FeedPage: React.FC = () => {
   const { posts, isLoading: isLoadingPost, setFeedValue, setTagValue, feedValue, tagValue, error: errorPost, getFeedPageData } = usePostContext();
@@ -80,14 +81,21 @@ const FeedPage: React.FC = () => {
 
       {/* Posts */}
       <div className="space-y-4">
-        {isLoadingPost && (
-          <LoadingComponent />
+        {isLoadingPost ? (
+          <motion.div
+          >
+            <div className="w-12 h-12 border-4 border-cyan-500 border-t-violet-500 rounded-full animate-spin mx-auto shadow-lg shadow-cyan-600/50"></div>
+          </motion.div>
+        ) : (
+            <motion.div
+              className="space-y-4">
+              <PostCreator />
+              <hr className="border-gray-700" />
+              <div className="w-full max-w-xl mx-auto space-y-4">
+                {posts && posts.map((post: Post, index) => <PostCard key={index} post={post} />)}
+              </div>
+            </motion.div>
         )}
-        <PostCreator />
-        <hr className="border-gray-700" />
-        <div className="w-full max-w-xl mx-auto space-y-4">
-          {posts && posts.map((post: Post, index) => <PostCard key={index} post={post} />)}
-        </div>
       </div>
     </div>
   );

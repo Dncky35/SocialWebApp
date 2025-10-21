@@ -4,6 +4,7 @@ import { BASEURL } from "./ContextProvider";
 import useGet from "@/hooks/useGet";
 import usePost from "@/hooks/usePost";
 import usePatch from "@/hooks/usePatch";
+import useDelete from "@/hooks/useDelete";
 import { ApiError } from "@/hooks/useFetch";
 import { useAuth } from "./AuthContext";
 import { Post } from "@/components/Posts/PostCard";
@@ -35,6 +36,7 @@ interface PostContext {
     setFeedValue: React.Dispatch<React.SetStateAction<string>>;
     setTagValue: React.Dispatch<React.SetStateAction<string>>;
     setNullEachError: () => void;
+    deletePost: (postId: string) => Promise<boolean>;
 }
 
 interface LikeType {
@@ -58,7 +60,8 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
             credentials: "include",
         }
     });
-
+    const { isLoading: isLoadingDelete, error:errorDelete, deleteData, setError: setErrorDelete} = useDelete();
+ 
     const { account, fetchWithAuth, setNullEachError: setNullEachErrorAuth } = useAuth();
     const [posts, setPosts] = useState<Post[] | null>(null);
     const [feedValue, setFeedValue] = useState<string>(FeedOptions[0]);
@@ -128,9 +131,9 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     }, [fetchPosts]);
 
-    const fetchPostWithID = useCallback(async (postID: string) => {
+    const fetchPostWithID = useCallback(async (postId: string) => {
         const result = await fetchWithAuth(async () => {
-            return await getData(`${BASEURL}posts/${postID}`, {
+            return await getData(`${BASEURL}posts/${postId}`, {
                 credentials: "include",
             });
         });
@@ -143,6 +146,23 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
             return null;
 
     }, [getData, fetchWithAuth]);
+
+    const deletePost = useCallback(async (postId: string) => {
+        const result = await fetchWithAuth(async () => {
+            return await deleteData(`${BASEURL}posts/${postId}`, {credentials: "include",})
+        });
+
+        if(result){
+            // Delete exist post from saved posts
+            setPosts((prevPosts) => {
+                if (!prevPosts) return prevPosts;
+                return prevPosts.filter((post) => post.id !== postId);
+            });
+            localStorage.setItem("posts", JSON.stringify(posts?.filter((post) => post.id !== postId)));
+        }
+
+        return true;
+    }, [fetchWithAuth, deleteData])
 
     const searchPosts = async (options: PostSearchOptions) => {
         // Check if post stored locally.
@@ -180,10 +200,9 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
             });
         });
 
-        if (result) {
+        if (result && feedValue === "Latest") {
             const postTemp = posts || [];
             // set as first element
-
             postTemp.unshift(result);
             setPosts(postTemp);
         }
@@ -366,6 +385,7 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setErrorPost(null);
         setErrorAuth(null);
         setErrorPatch(null);
+        setErrorDelete(null);
         setNullEachErrorAuth();
     }
 
@@ -385,9 +405,10 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
     return (
         <PostContext.Provider value={{
             posts,
-            isLoading: isLoadingPost || isLoadingGet || isLoadingPatch,
-            error: errorPost || errorGet || errorPatch,
+            isLoading: isLoadingPost || isLoadingGet || isLoadingPatch || isLoadingDelete,
+            error: errorPost || errorGet || errorPatch || errorDelete,
             createPost,
+            deletePost,
             likePost,
             addComment,
             likeComment,

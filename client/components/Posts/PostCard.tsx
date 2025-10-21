@@ -7,6 +7,7 @@ import { usePostContext } from "@/context/PostContext";
 import { useAuth } from "@/context/AuthContext";
 import CommentCreator from "./CommentCreator";
 import { MessageSquarePlus, Heart, Pencil, Eraser, Redo2 } from "lucide-react";
+import { motion } from "motion/react";
 
 export interface Post {
   id: string;
@@ -27,7 +28,7 @@ interface PostProps {
 }
 
 const PostCard: React.FC<PostProps> = ({ post }) => {
-  const { likePost } = usePostContext();
+  const { likePost, deletePost } = usePostContext();
   const { account } = useAuth();
   const [isCommentAdding, setIsCommentAdding] = useState(false);
   const isOwnPost = account && account.id === post.owner.id;
@@ -42,11 +43,15 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
 
   const handleOnDeleteClicked = async () => {
     // TO DO: show warning message to inform user that the post about to deleting.
-
+    await deletePost(post.id);
   };
 
   return (
-    <div
+    <motion.div
+      initial={{ y: 40, opacity:0 }}
+      animate={{ y:0, opacity:1 }}
+      exit={{ opacity: 0, scale: 0 }}
+      transition={{duration: .2}}
       className={`rounded-2xl shadow-xl px-4 py-3 w-full transform transition duration-300 hover:scale-[1.02] 
       ${isOwnPost
           ? "bg-gradient-to-br from-sky-600 to-violet-800"
@@ -64,18 +69,18 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
         {isOwnPost && (
           <div className="flex items-center space-x-4">
             {isEditing ? (
-                <div className="flex items-center justify-evenly space-x-2">
-                  <button className="hover:scale-105 cursor-pointer"><Eraser /></button>
-                  <button  className="hover:scale-105 cursor-pointer" onClick={() => setIsEditing((prev) => !prev)}><Redo2 /></button>
-                </div>
-              ) : 
+              <div className="flex items-center justify-evenly space-x-2">
+                <button className="hover:scale-105 cursor-pointer" onClick={() => handleOnDeleteClicked()} ><Eraser /></button>
+                <button className="hover:scale-105 cursor-pointer" onClick={() => setIsEditing((prev) => !prev)}><Redo2 /></button>
+              </div>
+            ) :
               (
-              <button
-              onClick={() => setIsEditing((prev) => !prev)}
-              className="cursor-pointer hover:underline text-gray-200"
-            >
-              <Pencil />
-            </button>)}
+                <button
+                  onClick={() => setIsEditing((prev) => !prev)}
+                  className="cursor-pointer hover:underline text-gray-200"
+                >
+                  <Pencil />
+                </button>)}
           </div>
         )}
       </div>
@@ -131,7 +136,7 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
 
       {/* Comment Creator */}
       {isCommentAdding && <CommentCreator postID={post.id} />}
-    </div>
+    </motion.div>
   );
 };
 
