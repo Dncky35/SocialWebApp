@@ -40,18 +40,15 @@ const ProfilePage: React.FC = () => {
         <PrivateAccountCard account={account} setIsEditing={setIsEditing} />
 
         {/* Options Tabs */}
-        <div className="flex justify-between gap-2">
+        <div className="grid grid-cols-3 p-2 space-x-4">
           {options.map((option, idx) => (
             <motion.button
               key={idx}
               onClick={() => setSelectedOption(option)}
-              className={`flex-1 py-2 rounded-lg text-lg font-semibold transition-transform duration-300
-                ${
-                  selectedOption === option
-                    ? "bg-gradient-to-br from-cyan-500 to-violet-500 shadow-lg scale-105 text-white"
-                    : "bg-slate-700/60 hover:bg-slate-700/80 text-slate-300 hover:scale-105"
-                }`}
-            >
+              className={`bg-gradient-to-b ${selectedOption === option ? "border-b-4 border-sky-500" : ""} 
+              cursor-pointer py-2 rounded hover:scale-[1.1] transform transition duration-300 text-white text-lg`}
+                    >
+            
               {option}
             </motion.button>
           ))}

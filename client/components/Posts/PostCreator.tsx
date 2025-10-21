@@ -55,7 +55,7 @@ const PostCreator: React.FC = () => {
 
   return (
     <div className="bg-slate-950/70 backdrop-blur-md px-6 py-3 rounded-2xl shadow-xl w-full max-w-xl mx-auto border border-slate-800">
-      {isLoading && <LoadingComponent />}
+      {/* {isLoading && <LoadingComponent />}} */}
 
       <div className="flex justify-between items-center mb-4">
         <label htmlFor="post" className="text-gray-100 font-semibold text-lg">

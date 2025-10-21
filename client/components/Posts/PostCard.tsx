@@ -6,7 +6,7 @@ import { Comment } from "./CommentCard";
 import { usePostContext } from "@/context/PostContext";
 import { useAuth } from "@/context/AuthContext";
 import CommentCreator from "./CommentCreator";
-import { MessageSquarePlus, Heart } from "lucide-react";
+import { MessageSquarePlus, Heart, Pencil, Eraser, Redo2 } from "lucide-react";
 
 export interface Post {
   id: string;
@@ -53,20 +53,6 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
           : "bg-gradient-to-br from-sky-700 to-violet-900"
         }`}
     >
-      {isEditing && (
-        <div className="w-full grid grid-cols-2 gap-4">
-          <button
-            onClick={handleOnDeleteClicked}
-            className="bg-rose-600 py-2 rounded-xl font-bold cursor-pointer hover:bg-rose-400 transition duration-300 hover:scale-101">
-            Delete
-          </button>
-          <button
-            onClick={(e) => setIsEditing(false)}
-            className="bg-green-600 py-2 rounded-xl font-bold cursor-pointer hover:bg-green-400 transition duration-300 hover:scale-101">
-            Cancel
-          </button>
-        </div>
-      )}
       {/* Header */}
       <div className="border-b border-slate-700 py-1 mb-2 flex justify-between items-center">
         <Link
@@ -75,14 +61,21 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
         >
           {post.owner.username}
         </Link>
-        {isOwnPost && !isEditing && (
-          <div className="flex items-center justify-center space-x-4">
-            <button
-              onClick={() => setIsEditing(true)}
+        {isOwnPost && (
+          <div className="flex items-center space-x-4">
+            {isEditing ? (
+                <div className="flex items-center justify-evenly space-x-2">
+                  <button className="hover:scale-105 cursor-pointer"><Eraser /></button>
+                  <button  className="hover:scale-105 cursor-pointer" onClick={() => setIsEditing((prev) => !prev)}><Redo2 /></button>
+                </div>
+              ) : 
+              (
+              <button
+              onClick={() => setIsEditing((prev) => !prev)}
               className="cursor-pointer hover:underline text-gray-200"
             >
-              Edit
-            </button>
+              <Pencil />
+            </button>)}
           </div>
         )}
       </div>
@@ -95,9 +88,6 @@ const PostCard: React.FC<PostProps> = ({ post }) => {
         >
           {post.content}
         </Link>
-        {isEditing && (
-          <p className="text-sm text-gray-400 mt-1">Delete button will be here soon</p>
-        )}
       </div>
 
       {/* Tags */}

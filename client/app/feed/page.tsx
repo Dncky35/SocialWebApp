@@ -1,14 +1,13 @@
 "use client";
 import React, { useEffect, useState } from "react";
-import { usePostContext, FeedOptions, tagList } from "@/context/PostContext";
+import { usePostContext, FeedOptions } from "@/context/PostContext";
 import PostCard, { Post } from "@/components/Posts/PostCard";
 import PostCreator from "@/components/Posts/PostCreator";
 import LoadingComponent from "@/components/Loading";
 import { useAuth } from "@/context/AuthContext";
 import { Search } from 'lucide-react'
 import ErrorDisplay from "@/components/ErrorDisplay";
-
-type ListName = "Feed" | "Tags";
+import { Tags } from "lucide-react";
 
 const FeedPage: React.FC = () => {
   const { posts, isLoading: isLoadingPost, setFeedValue, setTagValue, feedValue, tagValue, error: errorPost, getFeedPageData } = usePostContext();
@@ -30,75 +29,60 @@ const FeedPage: React.FC = () => {
     }
   }, [posts, errorPost, hydrated]);
 
-  if (isLoadingPost || isLoadingAuth || pageState === "Initializing")
+  // if (isLoadingPost || isLoadingAuth || pageState === "Initializing")
+  if (pageState === "Initializing")
     return <LoadingComponent />;
 
-  const handleOnValueChange = (listName: ListName, value: string) => {
-    if (listName === "Tags") {
-      setTagValue(value);
-      localStorage.setItem("tagValue", value);
-    }
-
-    if (listName === "Feed") {
-      setFeedValue(value);
-      localStorage.setItem("feedValue", value);
-    }
+  const onFeedChanged = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
+    const value = e.currentTarget.value;
+    setFeedValue(value);
+    localStorage.setItem("feedValue", value);
   };
 
   return (
     <div className="flex-grow flex flex-col gap-y-4 p-4 w-full max-w-2xl mx-auto rounded-2xl shadow-xl bg-slate-950/60 backdrop-blur-md mt-4 mb-4">
       {errorPost && <ErrorDisplay error={errorAuth || errorPost || undefined} />}
 
-      {/* Filters */}
-      <div className="grid grid-cols-4 gap-4 p-2">
-        <div className="pb-2 px-2 bg-slate-900/70 rounded-xl shadow-inner">
-          <label className="text-gray-300 text-sm font-semibold italic">Feed:</label>
-          <select
-            value={feedValue}
-            onChange={(e) => handleOnValueChange("Feed", e.target.value)}
-            className="bg-slate-800/70 rounded p-2 w-full text-gray-100 shadow-inner focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-1 transition"
-          >
-            {FeedOptions.map((option, index) => (
-              <option key={index}>{option}</option>
-            ))}
-          </select>
+      {/* Feed Options and Filters*/}
+      <div>
+        {/* Feed Options */}
+        <div className="grid grid-cols-3 p-2 space-x-4">
+          {FeedOptions.map((option, index) => (
+            <button className={`bg-gradient-to-b ${feedValue === option ? "border-b-4 border-sky-500" : ""} 
+              cursor-pointer py-2 rounded hover:scale-[1.1] transform transition duration-300 text-white text-lg`}
+              value={option} key={index} onClick={(e) => onFeedChanged(e)}>
+              {option}
+            </button>
+          ))}
+        </div>
+        {/* Filters */}
+        <div className="flex flex-col my-2 py-1 border border-slate-700 rounded-lg">
+          <p className="text-xs ml-5 text-slate-300">**currently under development</p>
+          <div className="flex items-center justify-evenly">
+            <div className="w-full col-span-2 flex items-center gap-x-2 bg-slate-900/70 rounded-xl py-2 px-2 shadow-inner">
+              <input
+                className="w-full text-gray-100 bg-slate-800/60 rounded py-2 px-4 shadow-inner focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-1 transition"
+                type="text"
+                placeholder="Search people or posts..."
+              />
+              <button className="cursor-pointer rounded-full bg-gradient-to-b from-cyan-500 to-violet-500 p-2 shadow-lg text-white hover:scale-105 hover:opacity-90 transition-transform">
+                <Search />
+              </button>
+              <button className="cursor-pointer rounded-full bg-gradient-to-b from-cyan-500 to-violet-500 p-2 shadow-lg text-white hover:scale-105 hover:opacity-90 transition-transform">
+                <Tags />
+              </button>
+            </div>
+          </div>
         </div>
 
-        <div className="col-span-2 flex items-center gap-x-2 bg-slate-900/70 rounded-xl py-2 px-2 shadow-inner">
-          <input
-            className="w-full text-gray-100 bg-slate-800/60 rounded py-2 px-4 shadow-inner focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:ring-offset-1 transition"
-            type="text"
-            placeholder="Search"
-          />
-          <button className="cursor-pointer rounded-full bg-gradient-to-b from-cyan-500 to-violet-500 p-2 shadow-lg text-white hover:scale-105 hover:opacity-90 transition-transform">
-            <Search />
-          </button>
-        </div>
-
-        <div className="pb-2 px-2 bg-slate-900/70 rounded-xl shadow-inner">
-          <label className="text-gray-300 text-sm font-semibold italic">Tag:</label>
-          <select
-            value={tagValue}
-            onChange={(e) => handleOnValueChange("Tags", e.target.value)}
-            className="bg-slate-800/70 rounded p-2 w-full text-gray-100 shadow-inner focus:outline-none focus:ring-2 focus:ring-violet-400 focus:ring-offset-1 transition"
-          >
-            {tagList.map((tag, index) =>
-              tag === "" ? (
-                <option key={index} value="">
-                  Select Tag
-                </option>
-              ) : (
-                <option key={index}>{tag}</option>
-              )
-            )}
-          </select>
-        </div>
       </div>
-
       <hr className="border-gray-700" />
 
       {/* Posts */}
       <div className="space-y-4">
+        {isLoadingPost && (
+          <LoadingComponent />
+        )}
         <PostCreator />
         <hr className="border-gray-700" />
         <div className="w-full max-w-xl mx-auto space-y-4">
