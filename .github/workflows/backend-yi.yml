@@ -33,7 +33,7 @@ jobs:
           ssh -i ~/.ssh/id_ed25519 -o StrictHostKeyChecking=yes ${{ secrets.SSH_USERNAME }}@${{ secrets.SSH_HOST }} << 'EOF'
             set -e
             cd /home/ercan/socialwebapp/server
-            git pull origin prod
+            git pull --rebase origin prod
             source .venv/bin/activate
             pip install -r requirements.txt
             deactivate

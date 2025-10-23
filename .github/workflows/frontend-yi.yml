@@ -42,7 +42,7 @@ jobs:
             npm -v
 
             cd /home/ercan/socialwebapp/client
-            git pull origin prod --rebase
+            git pull --rebase origin prod
             npm install
             npm run build
             sudo systemctl restart socialwebapp_client.service
