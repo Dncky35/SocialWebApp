@@ -8,36 +8,27 @@ import { useAuth } from "@/context/AuthContext";
 import { Search } from 'lucide-react'
 import ErrorDisplay from "@/components/ErrorDisplay";
 import { Tags } from "lucide-react";
-import {  motion } from "motion/react";
+import { motion } from "motion/react";
 
 const FeedPage: React.FC = () => {
-  const { posts, isLoading: isLoadingPost, setFeedValue, setTagValue, feedValue, tagValue, error: errorPost, getFeedPageData } = usePostContext();
+  const { posts, isLoading: isLoadingPost, setFeedValue, hasMore, feedValue, error: errorPost, getFeedPageData } = usePostContext();
   const { pageState, isLoading: isLoadingAuth, error: errorAuth } = useAuth();
-  const [hydrated, setHydrated] = useState(false);
+  const [page, setPage] = useState(1);
 
-  useEffect(() => {
-    const storedFeedValue = localStorage.getItem("feedValue");
-    if (storedFeedValue) setFeedValue(storedFeedValue);
-    setHydrated(true);
-  }, [setFeedValue]);
-
-  useEffect(() => {
-    if (!hydrated) return;
-
-    if (!posts && !isLoadingPost && !isLoadingAuth && !errorPost) {
-      const fetchingPosts = async () => await getFeedPageData();
-      fetchingPosts();
-    }
-  }, [posts, errorPost, hydrated]);
-
-  // if (isLoadingPost || isLoadingAuth || pageState === "Initializing")
   if (pageState === "Initializing")
     return <LoadingComponent />;
 
   const onFeedChanged = (e: React.MouseEvent<HTMLButtonElement, MouseEvent>) => {
     const value = e.currentTarget.value;
     setFeedValue(value);
+    setPage(1);
     localStorage.setItem("feedValue", value);
+  };
+
+  const handleLoadMore = async () => {
+    console.log("Loading more posts...");
+    await getFeedPageData(page);
+    setPage(prevPage => prevPage + 1);
   };
 
   return (
@@ -81,22 +72,30 @@ const FeedPage: React.FC = () => {
 
       {/* Posts */}
       <div className="space-y-4">
-        {isLoadingPost ? (
-          <motion.div
-          >
-            <div className="w-12 h-12 border-4 border-cyan-500 border-t-violet-500 rounded-full animate-spin mx-auto shadow-lg shadow-cyan-600/50"></div>
-          </motion.div>
-        ) : (
-            <motion.div
-              className="space-y-4">
-              <PostCreator />
-              <hr className="border-gray-700" />
-              <div className="w-full max-w-xl mx-auto space-y-4">
-                {posts && posts.map((post: Post, index) => <PostCard key={index} post={post} />)}
-              </div>
-            </motion.div>
-        )}
+        <motion.div
+          className="space-y-4">
+          <PostCreator />
+          <hr className="border-gray-700" />
+          <div className="w-full max-w-xl mx-auto space-y-4">
+            {posts && posts.map((post: Post, index) => <PostCard key={index} post={post} />)}
+          </div>
+        </motion.div>
       </div>
+      {isLoadingPost ? (
+        <motion.div>
+          <div className="w-12 h-12 border-4 border-cyan-500 border-t-violet-500 rounded-full animate-spin mx-auto shadow-lg shadow-cyan-600/50"></div>
+        </motion.div>
+      ) : hasMore ?(
+        <motion.button
+          whileHover={{ scale: 1.1 }}
+          whileTap={{ scale: 0.9 }}
+          transition={{ duration: 0.2 }}
+           className="w-full max-w-md mx-auto bg-gradient-to-b from-cyan-500 to-violet-500 text-white py-2 rounded cursor-pointer" onClick={() => handleLoadMore()}
+        >
+          <p className="text-center text-lg font-bold">Load More</p>
+        </motion.button>
+      ): null}
+
     </div>
   );
 };

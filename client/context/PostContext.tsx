@@ -30,9 +30,10 @@ interface PostContext {
     fetchCommentWithId: (commentID: string) => Promise<any> | null;
     followAccount: (accountID: string) => Promise<boolean>;
     fetchAccountWithId: (account_id: string) => Promise<void>;
-    getFeedPageData: () => Promise<void>;
+    getFeedPageData: (page: number) => Promise<void>;
     feedValue: string;
     tagValue: string;
+    hasMore: boolean;
     setFeedValue: React.Dispatch<React.SetStateAction<string>>;
     setTagValue: React.Dispatch<React.SetStateAction<string>>;
     setNullEachError: () => void;
@@ -66,69 +67,63 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
     const [posts, setPosts] = useState<Post[] | null>(null);
     const [feedValue, setFeedValue] = useState<string>(FeedOptions[0]);
     const [tagValue, setTagValue] = useState<string>(tagList[0]);
+    const [hasMore, setHasMore] = useState<boolean>(true);
 
-    const getLocalStoragedPosts = () => {
-        const result = localStorage.getItem("posts");
-        if (result) {
-            setPosts(JSON.parse(result));
-            return JSON.parse(result) as Post[];
+    useEffect(() => {
+        if (!account)
+            return;
+
+        if (!isLoadingGet && !isLoadingPost && !errorGet && !errorPost) {
+            const fetchingPost = async () => {
+                // localStorage.removeItem("posts");
+                setPosts(null);
+                setHasMore(true);
+                await fetchPosts();
+            };
+            fetchingPost();
         }
-        else
-            return null;
-    };
+    }, [feedValue, account]);
 
-    const storeFetchedPosts = (posts: Post[]) => {
-        const storedPosts = getLocalStoragedPosts();
+    const storeFetchedPosts = (comingPosts: Post[]) => {
+        
         let newPosts: Post[] = [];
+        // check if any post from coming post is exist in posts
+        comingPosts.map((post) => {
+            if(!posts?.includes(post))
+                newPosts.push(post);
+        });
 
-        if (!storedPosts) {
-            setPosts(posts);
-            localStorage.setItem("posts", JSON.stringify(posts));
-        }
-        else {
-            newPosts = posts;
-            posts.map((post) => {
-                const postExists = storedPosts?.find((p) => p.id === post.id) || null;
-                if (!postExists) {
-                    newPosts.push(post);
-                }
-            });
-            setPosts(newPosts);
-            localStorage.setItem("posts", JSON.stringify(newPosts));
-        }
+        setPosts((prevPosts) => ([...(prevPosts || []), ...newPosts]));
+        
     };
 
-    const fetchPosts = useCallback(async () => {
+    const fetchPosts = useCallback(async (page:number = 0) => {
+        if(page === 0){
+            setHasMore(true);
+            setPosts(null);
+        }
+
         const result = await fetchWithAuth(async () => {
-            return await getData(`${BASEURL}posts?feedValue=${feedValue}&tagValue=${tagValue}`, {
+            return await getData(`${BASEURL}posts?feedValue=${feedValue}&tagValue=${tagValue}&offset=${page * 10}`, {
                 credentials: "include",
             });
         });
 
-        if (result) {
-            localStorage.setItem("lastFetchDate", new Date().toISOString());
+        if(result){
             storeFetchedPosts(result);
+            if(result.length < 10)
+                setHasMore(false);
             return result;
         }
-        else {
+        else{
+            setHasMore(false);
             return null;
         }
 
     }, [getData, fetchWithAuth]);
 
-    const getFeedPageData = useCallback(async () => {
-        const lastFetchDate = localStorage.getItem("lastFetchDate");
-        // IF 10 minutes passed, fetch again
-        if (!lastFetchDate || new Date().getTime() - new Date(lastFetchDate).getTime() > 10 * 60 * 1000) {
-            await fetchPosts();
-            return;
-        }
-
-        const storedPosts = getLocalStoragedPosts();
-        if (!storedPosts) {
-            await fetchPosts();
-        }
-
+    const getFeedPageData = useCallback(async (page:number) => {
+        await fetchPosts(page);
     }, [fetchPosts]);
 
     const fetchPostWithID = useCallback(async (postId: string) => {
@@ -166,13 +161,9 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const searchPosts = async (options: PostSearchOptions) => {
         // Check if post stored locally.
-        const storedPosts = getLocalStoragedPosts();
-        if (!storedPosts) {
-            if (options.id) {
-                await fetchPostWithID(options.id);
-            }
-        }
-        else {
+        // const storedPosts = getLocalStoragedPosts();
+        if (options.id) {
+            await fetchPostWithID(options.id);
         }
     };
 
@@ -389,22 +380,10 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
         setNullEachErrorAuth();
     }
 
-    useEffect(() => {
-        if (!account)
-            return;
-
-        if (!isLoadingGet && !isLoadingPost && !errorGet && !errorPost) {
-            const fetchingPost = async () => {
-                localStorage.removeItem("posts");
-                await fetchPosts();
-            };
-            fetchingPost();
-        }
-    }, [feedValue, account]);
-
     return (
         <PostContext.Provider value={{
-            posts,
+            posts, 
+            hasMore,
             isLoading: isLoadingPost || isLoadingGet || isLoadingPatch || isLoadingDelete,
             error: errorPost || errorGet || errorPatch || errorDelete,
             createPost,
