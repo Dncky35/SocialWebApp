@@ -6,7 +6,8 @@ import PostCreator from "@/components/Posts/PostCreator";
 import LoadingComponent from "@/components/Loading";
 import { useAuth } from "@/context/AuthContext";
 import { Search } from 'lucide-react'
-import ErrorDisplay from "@/components/ErrorDisplay";
+import ErrorDisplay from "@/components/ErrorDisplay";r
+
 import { Tags } from "lucide-react";
 import { motion } from "motion/react";
 
