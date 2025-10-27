@@ -1,5 +1,5 @@
 "use client";
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { usePostContext, FeedOptions } from "@/context/PostContext";
 import PostCard, { Post } from "@/components/Posts/PostCard";
 import PostCreator from "@/components/Posts/PostCreator";
@@ -11,9 +11,27 @@ import { Tags } from "lucide-react";
 import { motion } from "motion/react";
 
 const FeedPage: React.FC = () => {
-  const { posts, isLoading: isLoadingPost, setFeedValue, hasMore, feedValue, error: errorPost, getFeedPageData } = usePostContext();
+  const { posts, isLoading: isLoadingPost, setFeedValue, hasMore, feedValue, error: errorPost, getFeedPageData} = usePostContext();
   const { pageState, isLoading: isLoadingAuth, error: errorAuth } = useAuth();
   const [page, setPage] = useState(1);
+  const loadingRef = useRef(false);
+
+  useEffect(() => {
+    const handleScrolling = async () => {
+      if (isLoadingPost || isLoadingAuth || !hasMore || loadingRef.current) return;
+      const scrollPosition = window.innerHeight + window.scrollY;
+      const threshold = document.body.offsetHeight - 400;
+
+      if (scrollPosition >= threshold) {
+        loadingRef.current = true; // lock it immediately (sync)
+        await getFeedPageData(page).finally(() => loadingRef.current = false);
+        setPage(prevPage => prevPage + 1);
+      }
+    };
+
+    window.addEventListener("scroll", handleScrolling);
+    return () => window.removeEventListener("scroll", handleScrolling);
+  }, [isLoadingPost, hasMore, getFeedPageData, page]);
 
   if (pageState === "Initializing")
     return <LoadingComponent />;
@@ -23,12 +41,6 @@ const FeedPage: React.FC = () => {
     setFeedValue(value);
     setPage(1);
     localStorage.setItem("feedValue", value);
-  };
-
-  const handleLoadMore = async () => {
-    console.log("Loading more posts...");
-    await getFeedPageData(page);
-    setPage(prevPage => prevPage + 1);
   };
 
   return (
@@ -66,7 +78,6 @@ const FeedPage: React.FC = () => {
             </div>
           </div>
         </div>
-
       </div>
       <hr className="border-gray-700" />
 
@@ -85,16 +96,7 @@ const FeedPage: React.FC = () => {
         <motion.div>
           <div className="w-12 h-12 border-4 border-cyan-500 border-t-violet-500 rounded-full animate-spin mx-auto shadow-lg shadow-cyan-600/50"></div>
         </motion.div>
-      ) : hasMore ?(
-        <motion.button
-          whileHover={{ scale: 1.1 }}
-          whileTap={{ scale: 0.9 }}
-          transition={{ duration: 0.2 }}
-           className="w-full max-w-md mx-auto bg-gradient-to-b from-cyan-500 to-violet-500 text-white py-2 rounded cursor-pointer" onClick={() => handleLoadMore()}
-        >
-          <p className="text-center text-lg font-bold">Load More</p>
-        </motion.button>
-      ): null}
+      ) : null}
 
     </div>
   );

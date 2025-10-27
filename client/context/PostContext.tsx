@@ -78,23 +78,35 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
                 // localStorage.removeItem("posts");
                 setPosts(null);
                 setHasMore(true);
-                await fetchPosts();
+                await getFeedPageData(0);
             };
             fetchingPost();
         }
     }, [feedValue, account]);
 
-    const storeFetchedPosts = (comingPosts: Post[]) => {
+    const getStoredPosts = (feed:string): Post[] | null => {
+        const storedPosts = localStorage.getItem(`posts${feed}`);
+        if (storedPosts)
+            return JSON.parse(storedPosts);
+        else
+            return null;
+    };
+
+    const setStoredPosts = (comingPosts: Post[]) => {
         
+        let storedPosts = getStoredPosts(feedValue) || [];
+        storedPosts = [...storedPosts, ...(posts || [])];
+
         let newPosts: Post[] = [];
         // check if any post from coming post is exist in posts
         comingPosts.map((post) => {
-            if(!posts?.includes(post))
+            if(!storedPosts?.includes(post))
                 newPosts.push(post);
         });
 
         setPosts((prevPosts) => ([...(prevPosts || []), ...newPosts]));
-        
+        localStorage.setItem(`posts${feedValue}`, JSON.stringify([...(posts || []), ...newPosts]));
+        localStorage.setItem("LastFetchDate", new Date().toISOString());
     };
 
     const fetchPosts = useCallback(async (page:number = 0) => {
@@ -102,7 +114,6 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
             setHasMore(true);
             setPosts(null);
         }
-
         const result = await fetchWithAuth(async () => {
             return await getData(`${BASEURL}posts?feedValue=${feedValue}&tagValue=${tagValue}&offset=${page * 10}`, {
                 credentials: "include",
@@ -110,7 +121,7 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
 
         if(result){
-            storeFetchedPosts(result);
+            setStoredPosts(result);
             if(result.length < 10)
                 setHasMore(false);
             return result;
@@ -134,7 +145,7 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
 
         if (result) {
-            storeFetchedPosts([result]);
+            setStoredPosts([result]);
             return result;
         }
         else
@@ -367,7 +378,7 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
 
         if (result) {
-            storeFetchedPosts(result);
+            setStoredPosts(result);
         }
 
     }, [getData, fetchWithAuth]);
