@@ -16,6 +16,7 @@ class Settings(BaseSettings):
     secret_key_refresh: str
     domain: Optional[str] = None
     environment: str
+    google_client_id:str
 
     model_config = ConfigDict(env_file=env_file)
 
