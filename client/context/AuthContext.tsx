@@ -7,7 +7,7 @@ import usePatch from "@/hooks/usePatch";
 import { ApiError } from "@/hooks/useFetch";
 import { BASEURL } from "./ContextProvider";
 
-interface AuthState{
+interface AuthState {
     account: PrivateAccount | null;
     isLoading: boolean;
     setAccount: React.Dispatch<React.SetStateAction<PrivateAccount | null>>
@@ -20,30 +20,33 @@ interface AuthState{
     pageState: PageState;
     setPageState: React.Dispatch<React.SetStateAction<PageState>>;
     setNullEachError: () => void;
+    authWithGoogle: (token: string) => Promise<boolean>;
 }
 
 export type PageState = "Completed" | "Initializing";
 
 const AuthContext = createContext<AuthState | undefined>(undefined);
 
-export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) => {
-    const { isLoading:isLoadingPost, error:errorPost, postData, setError:setErrorPost } = usePost("URLSearchParams");
-    const { isLoading:isLoadingGet, error:errorGet, getData, setError:setErrorAuth} = useGet();
-    const { isLoading:isLoadingPatch, error:errorPatch, patchData, setError:setErrorPatch } = usePatch({ bodyFormat: "JSON", headers:{ 
-        "Content-Type": "application/json",
-        credentials:"include",
-    }});
+export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+    const { isLoading: isLoadingPost, error: errorPost, postData, setError: setErrorPost } = usePost("URLSearchParams");
+    const { isLoading: isLoadingGet, error: errorGet, getData, setError: setErrorAuth } = useGet();
+    const { isLoading: isLoadingPatch, error: errorPatch, patchData, setError: setErrorPatch } = usePatch({
+        bodyFormat: "JSON", headers: {
+            "Content-Type": "application/json",
+            credentials: "include",
+        }
+    });
     const [account, setAccount] = useState<PrivateAccount | null>(null);
     const [pageState, setPageState] = useState<PageState>("Initializing");
 
     useEffect(() => {
         // Getting account from local storage
         const account = localStorage.getItem("account");
-        if(account){
+        if (account) {
             setAccount(JSON.parse(account));
             setPageState("Completed")
         }
-        
+
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
@@ -53,12 +56,37 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
         setErrorPatch(null);
     }
 
-    const signUp = useCallback(async (email:string, username:string, password:string) => {
-        const result = await postData(`${BASEURL}auth/signup`, {email, username, password}, {
-            credentials:"include",
+    const authWithGoogle = useCallback(async (credentialResponse: any): Promise<boolean> => {
+        if (!credentialResponse.credential) return false;
+
+        try {
+            const res = await fetch(`${BASEURL}auth/google`, {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ token: credentialResponse.credential }),
+                credentials: "include",
+            });
+
+            const data = await res.json();
+            setAccount(data);
+            localStorage.setItem("account", JSON.stringify(data));
+            window.location.href = "/";
+            return true;
+            // setUser(data); // update context
+        } catch (err) {
+            console.error("Google login failed:", JSON.stringify(err));
+            return false;
+        }
+
+    }, []);
+
+
+    const signUp = useCallback(async (email: string, username: string, password: string) => {
+        const result = await postData(`${BASEURL}auth/signup`, { email, username, password }, {
+            credentials: "include",
         });
 
-        if(result){
+        if (result) {
             setAccount(result);
             // store account on local store
             localStorage.setItem("account", JSON.stringify(result));
@@ -69,24 +97,24 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
 
     }, [postData]);
 
-    const login = useCallback(async (username:string, password:string) => {
-        const result = await postData(`${BASEURL}auth/login`, {username, password}, {
-            credentials:"include",
+    const login = useCallback(async (username: string, password: string) => {
+        const result = await postData(`${BASEURL}auth/login`, { username, password }, {
+            credentials: "include",
         });
 
-        if(result){
+        if (result) {
             localStorage.setItem("account", JSON.stringify(result));
             setAccount(result);
             window.location.href = "/";
-        }    
+        }
     }, [postData]);
 
     const logout = useCallback(async () => {
         const result = await postData(`${BASEURL}auth/logout`, {}, {
-            credentials:"include",
+            credentials: "include",
         });
 
-        if(result){
+        if (result) {
             localStorage.removeItem("account");
             localStorage.removeItem("lastFetchDate");
             localStorage.removeItem("posts");
@@ -98,17 +126,17 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
 
     const isAccessTokenValid = async () => {
         let isValid = await getData(`${BASEURL}auth/verify_access_token`, {
-            credentials:"include",
+            credentials: "include",
         });
 
-        if(!isValid){
-            isValid = await postData(`${BASEURL}auth/create_access_token`, {},{
-                credentials:"include",
+        if (!isValid) {
+            isValid = await postData(`${BASEURL}auth/create_access_token`, {}, {
+                credentials: "include",
             });
 
-            if(isValid)
+            if (isValid)
                 return true;
-            else{
+            else {
                 await logout();
                 return false;
             }
@@ -117,15 +145,15 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             return true;
     };
 
-    const fetchWithAuth = async ( fetchFunc: () => Promise<any>) => {
+    const fetchWithAuth = async (fetchFunc: () => Promise<any>) => {
         const isTokenValid = await isAccessTokenValid();
-        if(!isTokenValid)
+        if (!isTokenValid)
             return null;
         else
             return await fetchFunc();
     };
 
-    const updateProfile = useCallback(async (fullName?:string, bio?:string, avatarUrl?:string) => {
+    const updateProfile = useCallback(async (fullName?: string, bio?: string, avatarUrl?: string) => {
         const result = await fetchWithAuth(async () => {
             return await patchData(`${BASEURL}accounts/profile/me`, {
                 fullName,
@@ -134,7 +162,7 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
             });
         });
 
-        if(result){
+        if (result) {
             console.log(`result: ${JSON.stringify(result)} `);
             // TO DO: update current account without fetch data again
             setAccount(prevAccount => {
@@ -157,18 +185,19 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
     return (
         <AuthContext.Provider value={
             {
-                account, 
-                error: errorPost || errorGet || errorPatch, 
+                account,
+                error: errorPost || errorGet || errorPatch,
                 isLoading: isLoadingPost || isLoadingGet || isLoadingPatch,
                 pageState,
                 setPageState,
-                setAccount, 
-                signUp, 
-                login, 
-                logout, 
+                setAccount,
+                signUp,
+                login,
+                logout,
                 fetchWithAuth,
                 setNullEachError,
                 updateProfile,
+                authWithGoogle,
             }}>
             {children}
         </AuthContext.Provider>
@@ -177,7 +206,7 @@ export const AuthProvider:React.FC<{children:React.ReactNode}> = ({children}) =>
 
 export const useAuth = () => {
     const context = useContext(AuthContext);
-    if(!context){
+    if (!context) {
         throw new Error("useAuth must be used within an AuthProvider");
     }
 

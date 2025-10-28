@@ -1,4 +1,5 @@
 "use client";
+import GoogleLoginButton from "@/components/GoogleLoginButton";
 import { useAuth } from "@/context/AuthContext";
 import Link from "next/link";
 
@@ -11,6 +12,11 @@ const RootPage:React.FC = () => {
         <div className="fixed inset-0 flex justify-center items-center bg-black/80 z-50">
           <div className="p-4 rounded shadow-xl">
             <h1 className="text-center font-bold text-2xl mt-2">You haven&apos;t Signin yet</h1>
+            <div className="mt-4 flex flex-col items-center justify-center space-y-4 bg-slate-700/50 py-4 rounded-lg">
+              <div className="flex items-center justify-center">
+                <GoogleLoginButton />
+            </div>
+            </div>
             <div className="mt-4 text-center">
               <p>
                 If you don NOT have an account,{" "}

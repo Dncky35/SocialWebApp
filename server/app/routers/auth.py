@@ -1,10 +1,11 @@
-from fastapi import APIRouter, HTTPException, status, Response, Depends, Cookie
+from fastapi import APIRouter, HTTPException, status, Response, Depends, Cookie, Query
 from fastapi.security import OAuth2PasswordRequestForm
 from app.core import oauth2, utils, config
 from google.oauth2 import id_token
 from google.auth.transport import requests
 from app import models
 from app.schemas.account import PrivateAccount
+from app.schemas.token import GoogleToken
 import uuid
 
 router = APIRouter(
@@ -67,64 +68,68 @@ async def create_account(
     
     return private_account
 
-
 @router.post("/google", response_model=PrivateAccount)
-async def google_sign_in(response: Response, token:str):
+async def google_sign_in(response: Response, token_data: GoogleToken):
+    token = token_data.token
     try:
-        id_info = id_token.verify_oauth2_token(token, requests.Request(), config.google_client_id)
-        email = id_info.get("email")
-        full_name = id_info.get("name", "")
-        picture = id_info.get("picture", "")
-
-        # Find existing user
-        existing = await models.Account.find_one(models.Account.email == email)
-        if existing:
-            account = existing
-        else:
-            # Create new user
-            base_username = email.split("@")[0]
-            username = base_username
-            count = 1
-            while await models.Account.find_one(models.Account.username == username):
-                username = f"{base_username}{count}"
-                count += 1
-            # Create new verified Google account
-            account = models.Account(
-                email=email,
-                username=username,
-                password=utils.hash_password(uuid.uuid4().hex),  # placeholder password
-                full_name=full_name,
-                avatar_url=picture,
-                is_verified=True,
-            )
-            await account.insert()
-
-        refresh_token = oauth2.create_token(data={"account_id": str(account.id)})
-        response.set_cookie(
-            key="refreshToken",
-            value=refresh_token,
-            max_age=60 * 60 * 24 * 7,
-            **config.settings.cookie_config,
-        )
-
-        private_account = PrivateAccount(
-            id=account.id,
-            email=account.email,
-            username=account.username,
-            full_name=account.full_name,
-            is_verified=account.is_verified,
-            bio=account.bio,
-            avatar_url=account.avatar_url,
-            followers_count=len(account.followers),
-            following_count=len(account.following),
-            created_at=account.created_at,
-            updated_at=account.updated_at,
-        )
-
-        return private_account
-
+        idinfo = id_token.verify_oauth2_token(token, requests.Request(), config.settings.google_client_id)
     except ValueError:
-        raise HTTPException(status_code=401, detail="Invalid Google token")
+        raise HTTPException(status_code=401, detail="Invalid Google token v1")
+
+    email = idinfo.get("email")
+    full_name = idinfo.get("name", "")
+    picture = idinfo.get("picture", "")
+
+    # Check if user exists
+    existing = await models.Account.find_one(models.Account.email == email)
+    if existing:
+        account = existing
+        username = account.username  # <- make sure it's defined
+    else:
+        # Generate unique username
+        base_username = email.split("@")[0]
+        base_username = base_username.replace(".", "_")  # replace dot with underscore
+        username = base_username
+        count = 1
+        while await models.Account.find_one(models.Account.username == username):
+            username = f"{base_username}{count}"
+            count += 1
+
+    # Create new verified Google account
+    account = models.Account(
+        email=email,
+        username=username,
+        password=utils.hash_password(uuid.uuid4().hex),  # placeholder password
+        full_name=full_name,
+        avatar_url=picture,
+        is_verified=True,
+    )
+    await account.insert()
+
+    refresh_token = oauth2.create_token(data={"account_id": str(account.id)})
+    response.set_cookie(
+        key="refreshToken",
+        value=refresh_token,
+        max_age=60 * 60 * 24 * 7,
+        **config.settings.cookie_config,
+    )
+
+    private_account = PrivateAccount(
+        id=account.id,
+        email=account.email,
+        username=account.username,
+        full_name=account.full_name,
+        is_verified=account.is_verified,
+        bio=account.bio,
+        avatar_url=account.avatar_url,
+        followers_count=len(account.followers),
+        following_count=len(account.following),
+        created_at=account.created_at,
+        updated_at=account.updated_at,
+    )
+
+    return private_account
+
 
 @router.post("/login", status_code=status.HTTP_202_ACCEPTED, response_model=PrivateAccount)
 async def login_account(response:Response, credentials: OAuth2PasswordRequestForm = Depends()):
