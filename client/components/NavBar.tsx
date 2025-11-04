@@ -61,7 +61,7 @@ const NavBar: React.FC = () => {
               <Link
                 href="/profile/me"
                 className="block px-4 py-2 text-gray-800 hover:bg-slate-100 transition"
-                onClick={(e) => setDropdownVisible(false)}
+                onClick={() => setDropdownVisible(false)}
               >
                 Profile
               </Link>

@@ -1,14 +1,14 @@
 "use client";
 import React from 'react';
 import { BASEURL } from "@/context/ContextProvider";
-import { GoogleLogin } from "@react-oauth/google";
-import { useAuth } from "@/context/AuthContext";
+import { GoogleLogin, CredentialResponse } from "@react-oauth/google";
+// import { useAuth } from "@/context/AuthContext";
 
 const GoogleLoginButton: React.FC = () => {
 
-    const { authWithGoogle, isLoading, error } = useAuth();
+    // const { authWithGoogle, isLoading, error } = useAuth();
 
-    const handleSuccess = async (credentialResponse: any) => {
+    const handleSuccess = async (credentialResponse: CredentialResponse) => {
         if (!credentialResponse.credential) return false;
 
         try {
