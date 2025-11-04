@@ -42,8 +42,8 @@ app.state.limiter = limiter
 app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 origins_prod = [  # Ensure both Gitpod URLs are included
-    "https://cloudrocean.xyz",
-    "https://socialwebapp.cloudrocean.xyz",
+    "https://cloudrocean.com",
+    "https://socialwebapp.cloudrocean.com",
 ]
 
 origins_dev = [
