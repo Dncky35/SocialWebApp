@@ -25,7 +25,7 @@ const GoogleLoginButton: React.FC = () => {
             return true;
             // setUser(data); // update context
         } catch (err) {
-            console.error("Google login failed:", JSON.stringify(err));
+            console.error("Google login failed:", err);
             return false;
         }
     };

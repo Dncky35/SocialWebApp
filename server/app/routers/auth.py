@@ -81,9 +81,9 @@ async def google_sign_in(response: Response, token_data: GoogleToken):
     picture = idinfo.get("picture", "")
 
     # Check if user exists
-    existing = await models.Account.find_one(models.Account.email == email)
-    if existing:
-        account = existing
+    account = await models.Account.find_one(models.Account.email == email)
+    # account = await models.Account.find_one({"email": email})
+    if account:
         username = account.username  # <- make sure it's defined
     else:
         # Generate unique username
@@ -95,16 +95,16 @@ async def google_sign_in(response: Response, token_data: GoogleToken):
             username = f"{base_username}{count}"
             count += 1
 
-    # Create new verified Google account
-    account = models.Account(
-        email=email,
-        username=username,
-        password=utils.hash_password(uuid.uuid4().hex),  # placeholder password
-        full_name=full_name,
-        avatar_url=picture,
-        is_verified=True,
-    )
-    await account.insert()
+        # Create new verified Google account
+        account = models.Account(
+            email=email,
+            username=username,
+            password=utils.hash_password(uuid.uuid4().hex),  # placeholder password
+            full_name=full_name,
+            avatar_url=picture,
+            is_verified=True,
+        )
+        await account.insert()
 
     refresh_token = oauth2.create_token(data={"account_id": str(account.id)})
     response.set_cookie(
