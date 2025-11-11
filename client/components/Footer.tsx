@@ -8,7 +8,7 @@ const Footer: React.FC = () => {
         <div className="flex flex-col items-end">
           <p className="text-xs italic text-gray-400">Powered by</p>
           <Link
-            href={"https://cloudrocean.xyz/"}
+            href={"https://cloudrocean.com/"}
             className="text-md font-semibold text-cyan-400 hover:text-violet-400 transition-colors hover:underline"
           >
             © 2025 CloudROcean
