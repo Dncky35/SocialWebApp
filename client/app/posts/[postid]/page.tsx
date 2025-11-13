@@ -15,13 +15,14 @@ const PostPage:React.FC = () => {
     const { pageState } = useAuth();
 
     useEffect(() => {
-        if (!post && !isLoading && !error) {
-            const fetchPost = async () => {
-                await searchPosts({id: params.postid as string});
-            };
+        if(post || isLoading)
+            return;
 
-            fetchPost();
-        }
+        const fetchPost = async () => {
+            await searchPosts({id: params.postid as string});
+        };
+
+        fetchPost();
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [post, error]);
 
