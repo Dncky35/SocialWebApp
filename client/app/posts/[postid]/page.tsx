@@ -15,16 +15,15 @@ const PostPage:React.FC = () => {
     const { pageState } = useAuth();
 
     useEffect(() => {
-        if(post || isLoading)
-            return;
+        if(!post && !isLoading && !error){
+            const fetchPost = async () => {
+                await searchPosts({id: params.postid as string});
+            };
 
-        const fetchPost = async () => {
-            await searchPosts({id: params.postid as string});
-        };
-
-        fetchPost();
+            fetchPost();
+        }
         // eslint-disable-next-line react-hooks/exhaustive-deps
-    }, [post, error]);
+    }, [post, error, isLoading]);
 
     if(isLoading || pageState === "Initializing")
         return ( <LoadingComponent />);
