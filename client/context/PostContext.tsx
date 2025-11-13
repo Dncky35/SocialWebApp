@@ -94,8 +94,8 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const setStoredPosts = (comingPosts: Post[]) => {
         
-        let storedPosts = getStoredPosts(feedValue) || [];
-        storedPosts = [...storedPosts, ...(posts || [])];
+        let storedPosts = [];
+        storedPosts = [...(posts || [])];
 
         let newPosts: Post[] = [];
         // check if any post from coming post is exist in posts
@@ -105,8 +105,8 @@ export const PostProvider: React.FC<{ children: React.ReactNode }> = ({ children
         });
 
         setPosts((prevPosts) => ([...(prevPosts || []), ...newPosts]));
-        localStorage.setItem(`posts${feedValue}`, JSON.stringify([...(posts || []), ...newPosts]));
-        localStorage.setItem("LastFetchDate", new Date().toISOString());
+        // localStorage.setItem(`posts${feedValue}`, JSON.stringify([...(posts || []), ...newPosts]));
+        // localStorage.setItem("LastFetchDate", new Date().toISOString());
     };
 
     const fetchPosts = useCallback(async (page:number = 0) => {
