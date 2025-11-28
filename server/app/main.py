@@ -1,16 +1,16 @@
 from fastapi import FastAPI, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.middleware.httpsredirect import HTTPSRedirectMiddleware
 from fastapi.responses import JSONResponse
 from app.core.limiter import limiter
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from pymongo.errors import PyMongoError
-from app.routers import auth, posts, account, comment
-from app.routers.admin import admin_accounts, admin_toggle
+# from app.routers import posts, comment
+from app.routers.auth import account as auth_account
+from app.routers.profile import account as profile_account
+# from app.routers.admin import admin_accounts, admin_toggle
 from app.core.config import settings
 import logging
-import os
 from contextlib import asynccontextmanager
 from app.core.database import init_db, client
 
@@ -64,12 +64,11 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type"],
 )
 
-app.include_router(auth.router)
-app.include_router(posts.router)
-app.include_router(account.router)
-app.include_router(comment.router)
-app.include_router(admin_accounts.router)
-app.include_router(admin_toggle.router)
+# app.include_router(auth.router)
+app.include_router(auth_account.router)
+app.include_router(profile_account.router)
+# app.include_router(admin_accounts.router)
+# app.include_router(admin_toggle.router)
 
 @app.get("/")
 async def root():

@@ -1,40 +1,36 @@
-from pydantic import BaseModel, Field
 from beanie import PydanticObjectId
-from typing import Literal, Optional
+from pydantic import BaseModel, EmailStr, Field
+from typing import Optional
 from datetime import datetime
 
+# What the user sends to register
+class AccountRegister(BaseModel):
+    email: EmailStr
+    username: str = Field(..., min_length=3, max_length=30)
+    password: str = Field(..., min_length=8, description="Raw password from user")
+    full_name: Optional[str] = None
+    
+class LoginPayload(BaseModel):
+    email: EmailStr
+    password: str
+    
+class UpdateAccountPayload(BaseModel):
+    email: Optional[EmailStr] = None
+    username: Optional[str] = Field(None, min_length=3, max_length=30)
+    full_name: Optional[str] = None
+    bio: Optional[str] = None
+    avatar_url: Optional[str] = None
+    
 
-class PublicAccount(BaseModel):
-    id: PydanticObjectId
+# What you return to the frontend (Hides password!)
+class AccountResponse(BaseModel):
+    id: PydanticObjectId = Field(alias="_id")
+    email: EmailStr
     username: str
-    bio: Optional[str]
-    avatar_url: Optional[str]
-    followers_count: int
-    following_count: int
-    is_following: Optional[bool] = None  # Only set when viewing others
-    created_at: datetime
-
-    class Config:
-        orm_mode = True
-
-class PrivateAccount(PublicAccount):
-    email:str
     full_name: Optional[str]
-    is_verified: bool = Field(default=False)
-    updated_at: datetime
-
-class UpdateProfile(BaseModel):
-    full_name: Optional[str] = Field(None, max_length=50)
-    bio: Optional[str] = Field(None, max_length=160)
-    avatar_url: Optional[str] = Field(None, max_length=255)
-
-class AccountAdminRequest(BaseModel):
-    email: Optional[str] = Field(None, max_length=255)
-    username: Optional[str] = Field(None, max_length=50)
-    password: Optional[str] = Field(None, max_length=255)
-    full_name: Optional[str] = Field(None, max_length=50)
-    bio: Optional[str] = Field(None, max_length=160)
-    avatar_url: Optional[str] = Field(None, max_length=255)
-    role: Optional[Literal["user", "admin", "moderator"]] = Field(None)
-    is_verified: bool = Field(default=False)
-    is_deleted: bool = Field(default=False)
+    bio: Optional[str]
+    created_at: datetime
+    
+    class Config:
+        # Allows Pydantic to read data from the Beanie Document
+        from_attributes = True

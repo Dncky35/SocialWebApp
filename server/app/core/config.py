@@ -1,4 +1,4 @@
-from pydantic import ConfigDict
+from pydantic import ConfigDict, SecretStr
 from pydantic_settings import BaseSettings
 from dotenv import load_dotenv
 from typing import Optional
@@ -10,13 +10,13 @@ load_dotenv(env_file)
 
 class Settings(BaseSettings):
     mongodb_username: str
-    mongodb_password: str
-    secret_key: str
+    mongodb_password: SecretStr
+    secret_key: SecretStr
     algorithm: str
-    secret_key_refresh: str
+    secret_key_refresh: SecretStr
     domain: Optional[str] = None
     environment: str
-    google_client_id:str
+    google_client_id: SecretStr
 
     model_config = ConfigDict(env_file=env_file)
 

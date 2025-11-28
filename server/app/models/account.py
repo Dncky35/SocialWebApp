@@ -1,40 +1,39 @@
-from beanie import Document, PydanticObjectId
+from beanie import Document, PydanticObjectId, Replace, SaveChanges, before_event
 from pydantic import EmailStr, Field
 from datetime import datetime, timezone
-from typing import Optional, List
-from fastapi import Form
+from typing import Optional
+from enum import Enum
+
+class UserRole(str, Enum):
+    USER = "user"
+    ADMIN = "admin"
+    MODERATOR = "moderator"
 
 class Account(Document):
+    
     id: Optional[PydanticObjectId] = Field(default=None, alias="_id")
     email: EmailStr
     username: str = Field(..., min_length=3, max_length=30, pattern=r"^[a-zA-Z0-9_]+$")
     password: str = Field(..., min_length=8, max_length=255)
+    
     full_name: Optional[str] = Field(..., min_length=4, max_length=50)
     bio: Optional[str] = Field(None, max_length=160)
     avatar_url: Optional[str] = Field(None, max_length=255)
+    
     role: str = Field(default="user")
     is_verified: bool = Field(default=False)
     is_deleted: bool = Field(default=False)
     is_banned: bool = Field(default=False)
-    followers: List[PydanticObjectId] = Field(default_factory=list)
-    following: List[PydanticObjectId] = Field(default_factory=list)
+    # SCALABILITY: Store counts, not lists of IDs
+    follower_count: int = Field(default=0)
+    following_count: int = Field(default=0)
     created_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
     updated_at: datetime = Field(default_factory=lambda: datetime.now(timezone.utc))
 
     class Settings:
-        name = "accounts"  # MongoDB collection name
-
-    @classmethod
-    def as_form(
-        cls,
-        email: EmailStr = Form(...),
-        username: str = Form(...),
-        password: str = Form(...),
-        full_name: Optional[str] = Form(None),
-    ):
-        return cls(
-            email=email,
-            username=username,
-            password=password,
-            full_name=full_name
-        )
+        name = "accounts"
+        
+    # Automatically update 'updated_at' on save
+    @before_event(Replace, SaveChanges)
+    def update_timestamp(self):
+        self.updated_at = datetime.now(timezone.utc)
