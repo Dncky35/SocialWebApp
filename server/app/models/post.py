@@ -53,15 +53,15 @@ class Post(Document):
 # It's necessary for checking if a user liked a post and for retrieving a list of users who liked it.
 
 class PostLike(Document):
-    user_id: PydanticObjectId
     post_id: PydanticObjectId
-    created_at: datetime = Field(default_factory=get_utc_now)
+    liked_by: PydanticObjectId  # Kept this to match your router code
+    created_at: datetime = Field(default_factory=datetime.utcnow)
     
     class Settings:
         name = "post_likes"
-        # Ensures a user can only like a post once (unique constraint)
+        # UPDATED: Index must use 'liked_by', not 'user_id'
         indexes = [
-            ("user_id", "post_id"),
+            ("liked_by", "post_id"), 
         ]
         
 # This document tracks comments, which should be queryable by post ID

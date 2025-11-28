@@ -3,8 +3,8 @@ from beanie import PydanticObjectId
 from fastapi.responses import Response
 from app.schemas.account import AccountResponse, UpdatePayload
 from app.models.account import Account
-from app.core.oauth2 import get_logged_in_user, get_current_user, get_logged_in_user_from_session_token, get_current_user_from_access_token
-from server.app.core import config
+from app.core.oauth2 import get_current_user, get_logged_in_user_from_session_token, get_current_user_from_access_token
+from app.core import config
 
 router = APIRouter(
     prefix="/profile/account",
@@ -62,7 +62,6 @@ async def delete_my_profile(response: Response, current_account=Depends(get_curr
        **config.settings.cookie_config,
     )
     
-    
     return Response(status_code=status.HTTP_204_NO_CONTENT)
         
 @router.get("/{account_id}", status_code=status.HTTP_200_OK, response_model=AccountResponse)
@@ -72,4 +71,5 @@ async def get_profile(account_id: str, current_user=Depends(get_current_user)):
     if not account or account.is_deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Account not found")
     
+    account.id = str(account.id)
     return account

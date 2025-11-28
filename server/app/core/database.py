@@ -14,5 +14,5 @@ db = client[f"social_webapp_{settings.environment}"]
 async def init_db():
     await init_beanie(
         database=db,
-        document_models=[account.Account, post.Post, comment.Comment]  # Add all your Beanie models here
+        document_models=[account.Account, post.Post, post.PostLike, post.Comment, post.SubComment]  # Add all your Beanie models here
     )
