@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, requests, status, Response
 from pymongo.errors import DuplicateKeyError
 from app.models.account import Account
-from app.schemas.account import AccountRegister, AccountResponse, LoginPayload
+from app.schemas.account import AccountRegister, AccountResponse, LoginPayload, UpdatePayload
 from app.core.utils import hash_password, verify_password
 from app.core.oauth2 import create_token
 from app.core import config
@@ -41,7 +41,7 @@ async def create_account(response: Response, response_data: AccountRegister):
         )
     
     # Create token using inserted account id
-    refreshToken = create_token(data={"account_id": str(new_account.id)})
+    refreshToken = create_token(data={"account_id": str(new_account.id)}, is_access_token=False)
     response.set_cookie(
         key="sessionToken",
         value=refreshToken,
@@ -63,7 +63,7 @@ async def login_account(response: Response, form_data: AccountRegister):
         raise HTTPException(status_code=400, detail="Invalid email or password.")
     
     # Create token
-    refreshToken = create_token(data={"account_id": str(account.id)})
+    refreshToken = create_token(data={"account_id": str(account.id)}, is_access_token=False)
     response.set_cookie(
         key="sessionToken",
         value=refreshToken,
@@ -111,7 +111,7 @@ async def sign_in_with_google(response: Response, google_token: GoogleToken):
         await account.insert()
         
     # Common Login Logic (DRY)
-    refreshToken = create_token(data={"account_id": str(account.id)})
+    refreshToken = create_token(data={"account_id": str(account.id)}, is_access_token=False)
     
     response.set_cookie(
         key="sessionToken",
@@ -123,3 +123,18 @@ async def sign_in_with_google(response: Response, google_token: GoogleToken):
     )
     
     return account
+
+@router.post("/logout", status_code=status.HTTP_200_OK)
+async def logout_account(response: Response):
+    response.delete_cookie(
+        key="sessionToken",
+        **config.settings.cookie_config,
+    )
+    
+    response.delete_cookie(
+        key="accessToken",
+        path="/",
+        domain=config.settings.domain
+    )
+    
+    return {"detail": "Successfully logged out."}

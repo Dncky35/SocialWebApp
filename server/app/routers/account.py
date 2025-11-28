@@ -126,10 +126,6 @@ async def update_my_profile(profile_data: UpdateProfile, current_user=Depends(oa
     if not account or account.is_deleted:
         raise HTTPException(status_code=404, detail="Account not found")
 
-    # account.full_name = profile_data.full_name or account.full_name
-    # account.bio = profile_data.bio or account.bio
-    # account.profile_image_url = profile_data.profile_image_url or account.profile_image_url
-
     update_fields = profile_data.dict(exclude_unset=True)
     for key, value in update_fields.items():
         setattr(account, key, value)

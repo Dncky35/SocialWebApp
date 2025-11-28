@@ -25,7 +25,7 @@ async def validate_user_token(response: Response, token: str = Depends(get_curre
 @router.get("/rotate_session", status_code=status.HTTP_200_OK)
 async def rotate_session(response: Response, token: str = Depends(get_logged_in_user)):
     
-    new_refresh_token = create_token(data={"account_id": token.account_id, "role":token.role})
+    new_refresh_token = create_token(data={"account_id": token.account_id, "role":token.role}, is_access_token=False)
     response.set_cookie(
         key="sessionToken",
         value=new_refresh_token,

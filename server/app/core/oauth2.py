@@ -7,6 +7,7 @@ from app.core.config import settings
 from bson import ObjectId
 from app.schemas import token as token_schema
 from app import models
+from app.models.account import UserRole
 
 ACCESS_TOKEN_EXPIRE_MINUTES = 15
 REFRESH_TOKEN_EXPIRE_DAYS = 7
@@ -21,7 +22,7 @@ def create_token(data: dict, is_access_token: bool = False):
     to_encode.update({
         "exp": expire, 
         "sub": str(data.get("account_id")),
-        "role": data.get("role", "user")
+        "role": data.get("role", UserRole.USER.value)
         })
 
     secret_key = settings.secret_key if is_access_token else settings.secret_key_refresh
@@ -32,7 +33,7 @@ def verify_token(token: str, is_access_token: bool = False) -> token_schema.Toke
     try:
         payload = jwt.decode(token, secret_key, algorithms=[settings.algorithm])
         id: str = payload.get("sub")
-        role = payload.get("role", "user")
+        role = payload.get("role", UserRole.USER.value)
 
         if id is None:
             raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token payload")
@@ -51,7 +52,7 @@ async def get_current_user(token = Cookie(None, alias="accessToken")):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Access token missing")
     token_data = verify_token(token=token, is_access_token=True)
     account = await models.Account.find_one({"_id":ObjectId(token_data.account_id)})
-    if account is None:
+    if account is None or account.is_deleted or account.is_banned:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     return token_data
 
@@ -61,7 +62,7 @@ async def get_logged_in_user(token = Cookie(None, alias="refreshToken")):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token missing")
     token_data = verify_token(token=token)
     account = await models.Account.find_one({"_id":ObjectId(token_data.account_id)})
-    if account is None:
+    if account is None or account.is_deleted or account.is_banned:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     return token_data
 
@@ -79,7 +80,7 @@ async def get_current_admin_user(token = Cookie(None, alias="accessToken")) -> m
     if not account:
         raise HTTPException(status_code=404, detail="Account not found")
 
-    if not account.is_admin:
+    if not account.role == UserRole.ADMIN.value:
         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Not enough permissions")
     
     return account

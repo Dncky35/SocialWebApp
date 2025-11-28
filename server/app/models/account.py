@@ -4,6 +4,8 @@ from datetime import datetime, timezone
 from typing import Optional
 from enum import Enum
 
+from server.app.models.post import get_utc_now
+
 class UserRole(str, Enum):
     USER = "user"
     ADMIN = "admin"
@@ -24,6 +26,7 @@ class Account(Document):
     is_verified: bool = Field(default=False)
     is_deleted: bool = Field(default=False)
     is_banned: bool = Field(default=False)
+    deleted_at: Optional[datetime] = Field(default=None)
     # SCALABILITY: Store counts, not lists of IDs
     follower_count: int = Field(default=0)
     following_count: int = Field(default=0)
@@ -37,3 +40,10 @@ class Account(Document):
     @before_event(Replace, SaveChanges)
     def update_timestamp(self):
         self.updated_at = datetime.now(timezone.utc)
+        
+    @before_event(SaveChanges)
+    def update_deleted_at(self):
+        if self.is_deleted and self.deleted_at is None:
+            self.deleted_at = get_utc_now()
+        elif not self.is_deleted and self.deleted_at is not None:
+            self.deleted_at = None

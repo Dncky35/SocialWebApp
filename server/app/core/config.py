@@ -10,13 +10,13 @@ load_dotenv(env_file)
 
 class Settings(BaseSettings):
     mongodb_username: str
-    mongodb_password: SecretStr
-    secret_key: SecretStr
+    mongodb_password: str
+    secret_key: str
     algorithm: str
-    secret_key_refresh: SecretStr
+    secret_key_refresh: str
     domain: Optional[str] = None
     environment: str
-    google_client_id: SecretStr
+    google_client_id: str
 
     model_config = ConfigDict(env_file=env_file)
 

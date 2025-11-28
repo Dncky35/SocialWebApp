@@ -5,10 +5,8 @@ from app.core.limiter import limiter
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from pymongo.errors import PyMongoError
-# from app.routers import posts, comment
 from app.routers.auth import account as auth_account
 from app.routers.profile import account as profile_account
-# from app.routers.admin import admin_accounts, admin_toggle
 from app.core.config import settings
 import logging
 from contextlib import asynccontextmanager
