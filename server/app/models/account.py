@@ -1,10 +1,10 @@
 from beanie import Document, PydanticObjectId, Replace, SaveChanges, before_event
-from pydantic import EmailStr, Field
+from pydantic import ConfigDict, EmailStr, Field
 from datetime import datetime, timezone
 from typing import Optional
 from enum import Enum
 
-from server.app.models.post import get_utc_now
+from app.models.post import get_utc_now
 
 class UserRole(str, Enum):
     USER = "user"
@@ -35,12 +35,17 @@ class Account(Document):
 
     class Settings:
         name = "accounts"
+    
+    class Config:
+        json_encoders = {PydanticObjectId: str}
+        from_attributes = True
         
     # Automatically update 'updated_at' on save
     @before_event(Replace, SaveChanges)
     def update_timestamp(self):
         self.updated_at = datetime.now(timezone.utc)
-        
+    
+    # Automatically manage 'deleted_at' based on 'is_deleted' status    
     @before_event(SaveChanges)
     def update_deleted_at(self):
         if self.is_deleted and self.deleted_at is None:

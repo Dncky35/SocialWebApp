@@ -56,7 +56,7 @@ async def get_current_user(token = Cookie(None, alias="accessToken")):
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
     return token_data
 
-async def get_logged_in_user(token = Cookie(None, alias="refreshToken")):
+async def get_logged_in_user(token = Cookie(None, alias="sessionToken")):
 
     if not token:
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token missing")
@@ -85,3 +85,39 @@ async def get_current_admin_user(token = Cookie(None, alias="accessToken")) -> m
     
     return account
 
+# --- Dependency Functions ---
+
+async def get_current_user_from_access_token(token: str = Cookie(None, alias="accessToken")) -> models.Account:
+    """Dependency that verifies Access Token and returns the full Account object."""
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Access token missing")
+    
+    token_data = verify_token(token=token, is_access_token=True)
+    
+    # FIX: Use PydanticObjectId directly with Beanie's .get()
+    account = await models.Account.get(PydanticObjectId(token_data.account_id))
+    
+    if account is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+        
+    # Check if the user is banned or deleted
+    if account.is_banned or account.is_deleted:
+         raise HTTPException(status_code=status.HTTP_403_FORBIDDEN, detail="Account disabled")
+         
+    return account # Return the Account object
+
+async def get_logged_in_user_from_session_token(token: str = Cookie(None, alias="sessionToken")) -> models.Account:
+    """Dependency that verifies Refresh Token and returns the full Account object."""
+    if not token:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Refresh token missing")
+        
+    # Note: refresh tokens are not considered access tokens for verification
+    token_data = verify_token(token=token, is_access_token=False) 
+    
+    # FIX: Use PydanticObjectId directly with Beanie's .get()
+    account = await models.Account.get(PydanticObjectId(token_data.account_id))
+    
+    if account is None:
+        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
+        
+    return account # Return the Account object (needed for session rotation)

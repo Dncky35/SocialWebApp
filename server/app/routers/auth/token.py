@@ -22,7 +22,7 @@ async def validate_user_token(response: Response, token: str = Depends(get_curre
     
     return {"detail": "Access token is valid."}
 
-@router.get("/rotate_session", status_code=status.HTTP_200_OK)
+@router.post("/rotate_session", status_code=status.HTTP_200_OK)
 async def rotate_session(response: Response, token: str = Depends(get_logged_in_user)):
     
     new_refresh_token = create_token(data={"account_id": token.account_id, "role":token.role}, is_access_token=False)
@@ -35,8 +35,8 @@ async def rotate_session(response: Response, token: str = Depends(get_logged_in_
     
     return {"detail": "Session rotated."}
 
-@router.get("/rotate_access_token", status_code=status.HTTP_200_OK)
-async def rotate_access_token(response: Response, token: str = Depends(get_logged_in_user)):
+@router.post("/create_access_token", status_code=status.HTTP_200_OK)
+async def create_access_token(response: Response, token: str = Depends(get_logged_in_user)):
     
     new_access_token = create_token(data={"account_id": token.account_id, "role":token.role}, is_access_token=True)
     response.set_cookie(

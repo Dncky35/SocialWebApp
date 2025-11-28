@@ -1,10 +1,7 @@
 from pydantic import BaseModel
 from typing import Optional
-from app.schemas.account import PublicAccount
-from app.schemas.comment import CommentResponse
-from datetime import datetime
 
-class PostCreate(BaseModel):
+class PostCreation(BaseModel):
     content: str
     image_url: Optional[str] = None
     tags: Optional[list[str]] = None
@@ -13,15 +10,48 @@ class PostUpdate(BaseModel):
     content: Optional[str] = None
     image_url: Optional[str] = None
     tags: Optional[list[str]] = None
-
-class PostPublic(BaseModel):
+    
+class PostResponse(BaseModel):
     id: str
     content: str
     image_url: Optional[str] = None
     tags: Optional[list[str]] = None
-    likes: list[str]
-    is_liked: Optional[bool] = None
-    comments: Optional[list[CommentResponse]] = None
-    created_at: datetime   
-    updated_at: datetime
-    owner: PublicAccount
+    created_at: str
+    updated_at: str
+    author_id: str
+    likes_count: int
+    comments_count: int
+    reposts_count: int
+
+class PostLikeResponse(BaseModel):
+    user_id: str
+    post_id: str
+    created_at: str
+
+class CommentResponse(BaseModel):
+    id: str
+    post_id: str
+    author_id: str
+    content: str
+    created_at: str
+    updated_at: str
+    
+class CommentCreation(BaseModel):
+    content: str
+    
+class CommentUpdate(BaseModel):
+    content: Optional[str] = None
+    
+class SubCommentResponse(BaseModel):
+    id: str
+    comment_id: str
+    author_id: str
+    content: str
+    created_at: str
+    updated_at: str
+    
+class SubCommentCreation(BaseModel):
+    content: str
+    
+class SubCommentUpdate(BaseModel):
+    content: Optional[str] = None

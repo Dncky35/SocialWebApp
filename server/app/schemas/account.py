@@ -16,7 +16,7 @@ class LoginPayload(BaseModel):
 
 # What you return to the frontend (Hides password!)
 class AccountResponse(BaseModel):
-    id: PydanticObjectId = Field(alias="_id")
+    id: str
     email: EmailStr
     username: str
     full_name: Optional[str]

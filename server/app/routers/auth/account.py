@@ -1,7 +1,7 @@
 from fastapi import APIRouter, HTTPException, requests, status, Response
 from pymongo.errors import DuplicateKeyError
 from app.models.account import Account
-from app.schemas.account import AccountRegister, AccountResponse, LoginPayload, UpdatePayload
+from app.schemas.account import AccountRegister, AccountResponse, LoginPayload
 from app.core.utils import hash_password, verify_password
 from app.core.oauth2 import create_token
 from app.core import config
@@ -29,6 +29,24 @@ async def create_account(response: Response, response_data: AccountRegister):
         full_name=response_data.full_name
     )
     
+    # validations for unique email and username
+    existing_account = await Account.find_one(
+        Account.email == response_data.email
+    )
+    if existing_account:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="An account with this email already exists."
+        )
+    existing_username = await Account.find_one(
+        Account.username == response_data.username
+    )
+    if existing_username:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="An account with this username already exists."
+        )     
+    
     # Save to DB (insert)
     # 3. Save to DB with Race Condition Handling
     try:
@@ -49,10 +67,11 @@ async def create_account(response: Response, response_data: AccountRegister):
         **config.settings.cookie_config,
     )
     
+    new_account.id = str(new_account.id)  # Convert ObjectId to str for response
     return new_account
 
-@router.post("/login", status_code=status.HTTP_200_OK, response_model=LoginPayload)
-async def login_account(response: Response, form_data: AccountRegister):
+@router.post("/login", status_code=status.HTTP_200_OK, response_model=AccountResponse)
+async def login_account(response: Response, form_data: LoginPayload):
     # Find account by email
     account = await Account.find_one(Account.email == form_data.email)
     if not account:
@@ -71,6 +90,7 @@ async def login_account(response: Response, form_data: AccountRegister):
         **config.settings.cookie_config,
     )
     
+    account.id = str(account.id)  # Convert ObjectId to str for response
     return account
 
 @router.post("/sign_in_with_google", status_code=status.HTTP_200_OK, response_model=AccountResponse)
@@ -133,8 +153,7 @@ async def logout_account(response: Response):
     
     response.delete_cookie(
         key="accessToken",
-        path="/",
-        domain=config.settings.domain
+       **config.settings.cookie_config,
     )
     
     return {"detail": "Successfully logged out."}

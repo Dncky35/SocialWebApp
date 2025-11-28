@@ -5,8 +5,9 @@ from app.core.limiter import limiter
 from slowapi import _rate_limit_exceeded_handler
 from slowapi.errors import RateLimitExceeded
 from pymongo.errors import PyMongoError
-from app.routers.auth import account as auth_account
+from app.routers.auth import account as auth_account, token as auth_token
 from app.routers.profile import account as profile_account
+from app.routers.feed import posts as feed_posts
 from app.core.config import settings
 import logging
 from contextlib import asynccontextmanager
@@ -64,7 +65,9 @@ app.add_middleware(
 
 # app.include_router(auth.router)
 app.include_router(auth_account.router)
+app.include_router(auth_token.router)
 app.include_router(profile_account.router)
+app.include_router(feed_posts.router)
 # app.include_router(admin_accounts.router)
 # app.include_router(admin_toggle.router)
 
