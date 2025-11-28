@@ -3,7 +3,8 @@ from beanie import PydanticObjectId
 from fastapi.responses import Response
 from app.schemas.account import AccountResponse, UpdatePayload
 from app.models.account import Account
-from app.core.oauth2 import get_logged_in_user, get_current_user
+from app.core.oauth2 import get_logged_in_user, get_current_user, get_logged_in_user_from_session_token, get_current_user_from_access_token
+from server.app.core import config
 
 router = APIRouter(
     prefix="/profile/account",
@@ -12,57 +13,56 @@ router = APIRouter(
 )
 
 @router.get("/me", status_code=status.HTTP_200_OK, response_model=AccountResponse)
-async def get_my_profile(current_user=Depends(get_logged_in_user)):
-    
-    account = await Account.get(PydanticObjectId(current_user.id) if PydanticObjectId.is_valid(current_user.account_id) else None)
-    if not account or account.is_deleted:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Account not found")
-    
-    return account
+async def get_my_profile(current_account=Depends(get_logged_in_user_from_session_token)):
+    current_account.id = str(current_account.id)
+    return current_account
 
 @router.patch("/me", response_model=AccountResponse, status_code=status.HTTP_200_OK)
-async def update_my_profile(payload: UpdatePayload, current_user=Depends(get_current_user)):
+async def update_my_profile(payload: UpdatePayload, current_account=Depends(get_current_user_from_access_token)):
     
-    account = await Account.get(PydanticObjectId(current_user.id) if PydanticObjectId.is_valid(current_user.account_id) else None)
+    account:Account = current_account
     if not account or account.is_deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Account not found")
     
-    update_dict = payload.model_dump(exclude_none=True, exclude_unset=True)
-    if not update_dict:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="No fields provided for update."
-        )
+    if payload.username is not None:
+        # check if username is taken
+        existing_account = await Account.find_one(Account.username == payload.username, Account.id != account.id)
+        if existing_account is not None:
+            raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="Username is already taken")
         
-    # Handle username uniqueness check
-    if 'username' in update_dict:
-        new_username = update_dict['username']
-        
-        # Only check if the new username is different from the current one
-        if new_username != account.username:
-            existing_user = await Account.find_one(Account.username == new_username)
-            if existing_user:
-                raise HTTPException(
-                    status_code=status.HTTP_400_BAD_REQUEST,
-                    detail="This username is already taken."
-                )
-                
-    # 3. Apply updates to the Beanie model
-    # The ** operator unpacks the dictionary fields into the model
-    account.set(update_dict) 
-
-    # 4. Save the changes to the database
+        account.username = payload.username
+    if payload.full_name is not None:
+        account.full_name = payload.full_name
+    if payload.bio is not None:
+        account.bio = payload.bio
+    if payload.avatar_url is not None:
+        account.avatar_url = payload.avatar_url
+    
     await account.save()
+    account.id = str(account.id)
     return account
 
 @router.delete("/me", status_code=status.HTTP_204_NO_CONTENT)
-async def delete_my_profile(current_user=Depends(get_current_user)):
-    account = await Account.get(PydanticObjectId(current_user.id) if PydanticObjectId.is_valid(current_user.account_id) else None)
+async def delete_my_profile(response: Response, current_account=Depends(get_current_user_from_access_token)):
+    # account = await Account.get(PydanticObjectId(current_account.id) if PydanticObjectId.is_valid(current_account.id) else None)
+    account:Account = current_account
     if not account or account.is_deleted:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="Account not found")
     
     account.is_deleted = True
     await account.save()
+    
+    response.delete_cookie(
+        key="sessionToken",
+        **config.settings.cookie_config,
+    )
+    
+    response.delete_cookie(
+        key="accessToken",
+       **config.settings.cookie_config,
+    )
+    
+    
     return Response(status_code=status.HTTP_204_NO_CONTENT)
         
 @router.get("/{account_id}", status_code=status.HTTP_200_OK, response_model=AccountResponse)

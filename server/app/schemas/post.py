@@ -22,6 +22,13 @@ class PostResponse(BaseModel):
     likes_count: int
     comments_count: int
     reposts_count: int
+    
+class PaginatedPostResponse(BaseModel):
+    posts: list[PostResponse]
+    total: int
+    page: int
+    size: int
+    has_more: bool
 
 class PostLikeResponse(BaseModel):
     user_id: str

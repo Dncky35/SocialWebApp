@@ -81,6 +81,9 @@ async def login_account(response: Response, form_data: LoginPayload):
     if not verify_password(form_data.password, account.password):
         raise HTTPException(status_code=400, detail="Invalid email or password.")
     
+    if account.is_deleted or not account.is_banned:
+        raise HTTPException(status_code=403, detail="Account is disabled.")
+    
     # Create token
     refreshToken = create_token(data={"account_id": str(account.id)}, is_access_token=False)
     response.set_cookie(
@@ -129,6 +132,9 @@ async def sign_in_with_google(response: Response, google_token: GoogleToken):
         )
         
         await account.insert()
+        
+    if account.is_deleted or account.is_banned:
+        raise HTTPException(status_code=403, detail="Account is disabled.")
         
     # Common Login Logic (DRY)
     refreshToken = create_token(data={"account_id": str(account.id)}, is_access_token=False)
