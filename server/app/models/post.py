@@ -30,9 +30,12 @@ class Post(Document):
     updated_at: datetime = Field(default_factory=get_utc_now)
     
     class Settings:
-        name = "posts"  
-        # Optional: Add a compound index on author_id and created_at for feeds
-        # indexes = [("author_id", -1), ("created_at", -1)] 
+        name = "posts"
+        # The outer list holds all indexes. 
+        # The inner list defines ONE specific compound index.
+        indexes = [
+            [("author_id", -1), ("created_at", -1)]
+        ]
     
     # Auto-update the updated_at field before every save
     @before_event(Replace, SaveChanges)
@@ -76,7 +79,7 @@ class Comment(Document):
         name = "comments"
         # Index comments by post ID for fast retrieval
         indexes = [
-            ("post_id", -1), 
+            [("post_id", -1)], 
         ]
         
 class SubComment(Document):
@@ -90,5 +93,5 @@ class SubComment(Document):
         name = "subcomments"
         # Index subcomments by comment ID for fast retrieval
         indexes = [
-            ("comment_id", -1), 
+            [("comment_id", -1)], 
         ]

@@ -7,7 +7,7 @@ from slowapi.errors import RateLimitExceeded
 from pymongo.errors import PyMongoError
 from app.routers.auth import account as auth_account, token as auth_token
 from app.routers.profile import account as profile_account
-from app.routers.feed import posts as feed_posts
+from app.routers.content import posts as content_posts, feed as conten_feed, comment as content_comment
 from app.core.config import settings
 import logging
 from contextlib import asynccontextmanager
@@ -63,13 +63,15 @@ app.add_middleware(
     allow_headers=["Authorization", "Content-Type"],
 )
 
-# app.include_router(auth.router)
+# AUTH ROUTERS
 app.include_router(auth_account.router)
 app.include_router(auth_token.router)
+# PROFILE ROUTERS
 app.include_router(profile_account.router)
-app.include_router(feed_posts.router)
-# app.include_router(admin_accounts.router)
-# app.include_router(admin_toggle.router)
+# CONTENT ROUTERS
+app.include_router(conten_feed.router)
+app.include_router(content_posts.router)
+app.include_router(content_comment.router)
 
 @app.get("/")
 async def root():

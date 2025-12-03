@@ -60,7 +60,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         if (!credentialResponse.credential) return false;
 
         try {
-            const res = await fetch(`${BASEURL}auth/google`, {
+            const res = await fetch(`${BASEURL}auth/account/sign_in_with_google`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ token: credentialResponse.credential }),
@@ -82,7 +82,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
 
     const signUp = useCallback(async (email: string, username: string, password: string) => {
-        const result = await postData(`${BASEURL}auth/signup`, { email, username, password }, {
+        const result = await postData(`${BASEURL}auth/account/signup`, { email, username, password }, {
             credentials: "include",
         });
 
@@ -98,7 +98,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, [postData]);
 
     const login = useCallback(async (username: string, password: string) => {
-        const result = await postData(`${BASEURL}auth/login`, { username, password }, {
+        const result = await postData(`${BASEURL}auth/account/login`, { username, password }, {
             credentials: "include",
         });
 
@@ -110,7 +110,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }, [postData]);
 
     const logout = useCallback(async () => {
-        const result = await postData(`${BASEURL}auth/logout`, {}, {
+        const result = await postData(`${BASEURL}auth/account/logout`, {}, {
             credentials: "include",
         });
 

@@ -9,7 +9,7 @@ from app.schemas.post import (
 )
 
 router = APIRouter(
-    prefix="/feed/posts",
+    prefix="/content/posts",
     tags=["feed", "posts"], 
     responses={404: {"description": "Not found"}},
 )
@@ -104,39 +104,6 @@ async def get_post(post_id: str, current_user=Depends(get_current_user_from_acce
         likes_count=db_post.likes_count,
         comments_count=db_post.comments_count,
         reposts_count=db_post.reposts_count
-    )
-
-@router.get("/", response_model=PaginatedPostResponse, status_code=status.HTTP_200_OK)
-async def get_posts(page: int = 1, limit: int = 10, current_user=Depends(get_current_user_from_access_token)):
-    """Retrieve a list of posts with pagination."""
-    
-    #validate limit and offeset
-    if limit < 1 or limit > 100:
-        raise HTTPException(status_code=400, detail="Limit must be between 1 and 100")
-    if page < 1:
-        raise HTTPException(status_code=400, detail="Page must be greater than 0")
-    
-    
-    skip = (page - 1) * limit
-    # Fetch posts that are not deleted from the database
-    # Get Latest posts first
-    posts = await Post.find(Post.is_deleted == False).sort(-Post.created_at).skip(skip).limit(limit).to_list()
-    total_posts = await Post.find(Post.is_deleted == False).count()
-    return PaginatedPostResponse(
-        total=total_posts,
-        has_more=skip + limit < total_posts,
-        posts=[PostResponse(
-            id=str(post.id),
-            content=post.content,
-            image_url=post.image_url,
-            tags=post.tags,
-            created_at=post.created_at.isoformat(),
-            updated_at=post.updated_at.isoformat(),
-            author_id=str(post.author_id),
-            likes_count=post.likes_count,
-            comments_count=post.comments_count,
-            reposts_count=post.reposts_count
-        ) for post in posts]
     )
 
 @router.post("/{post_id}/like", response_model=PostLikeResponse, status_code=status.HTTP_201_CREATED)
